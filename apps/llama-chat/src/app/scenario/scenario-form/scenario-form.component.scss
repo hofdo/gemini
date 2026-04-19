@@ -97,10 +97,27 @@ input, textarea {
   &:hover { background: #e74c3c; color: white; }
 }
 
-.btn-primary {
-  display: block;
-  width: 100%;
+.form-actions {
+  display: flex;
+  gap: 0.75rem;
   margin-top: 2rem;
+}
+
+.btn-secondary {
+  flex: 0 0 auto;
+  padding: 0.75rem 1.25rem;
+  font-size: 1rem;
+  border: 1px solid #e74c3c;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: #e74c3c;
+  cursor: pointer;
+
+  &:hover { background: #e74c3c; color: white; }
+}
+
+.btn-primary {
+  flex: 1;
   padding: 0.75rem;
   font-size: 1.1rem;
   border: none;
@@ -112,4 +129,3 @@ input, textarea {
   &:hover:not(:disabled) { background: #7b52ab; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
-

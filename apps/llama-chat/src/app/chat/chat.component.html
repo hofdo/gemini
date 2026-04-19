@@ -1,10 +1,42 @@
 <div class="chat-container">
   <header class="chat-header">
-    <span>🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}</span>
-    <button class="btn-change" (click)="changeScenario()">✏️ Change</button>
+    <div class="header-left">
+      <span class="title" (click)="toggleScenarioInfo()" title="Click to toggle scenario details">
+        🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}
+        <span class="scenario-badge">{{ scenarioService.activeScenario()?.scenarioType === 'interpersonal' ? '💬' : '🗺️' }}</span>
+      </span>
+      @if (chatService.messages().length > 0) {
+        <span class="msg-count">{{ chatService.messages().length }} messages</span>
+      }
+    </div>
+    <div class="header-actions">
+      <button class="btn-header" (click)="resetStory()" title="Reset story (keep scenario)" [disabled]="chatService.messages().length === 0">🔄</button>
+      <button class="btn-header" (click)="changeScenario()" title="Edit scenario">✏️</button>
+      <button class="btn-header" (click)="newScenario()" title="New scenario">🆕</button>
+    </div>
   </header>
 
+  @if (showScenarioInfo() && scenarioService.activeScenario(); as scenario) {
+    <div class="scenario-info">
+      <div class="info-row"><strong>Setting:</strong> {{ scenario.setting }}</div>
+      <div class="info-row"><strong>Tone:</strong> {{ scenario.tone }}</div>
+      <div class="info-row"><strong>You:</strong> {{ scenario.characterName }}</div>
+      @if (scenario.scenarioType === 'interpersonal' && scenario.partnerName) {
+        <div class="info-row"><strong>Partner:</strong> {{ scenario.partnerName }}</div>
+        @if (scenario.relationship) {
+          <div class="info-row"><strong>Relationship:</strong> {{ scenario.relationship }}</div>
+        }
+      }
+    </div>
+  }
+
   <div class="message-list" #messageList>
+    @if (chatService.messages().length === 0) {
+      <div class="empty-state">
+        <p>✨ Your story awaits!</p>
+        <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue and ⚔️ action mode.</p>
+      </div>
+    }
     @for (msg of chatService.messages(); track $index) {
       <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
         @if (msg.role === 'user' && msg.inputType) {
@@ -25,10 +57,11 @@
       {{ inputType() === 'dialogue' ? '🗣' : '⚔️' }}
     </button>
     <textarea
+      #chatInput
       [value]="input()"
       (input)="input.set($any($event.target).value)"
       (keydown)="onKeydown($event)"
-      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character…' : 'Describe an action or narration…'"
+      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : 'Describe an action… (Enter to send)'"
       rows="2"
     ></textarea>
     <button (click)="send()" [disabled]="chatService.loading()">Send</button>

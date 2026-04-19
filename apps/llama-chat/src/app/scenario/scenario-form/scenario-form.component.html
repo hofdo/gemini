@@ -76,7 +76,10 @@
       }
     </section>
 
-    <button type="submit" class="btn-primary" [disabled]="form.invalid">🎭 Start Story</button>
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="resetForm()">🗑️ Clear Form</button>
+      <button type="submit" class="btn-primary" [disabled]="form.invalid">🎭 Start Story</button>
+    </div>
   </form>
 </div>
 

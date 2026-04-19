@@ -19,8 +19,10 @@ export class ChatComponent implements AfterViewChecked, OnInit {
 
   protected input = signal('');
   protected inputType = signal<InputType>('dialogue');
+  protected showScenarioInfo = signal(false);
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLElement>;
+  @ViewChild('chatInput') private chatInput!: ElementRef<HTMLTextAreaElement>;
 
   ngOnInit(): void {
     if (!this.scenarioService.activeScenario()) {
@@ -33,13 +35,36 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     if (el) el.scrollTop = el.scrollHeight;
   }
 
+  focusInput(): void {
+    setTimeout(() => this.chatInput?.nativeElement?.focus(), 0);
+  }
+
   toggleInputType(): void {
     this.inputType.update((t) => (t === 'dialogue' ? 'action' : 'dialogue'));
+    this.focusInput();
+  }
+
+  toggleScenarioInfo(): void {
+    this.showScenarioInfo.update((v) => !v);
+  }
+
+  resetStory(): void {
+    if (this.chatService.messages().length === 0) return;
+    if (!confirm('Reset the current story? The scenario will be kept but all messages will be cleared.')) return;
+    this.chatService.resetMessages();
+    this.focusInput();
+  }
+
+  newScenario(): void {
+    if (!confirm('Start a completely new scenario? This will clear everything.')) return;
+    this.chatService.resetMessages();
+    this.scenarioService.clearScenario();
+    this.router.navigate(['/scenario']);
   }
 
   changeScenario(): void {
     if (this.chatService.messages().length > 0) {
-      if (!confirm('Changing the scenario will reset the current story. Continue?')) return;
+      if (!confirm('Editing the scenario will reset the current story. Continue?')) return;
       this.chatService.resetMessages();
     }
     this.router.navigate(['/scenario']);
@@ -50,6 +75,7 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     if (!text || this.chatService.loading()) return;
     this.input.set('');
     this.chatService.sendMessage(text, this.inputType());
+    this.focusInput();
   }
 
   onKeydown(event: KeyboardEvent): void {
@@ -59,4 +85,3 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     }
   }
 }
-

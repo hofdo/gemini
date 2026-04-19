@@ -37,14 +37,28 @@ export class ScenarioFormComponent {
     if (existing) {
       this.form.patchValue(existing);
       this.scenarioType.set(existing.scenarioType ?? 'adventure');
+      this.applyTypeValidators(existing.scenarioType ?? 'adventure');
       existing.npcs.forEach((n) => this.addNpc(n.name, n.description));
       existing.rules.forEach((r) => this.addRule(r));
     }
   }
 
   setType(type: ScenarioType): void {
+    if (type === this.scenarioType()) return;
     this.scenarioType.set(type);
     this.form.patchValue({ scenarioType: type });
+
+    // Clear type-specific fields on switch
+    if (type === 'interpersonal') {
+      this.npcs.clear();
+    } else {
+      this.form.patchValue({ partnerName: '', partnerDescription: '', relationship: '' });
+    }
+
+    this.applyTypeValidators(type);
+  }
+
+  private applyTypeValidators(type: ScenarioType): void {
     if (type === 'interpersonal') {
       this.form.get('partnerName')!.setValidators(Validators.required);
       this.form.get('partnerDescription')!.setValidators(Validators.required);
@@ -80,6 +94,18 @@ export class ScenarioFormComponent {
     this.rules.removeAt(i);
   }
 
+  resetForm(): void {
+    this.form.reset({
+      scenarioType: 'adventure', title: '', setting: '', tone: '',
+      characterName: '', characterDescription: '',
+      partnerName: '', partnerDescription: '', relationship: '',
+    });
+    this.npcs.clear();
+    this.rules.clear();
+    this.scenarioType.set('adventure');
+    this.applyTypeValidators('adventure');
+  }
+
   start(): void {
     if (this.form.invalid) return;
     const scenario: Scenario = this.form.value;
@@ -87,4 +113,3 @@ export class ScenarioFormComponent {
     this.router.navigate(['/chat']);
   }
 }
-
