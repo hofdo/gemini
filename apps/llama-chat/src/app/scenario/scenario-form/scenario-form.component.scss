@@ -1,0 +1,115 @@
+:host {
+  display: flex;
+  height: 100%;
+}
+
+.scenario-container {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+  font-family: sans-serif;
+  color: #e0e0e0;
+  background: #1a1a2e;
+  min-height: 100vh;
+  width: 100%;
+}
+
+h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
+
+.type-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+
+  button {
+    flex: 1;
+    padding: 0.6rem 1rem;
+    border: 1px solid #0f3460;
+    border-radius: 0.5rem;
+    background: #16213e;
+    color: #e0e0e0;
+    font-size: 1rem;
+    cursor: pointer;
+
+    &.active {
+      background: #533483;
+      border-color: #533483;
+    }
+
+    &:hover:not(.active) { background: #0f3460; }
+  }
+}
+
+h2 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+
+section { margin-bottom: 0.5rem; }
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+input, textarea {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 0.5rem;
+  color: #e0e0e0;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+
+  &:focus { outline: none; border-color: #533483; }
+}
+
+.npc-row, .rule-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  align-items: center;
+
+  input { flex: 1; }
+}
+
+.btn-small {
+  background: #0f3460;
+  border: none;
+  color: #e0e0e0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  &:hover { background: #533483; }
+}
+
+.btn-danger {
+  background: transparent;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+
+  &:hover { background: #e74c3c; color: white; }
+}
+
+.btn-primary {
+  display: block;
+  width: 100%;
+  margin-top: 2rem;
+  padding: 0.75rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 0.5rem;
+  background: #533483;
+  color: white;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: #7b52ab; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+

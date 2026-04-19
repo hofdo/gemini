@@ -21,6 +21,21 @@
   font-size: 1.25rem;
   font-weight: 600;
   border-bottom: 1px solid #0f3460;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.btn-change {
+  background: transparent;
+  border: 1px solid #533483;
+  color: #e0e0e0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+
+  &:hover { background: #533483; }
 }
 
 .message-list {
@@ -69,6 +84,12 @@
   50% { opacity: 0; }
 }
 
+.input-tag {
+  font-size: 1.1rem;
+  align-self: flex-start;
+  margin-top: 0.3rem;
+}
+
 .input-row {
   display: flex;
   gap: 0.5rem;
@@ -112,5 +133,16 @@
       cursor: not-allowed;
     }
   }
-}
 
+  .btn-toggle {
+    background: #0f3460;
+    border: 1px solid #533483;
+    border-radius: 0.5rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    align-self: flex-end;
+
+    &:hover { background: #533483; }
+  }
+}

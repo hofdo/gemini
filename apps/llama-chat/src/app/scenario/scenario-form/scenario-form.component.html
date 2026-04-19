@@ -1,0 +1,82 @@
+<div class="scenario-container">
+  <h1>📜 Define Your Story Scenario</h1>
+
+  <div class="type-selector">
+    <button type="button" [class.active]="scenarioType() === 'adventure'" (click)="setType('adventure')">🗺️ Adventure</button>
+    <button type="button" [class.active]="scenarioType() === 'interpersonal'" (click)="setType('interpersonal')">💬 Interpersonal</button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="start()">
+    <section>
+      <h2>Basic Info</h2>
+      <label>
+        Title
+        <input formControlName="title" placeholder="e.g. The Lost Kingdom" />
+      </label>
+      <label>
+        Setting
+        <textarea formControlName="setting" rows="3" placeholder="Describe the world, time period, location…"></textarea>
+      </label>
+      <label>
+        Tone / Genre
+        <input formControlName="tone" placeholder="e.g. Dark fantasy, Comedic sci-fi, Romance…" />
+      </label>
+    </section>
+
+    <section>
+      <h2>Your Character</h2>
+      <label>
+        Name
+        <input formControlName="characterName" placeholder="Character name" />
+      </label>
+      <label>
+        Description
+        <textarea formControlName="characterDescription" rows="2" placeholder="Backstory, skills, appearance…"></textarea>
+      </label>
+    </section>
+
+    @if (scenarioType() === 'interpersonal') {
+      <section>
+        <h2>Other Character (played by the LLM)</h2>
+        <label>
+          Name
+          <input formControlName="partnerName" placeholder="Partner character name" />
+        </label>
+        <label>
+          Description
+          <textarea formControlName="partnerDescription" rows="2" placeholder="Personality, appearance, backstory…"></textarea>
+        </label>
+        <label>
+          Relationship
+          <input formControlName="relationship" placeholder="e.g. Childhood friends, Strangers who just met…" />
+        </label>
+      </section>
+    }
+
+    @if (scenarioType() === 'adventure') {
+      <section>
+        <h2>NPCs <button type="button" class="btn-small" (click)="addNpc()">+ Add</button></h2>
+        @for (npc of npcs.controls; track $index) {
+          <div class="npc-row" [formGroupName]="$index">
+            <input formControlName="name" placeholder="NPC name" />
+            <input formControlName="description" placeholder="NPC description" />
+            <button type="button" class="btn-danger" (click)="removeNpc($index)">✕</button>
+          </div>
+        }
+      </section>
+    }
+
+    <section>
+      <h2>Rules <button type="button" class="btn-small" (click)="addRule()">+ Add</button></h2>
+      @for (rule of rules.controls; track $index) {
+        <div class="rule-row">
+          <input [formControlName]="$index" placeholder="e.g. No modern technology" />
+          <button type="button" class="btn-danger" (click)="removeRule($index)">✕</button>
+        </div>
+      }
+    </section>
+
+    <button type="submit" class="btn-primary" [disabled]="form.invalid">🎭 Start Story</button>
+  </form>
+</div>
+

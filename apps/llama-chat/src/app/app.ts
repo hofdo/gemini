@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { ChatComponent } from './chat/chat.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [ChatComponent],
+  imports: [RouterOutlet],
   selector: 'llama-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',

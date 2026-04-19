@@ -1,11 +1,15 @@
 <div class="chat-container">
   <header class="chat-header">
-    <span>🦙 Llama Chat</span>
+    <span>🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}</span>
+    <button class="btn-change" (click)="changeScenario()">✏️ Change</button>
   </header>
 
   <div class="message-list" #messageList>
     @for (msg of chatService.messages(); track $index) {
       <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+        @if (msg.role === 'user' && msg.inputType) {
+          <span class="input-tag">{{ msg.inputType === 'dialogue' ? '🗣' : '⚔️' }}</span>
+        }
         <span class="bubble">{{ msg.content }}</span>
       </div>
     }
@@ -17,11 +21,14 @@
   </div>
 
   <div class="input-row">
+    <button class="btn-toggle" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue mode' : 'Action mode'">
+      {{ inputType() === 'dialogue' ? '🗣' : '⚔️' }}
+    </button>
     <textarea
       [value]="input()"
       (input)="input.set($any($event.target).value)"
       (keydown)="onKeydown($event)"
-      placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
+      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character…' : 'Describe an action or narration…'"
       rows="2"
     ></textarea>
     <button (click)="send()" [disabled]="chatService.loading()">Send</button>
