@@ -107,6 +107,22 @@ def build_interpersonal_system_prompt(scenario: Scenario) -> str:
     )
 
 
+def build_kickoff_prompt(scenario: Scenario) -> str:
+    """Hidden user message to trigger the opening narration when no messages exist."""
+    if scenario.scenario_type == "interpersonal":
+        return (
+            f"Set the scene for this encounter. Describe the setting and atmosphere briefly, "
+            f"then — as {scenario.partner_name} — initiate the first interaction with "
+            f"{scenario.character_name}. Stay in character, matching the tone and your "
+            f"character's personality. Keep it natural and conversational."
+        )
+    return (
+        "Begin the story. Set the scene vividly — describe the environment, atmosphere, "
+        "sounds, and smells. Introduce the situation the player character finds themselves in "
+        "and hint at what lies ahead. Do not speak or act for the player character."
+    )
+
+
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
@@ -123,13 +139,17 @@ async def chat(request: ChatRequest) -> ChatResponse:
             system_prompt = build_system_prompt(request.scenario)
         api_messages.append({"role": "system", "content": system_prompt})
 
-    # Format user messages with input-type prefix
-    for m in request.messages:
-        if m.role == "user" and request.scenario:
-            prefix = "[Dialogue]:" if m.input_type == "dialogue" else "[Action]:"
-            api_messages.append({"role": m.role, "content": f"{prefix} {m.content}"})
-        else:
-            api_messages.append({"role": m.role, "content": m.content})
+    # If no user messages yet, inject a hidden kickoff prompt
+    if not request.messages and request.scenario:
+        api_messages.append({"role": "user", "content": build_kickoff_prompt(request.scenario)})
+    else:
+        # Format user messages with input-type prefix
+        for m in request.messages:
+            if m.role == "user" and request.scenario:
+                prefix = "[Dialogue]:" if m.input_type == "dialogue" else "[Action]:"
+                api_messages.append({"role": m.role, "content": f"{prefix} {m.content}"})
+            else:
+                api_messages.append({"role": m.role, "content": m.content})
 
     payload = {
         "model": "local-model",

@@ -31,10 +31,15 @@
   }
 
   <div class="message-list" #messageList>
-    @if (chatService.messages().length === 0) {
+    @if (chatService.messages().length === 0 && !chatService.loading()) {
       <div class="empty-state">
         <p>✨ Your story awaits!</p>
         <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue and ⚔️ action mode.</p>
+      </div>
+    }
+    @if (chatService.messages().length === 0 && chatService.loading()) {
+      <div class="empty-state">
+        <p class="scene-loading">🎭 Setting the scene…</p>
       </div>
     }
     @for (msg of chatService.messages(); track $index) {

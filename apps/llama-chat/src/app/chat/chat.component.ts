@@ -27,6 +27,8 @@ export class ChatComponent implements AfterViewChecked, OnInit {
   ngOnInit(): void {
     if (!this.scenarioService.activeScenario()) {
       this.router.navigate(['/scenario']);
+    } else if (this.chatService.messages().length === 0) {
+      this.chatService.initializeStory();
     }
   }
 
@@ -52,7 +54,7 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     if (this.chatService.messages().length === 0) return;
     if (!confirm('Reset the current story? The scenario will be kept but all messages will be cleared.')) return;
     this.chatService.resetMessages();
-    this.focusInput();
+    this.chatService.initializeStory();
   }
 
   newScenario(): void {

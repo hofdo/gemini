@@ -25,6 +25,49 @@ export class ChatService {
     this.messages.set([]);
   }
 
+  initializeStory(): void {
+    const scenario = this.scenarioService.activeScenario();
+    if (!scenario || this.messages().length > 0 || this.loading()) return;
+
+    this.loading.set(true);
+
+    const payload = {
+      messages: [],
+      scenario: {
+        scenario_type: scenario.scenarioType ?? 'adventure',
+        title: scenario.title,
+        setting: scenario.setting,
+        tone: scenario.tone,
+        character_name: scenario.characterName,
+        character_description: scenario.characterDescription,
+        npcs: scenario.npcs,
+        rules: scenario.rules,
+        partner_name: scenario.partnerName ?? '',
+        partner_description: scenario.partnerDescription ?? '',
+        relationship: scenario.relationship ?? '',
+      },
+    };
+
+    this.http
+      .post<ChatResponse>('/chat', payload)
+      .subscribe({
+        next: (res) => {
+          this.messages.update((msgs) => [
+            ...msgs,
+            { role: 'assistant', content: res.reply },
+          ]);
+        },
+        error: (err) => {
+          console.error('Story init error', err);
+          this.messages.update((msgs) => [
+            ...msgs,
+            { role: 'assistant', content: '⚠️ Error setting the scene.' },
+          ]);
+        },
+        complete: () => this.loading.set(false),
+      });
+  }
+
   sendMessage(content: string, inputType: InputType = 'dialogue'): void {
     const userMsg: ChatMessage = { role: 'user', content, inputType };
     this.messages.update((msgs) => [...msgs, userMsg]);
@@ -75,4 +118,3 @@ export class ChatService {
       });
   }
 }
-
