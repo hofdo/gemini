@@ -1,0 +1,30 @@
+<div class="chat-container">
+  <header class="chat-header">
+    <span>🦙 Llama Chat</span>
+  </header>
+
+  <div class="message-list" #messageList>
+    @for (msg of chatService.messages(); track $index) {
+      <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+        <span class="bubble">{{ msg.content }}</span>
+      </div>
+    }
+    @if (chatService.loading()) {
+      <div class="message assistant">
+        <span class="bubble typing">▋</span>
+      </div>
+    }
+  </div>
+
+  <div class="input-row">
+    <textarea
+      [value]="input()"
+      (input)="input.set($any($event.target).value)"
+      (keydown)="onKeydown($event)"
+      placeholder="Type a message… (Enter to send, Shift+Enter for newline)"
+      rows="2"
+    ></textarea>
+    <button (click)="send()" [disabled]="chatService.loading()">Send</button>
+  </div>
+</div>
+

@@ -1,0 +1,31 @@
+{
+  "name": "llama-proxy",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/llama-proxy",
+  "tags": ["scope:backend", "lang:python"],
+  "targets": {
+    "serve": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": ".venv/bin/uvicorn main:app --reload --port 8000",
+        "cwd": "apps/llama-proxy"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": ".venv/bin/ruff check .",
+        "cwd": "apps/llama-proxy"
+      }
+    },
+    "setup": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "python3.12 -m venv .venv && .venv/bin/pip install -e .",
+        "cwd": "apps/llama-proxy"
+      }
+    }
+  }
+}
