@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ChatService } from './chat.service';
 import { ScenarioService } from '../scenario/scenario.service';
+import { AiAssistService } from '../shared/ai-assist.service';
 import { InputType } from '../scenario/scenario.model';
 
 @Component({
@@ -15,11 +16,13 @@ import { InputType } from '../scenario/scenario.model';
 export class ChatComponent implements AfterViewChecked, OnInit {
   protected chatService = inject(ChatService);
   protected scenarioService = inject(ScenarioService);
+  private aiAssist = inject(AiAssistService);
   private router = inject(Router);
 
   protected input = signal('');
   protected inputType = signal<InputType>('dialogue');
   protected showScenarioInfo = signal(false);
+  protected aiAssisting = signal(false);
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLElement>;
   @ViewChild('chatInput') private chatInput!: ElementRef<HTMLTextAreaElement>;
@@ -84,6 +87,28 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.send();
+    }
+  }
+
+  async aiSuggestOrRewrite(): Promise<void> {
+    if (this.aiAssisting() || this.chatService.loading()) return;
+    this.aiAssisting.set(true);
+    try {
+      const currentText = this.input().trim();
+      const messages = this.chatService.messages();
+      const inputType = this.inputType();
+      let result: string;
+      if (currentText) {
+        result = await this.aiAssist.rewriteInput(currentText, messages, inputType);
+      } else {
+        result = await this.aiAssist.suggestInput(messages, inputType);
+      }
+      this.input.set(result);
+      this.focusInput();
+    } catch (err) {
+      console.error('AI assist error', err);
+    } finally {
+      this.aiAssisting.set(false);
     }
   }
 }

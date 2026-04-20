@@ -3,6 +3,15 @@
     "target": "http://localhost:8000",
     "secure": false,
     "changeOrigin": true
+  },
+  "/assist": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/generate-scenario": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true
   }
 }
-

@@ -6,6 +6,21 @@
     <button type="button" [class.active]="scenarioType() === 'interpersonal'" (click)="setType('interpersonal')">💬 Interpersonal</button>
   </div>
 
+  <section class="ai-generate-section">
+    <h2>✨ Write Scenario with AI</h2>
+    <textarea
+      [ngModel]="aiDescription()"
+      (ngModelChange)="aiDescription.set($event)"
+      rows="3"
+      placeholder="Roughly describe your scenario… e.g. 'A noir detective story in 1940s Chicago where I play a private eye investigating a missing heiress'"
+    ></textarea>
+    <button type="button" class="btn-ai-generate" (click)="generateWithAi()" [disabled]="generatingScenario() || !aiDescription().trim()">
+      @if (generatingScenario()) { ⏳ Generating… } @else { ✨ Generate Scenario }
+    </button>
+  </section>
+
+  <hr class="divider" />
+
   <form [formGroup]="form" (ngSubmit)="start()">
     <section>
       <h2>Basic Info</h2>

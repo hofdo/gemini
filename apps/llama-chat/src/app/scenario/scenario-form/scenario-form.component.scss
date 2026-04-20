@@ -129,3 +129,36 @@ input, textarea {
   &:hover:not(:disabled) { background: #7b52ab; }
   &:disabled { opacity: 0.5; cursor: not-allowed; }
 }
+
+.ai-generate-section {
+  margin-bottom: 0.5rem;
+
+  h2 { color: #e6a817; }
+
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .btn-ai-generate {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border: 1px solid #e6a817;
+    border-radius: 0.5rem;
+    background: transparent;
+    color: #e6a817;
+    cursor: pointer;
+
+    &:hover:not(:disabled) { background: #e6a817; color: #1a1a2e; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #0f3460;
+  margin: 1.5rem 0;
+}

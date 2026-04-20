@@ -50,7 +50,7 @@
         <span class="bubble">{{ msg.content }}</span>
       </div>
     }
-    @if (chatService.loading()) {
+    @if (chatService.loading() && chatService.messages().length > 0 && chatService.messages()[chatService.messages().length - 1].content === '') {
       <div class="message assistant">
         <span class="bubble typing">▋</span>
       </div>
@@ -60,6 +60,9 @@
   <div class="input-row">
     <button class="btn-toggle" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue mode' : 'Action mode'">
       {{ inputType() === 'dialogue' ? '🗣' : '⚔️' }}
+    </button>
+    <button class="btn-ai" (click)="aiSuggestOrRewrite()" [disabled]="aiAssisting() || chatService.loading()" [title]="input().trim() ? '✨ Enhance text' : '✨ Suggest text'">
+      @if (aiAssisting()) { ⏳ } @else { ✨ }
     </button>
     <textarea
       #chatInput

@@ -214,4 +214,18 @@
 
     &:hover { background: #533483; }
   }
+
+  .btn-ai {
+    background: #0f3460;
+    border: 1px solid #e6a817;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    align-self: flex-end;
+    color: #e6a817;
+
+    &:hover:not(:disabled) { background: #533483; border-color: #533483; }
+    &:disabled { opacity: 0.4; cursor: not-allowed; }
+  }
 }

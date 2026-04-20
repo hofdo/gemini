@@ -1,6 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
-import { InputType, Scenario } from '../scenario/scenario.model';
+import { InputType } from '../scenario/scenario.model';
 import { ScenarioService } from '../scenario/scenario.service';
 
 export interface ChatMessage {
@@ -9,13 +8,8 @@ export interface ChatMessage {
   inputType?: InputType;
 }
 
-interface ChatResponse {
-  reply: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class ChatService {
-  private http = inject(HttpClient);
   private scenarioService = inject(ScenarioService);
 
   readonly messages = signal<ChatMessage[]>([]);
@@ -29,49 +23,18 @@ export class ChatService {
     const scenario = this.scenarioService.activeScenario();
     if (!scenario || this.messages().length > 0 || this.loading()) return;
 
-    this.loading.set(true);
-
     const payload = {
-      messages: [],
-      scenario: {
-        scenario_type: scenario.scenarioType ?? 'adventure',
-        title: scenario.title,
-        setting: scenario.setting,
-        tone: scenario.tone,
-        character_name: scenario.characterName,
-        character_description: scenario.characterDescription,
-        npcs: scenario.npcs,
-        rules: scenario.rules,
-        partner_name: scenario.partnerName ?? '',
-        partner_description: scenario.partnerDescription ?? '',
-        relationship: scenario.relationship ?? '',
-      },
+      messages: [] as never[],
+      stream: true,
+      scenario: this.buildScenarioPayload(scenario),
     };
 
-    this.http
-      .post<ChatResponse>('/chat', payload)
-      .subscribe({
-        next: (res) => {
-          this.messages.update((msgs) => [
-            ...msgs,
-            { role: 'assistant', content: res.reply },
-          ]);
-        },
-        error: (err) => {
-          console.error('Story init error', err);
-          this.messages.update((msgs) => [
-            ...msgs,
-            { role: 'assistant', content: '⚠️ Error setting the scene.' },
-          ]);
-        },
-        complete: () => this.loading.set(false),
-      });
+    this.streamRequest(payload);
   }
 
   sendMessage(content: string, inputType: InputType = 'dialogue'): void {
     const userMsg: ChatMessage = { role: 'user', content, inputType };
     this.messages.update((msgs) => [...msgs, userMsg]);
-    this.loading.set(true);
 
     const scenario = this.scenarioService.activeScenario();
 
@@ -81,40 +44,90 @@ export class ChatService {
         content: m.content,
         input_type: m.inputType ?? 'dialogue',
       })),
-      scenario: scenario
-        ? {
-            scenario_type: scenario.scenarioType ?? 'adventure',
-            title: scenario.title,
-            setting: scenario.setting,
-            tone: scenario.tone,
-            character_name: scenario.characterName,
-            character_description: scenario.characterDescription,
-            npcs: scenario.npcs,
-            rules: scenario.rules,
-            partner_name: scenario.partnerName ?? '',
-            partner_description: scenario.partnerDescription ?? '',
-            relationship: scenario.relationship ?? '',
-          }
-        : null,
+      stream: true,
+      scenario: scenario ? this.buildScenarioPayload(scenario) : null,
     };
 
-    this.http
-      .post<ChatResponse>('/chat', payload)
-      .subscribe({
-        next: (res) => {
-          this.messages.update((msgs) => [
-            ...msgs,
-            { role: 'assistant', content: res.reply },
-          ]);
-        },
-        error: (err) => {
-          console.error('Chat error', err);
-          this.messages.update((msgs) => [
-            ...msgs,
-            { role: 'assistant', content: '⚠️ Error reaching the backend.' },
-          ]);
-        },
-        complete: () => this.loading.set(false),
+    this.streamRequest(payload);
+  }
+
+  private buildScenarioPayload(scenario: NonNullable<ReturnType<ScenarioService['activeScenario']>>) {
+    return {
+      scenario_type: scenario.scenarioType ?? 'adventure',
+      title: scenario.title,
+      setting: scenario.setting,
+      tone: scenario.tone,
+      character_name: scenario.characterName,
+      character_description: scenario.characterDescription,
+      npcs: scenario.npcs,
+      rules: scenario.rules,
+      partner_name: scenario.partnerName ?? '',
+      partner_description: scenario.partnerDescription ?? '',
+      relationship: scenario.relationship ?? '',
+    };
+  }
+
+  private async streamRequest(payload: Record<string, unknown>): Promise<void> {
+    this.loading.set(true);
+
+    // Add placeholder assistant message
+    this.messages.update((msgs) => [...msgs, { role: 'assistant' as const, content: '' }]);
+
+    try {
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const reader = response.body!.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        // Keep the last (possibly incomplete) line in the buffer
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: [DONE]')) {
+            break;
+          }
+          if (line.startsWith('data: ')) {
+            try {
+              const json = JSON.parse(line.slice(6));
+              const token: string = json.choices?.[0]?.delta?.content ?? '';
+              if (token) {
+                this.appendToLastMessage(token);
+              }
+            } catch {
+              // skip malformed JSON lines
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Stream error', err);
+      this.appendToLastMessage('\n\n⚠️ Error during streaming.');
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  private appendToLastMessage(token: string): void {
+    this.messages.update((msgs) => {
+      const updated = [...msgs];
+      const last = updated[updated.length - 1];
+      updated[updated.length - 1] = { ...last, content: last.content + token };
+      return updated;
+    });
   }
 }

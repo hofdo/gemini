@@ -1,13 +1,15 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ScenarioService } from '../scenario.service';
+import { AiAssistService } from '../../shared/ai-assist.service';
 import { Scenario, ScenarioType } from '../scenario.model';
 
 @Component({
   selector: 'llama-scenario-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, FormsModule],
   templateUrl: './scenario-form.component.html',
   styleUrl: './scenario-form.component.scss',
 })
@@ -15,8 +17,11 @@ export class ScenarioFormComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private scenarioService = inject(ScenarioService);
+  private aiAssist = inject(AiAssistService);
 
   scenarioType = signal<ScenarioType>('adventure');
+  aiDescription = signal('');
+  generatingScenario = signal(false);
 
   form: FormGroup = this.fb.group({
     scenarioType: ['adventure'],
@@ -111,5 +116,39 @@ export class ScenarioFormComponent {
     const scenario: Scenario = this.form.value;
     this.scenarioService.setScenario(scenario);
     this.router.navigate(['/chat']);
+  }
+
+  async generateWithAi(): Promise<void> {
+    const desc = this.aiDescription().trim();
+    if (!desc || this.generatingScenario()) return;
+    this.generatingScenario.set(true);
+    try {
+      const scenario = await this.aiAssist.generateScenario(desc, this.scenarioType());
+      // Patch the form with generated values
+      this.form.patchValue({
+        scenarioType: scenario.scenarioType,
+        title: scenario.title,
+        setting: scenario.setting,
+        tone: scenario.tone,
+        characterName: scenario.characterName,
+        characterDescription: scenario.characterDescription,
+        partnerName: scenario.partnerName ?? '',
+        partnerDescription: scenario.partnerDescription ?? '',
+        relationship: scenario.relationship ?? '',
+      });
+      // Update type signal + validators
+      this.scenarioType.set(scenario.scenarioType);
+      this.applyTypeValidators(scenario.scenarioType);
+      // Populate NPCs
+      this.npcs.clear();
+      (scenario.npcs ?? []).forEach((n) => this.addNpc(n.name, n.description));
+      // Populate rules
+      this.rules.clear();
+      (scenario.rules ?? []).forEach((r) => this.addRule(r));
+    } catch (err) {
+      console.error('AI scenario generation error', err);
+    } finally {
+      this.generatingScenario.set(false);
+    }
   }
 }
