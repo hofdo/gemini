@@ -1,0 +1,875 @@
+:host {
+  display: flex;
+  height: 100%;
+}
+
+// ---------------------------------------------------------------------------
+// Layout
+// ---------------------------------------------------------------------------
+
+.dm-container {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1.5rem 2rem 3rem;
+  background: #1a1a2e;
+  color: #e0e0e0;
+  font-family: sans-serif;
+  box-sizing: border-box;
+}
+
+.dm-header {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.dm-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dm-icon {
+  font-size: 2.4rem;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #e2d5f8;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 0.25rem;
+  color: #c9b8f0;
+}
+
+// ---------------------------------------------------------------------------
+// Buttons — base
+// ---------------------------------------------------------------------------
+
+.btn-back {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px solid #0f3460;
+  color: #e0e0e0;
+  padding: 0.45rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  &:hover { background: #0f3460; }
+}
+
+.btn-generate {
+  margin-top: 1rem;
+  padding: 0.65rem 1.5rem;
+  background: linear-gradient(135deg, #533483, #7b52ab);
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  &:hover:not(:disabled) { opacity: 0.85; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
+}
+
+.btn-save {
+  padding: 0.5rem 1.1rem;
+  background: linear-gradient(135deg, #1d6a3a, #27a055);
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  &:hover { opacity: 0.85; }
+}
+
+.btn-secondary {
+  padding: 0.5rem 1.1rem;
+  background: transparent;
+  border: 1px solid #533483;
+  border-radius: 0.5rem;
+  color: #c9b8f0;
+  font-size: 0.9rem;
+  cursor: pointer;
+  &:hover { background: #2a1a4a; }
+}
+
+.btn-advanced {
+  margin-top: 0.75rem;
+  background: transparent;
+  border: none;
+  color: #a89cc8;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.25rem 0;
+  text-align: left;
+  &:hover { color: #e0e0e0; }
+}
+
+.btn-add-item {
+  background: transparent;
+  border: 1px solid #533483;
+  color: #c9b8f0;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  &:hover { background: #2a1a4a; }
+}
+
+.btn-remove-item {
+  background: transparent;
+  border: none;
+  color: #c06060;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.1rem 0.4rem;
+  flex-shrink: 0;
+  &:hover { color: #e07070; }
+}
+
+.btn-collection-toggle {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  color: #e0e0e0;
+  border-radius: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  width: 100%;
+  &:hover { background: #1d2e55; }
+}
+
+.btn-delete {
+  background: transparent;
+  border: none;
+  color: #c06060;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  &:hover { color: #e07070; }
+}
+
+// ---------------------------------------------------------------------------
+// Tab bar
+// ---------------------------------------------------------------------------
+
+.tab-bar {
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 860px;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #0f3460;
+}
+
+.tab-btn {
+  padding: 0.6rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  color: #a0a0c0;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  &:hover { color: #e0e0e0; }
+  &.active {
+    color: #c9b8f0;
+    border-bottom-color: #7b52ab;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tab content
+// ---------------------------------------------------------------------------
+
+.tab-content {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// Creator card (input phase)
+// ---------------------------------------------------------------------------
+
+.creator-card {
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.creator-desc {
+  color: #aaa;
+  font-size: 0.9rem;
+  margin: 0 0 0.5rem;
+}
+
+.prompt-area {
+  width: 100%;
+  box-sizing: border-box;
+  background: #0f1b30;
+  border: 1px solid #1e3a6e;
+  border-radius: 0.5rem;
+  color: #e0e0e0;
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  resize: vertical;
+  &:focus { outline: none; border-color: #533483; }
+}
+
+.advanced-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #0f1b30;
+  border: 1px solid #1e3a6e;
+  border-radius: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.error-msg {
+  color: #e07070;
+  font-size: 0.9rem;
+  margin: 0.25rem 0 0;
+}
+
+// ---------------------------------------------------------------------------
+// Result card (result phase)
+// ---------------------------------------------------------------------------
+
+.result-card {
+  background: #16213e;
+  border: 1px solid #533483;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.result-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.result-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+// ---------------------------------------------------------------------------
+// Form fields
+// ---------------------------------------------------------------------------
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.85rem;
+    color: #a0a0c0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  &.half { flex: 1; min-width: 160px; }
+}
+
+.field-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  background: #0f1b30;
+  border: 1px solid #1e3a6e;
+  border-radius: 0.4rem;
+  color: #e0e0e0;
+  padding: 0.5rem 0.7rem;
+  font-size: 0.9rem;
+  width: 100%;
+  box-sizing: border-box;
+  &:focus { outline: none; border-color: #533483; }
+}
+
+select.diff-select {
+  display: inline-block;
+  width: auto;
+  margin-left: 0.5rem;
+}
+
+// ---------------------------------------------------------------------------
+// List sections
+// ---------------------------------------------------------------------------
+
+.list-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c9b8f0;
+}
+
+.list-item-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  input { flex: 1; }
+}
+
+.section-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #c9b8f0;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+// ---------------------------------------------------------------------------
+// Stats grid
+// ---------------------------------------------------------------------------
+
+.stats-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.5rem;
+  @media (max-width: 600px) { grid-template-columns: repeat(3, 1fr); }
+}
+
+.stat-cell {
+  background: #0f1b30;
+  border: 1px solid #1e3a6e;
+  border-radius: 0.4rem;
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.7rem;
+    color: #7b52ab;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    text-align: center;
+    padding: 0.2rem;
+    border: none;
+    background: transparent;
+    color: #e0e0e0;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  span {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #e0e0e0;
+  }
+}
+
+.mini-stats {
+  margin-top: 0.5rem;
+  .stat-cell { padding: 0.3rem; }
+}
+
+// ---------------------------------------------------------------------------
+// Difficulty badge
+// ---------------------------------------------------------------------------
+
+.diff-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+.diff-easy    { background: #1b4d2e; color: #5dd87e; }
+.diff-medium  { background: #4d3e0a; color: #f0c040; }
+.diff-hard    { background: #4d2010; color: #f07040; }
+.diff-deadly  { background: #3d0810; color: #e03050; }
+
+.level-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #0f3460;
+  color: #a0c4ff;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
+// Party level input row (quest creator form)
+.party-level-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.party-level-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: #b0b8d0;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.party-level-input {
+  width: 70px;
+  padding: 0.35rem 0.5rem;
+  background: #0f3460;
+  border: 1px solid #533483;
+  border-radius: 6px;
+  color: #e0e0e0;
+  font-size: 0.9rem;
+  text-align: center;
+
+  &:focus { outline: none; border-color: #a78bfa; }
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button { opacity: 1; }
+}
+
+.party-level-hint {
+  font-size: 0.78rem;
+  color: #667;
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------------------
+// Collection section
+// ---------------------------------------------------------------------------
+
+.collection-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.collection-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.collection-card {
+  background: #0f1b30;
+  border: 1px solid #1e3a6e;
+  border-radius: 0.6rem;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.collection-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.collection-card-title {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  strong { color: #e2d5f8; font-size: 1rem; }
+}
+
+.collection-card-desc {
+  color: #aaa;
+  font-size: 0.85rem;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.collection-card-personality {
+  color: #8888aa;
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.mini-list {
+  list-style: disc;
+  padding-left: 1.25rem;
+  margin: 0.25rem 0 0;
+  color: #c0c0d8;
+  font-size: 0.85rem;
+  li { margin-bottom: 0.15rem; }
+}
+
+// ---------------------------------------------------------------------------
+// Reward grid (result card)
+// ---------------------------------------------------------------------------
+
+.rewards-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reward-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.reward-cell {
+  flex: 1;
+  min-width: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.85rem;
+    color: #a0a0c0;
+    font-weight: 600;
+  }
+
+  input {
+    background: #0f1b30;
+    border: 1px solid #1e3a6e;
+    border-radius: 0.4rem;
+    color: #e0e0e0;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    &:focus { outline: none; border-color: #a78bfa; }
+  }
+}
+
+// Reward summary pills (collection card)
+.reward-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+}
+
+.reward-pill {
+  display: inline-block;
+  padding: 0.15rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+
+  &.gold   { background: #3d2e00; color: #f0c040; }
+  &.silver { background: #252535; color: #c0c8e0; }
+  &.item   { background: #0d2030; color: #80b8e0; }
+}
+
+// ---------------------------------------------------------------------------
+// Encounter cards & monster table (result card)
+// ---------------------------------------------------------------------------
+
+.encounter-card {
+  background: #0d1e38;
+  border: 1px solid #1a3a60;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.encounter-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  .encounter-desc-input {
+    flex: 1;
+    background: #0a1626;
+    border: 1px solid #1e3a6e;
+    border-radius: 0.4rem;
+    color: #e0e0e0;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    &:focus { outline: none; border-color: #533483; }
+  }
+}
+
+.monster-table {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.monster-table-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 32px;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #7b52ab;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 0.1rem;
+}
+
+.monster-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 32px;
+  gap: 0.4rem;
+  align-items: center;
+
+  .cr-input {
+    text-align: center;
+    font-weight: 700;
+    color: #f0c040;
+  }
+}
+
+.btn-add-monster {
+  align-self: flex-start;
+  background: transparent;
+  border: 1px dashed #533483;
+  color: #a89cc8;
+  padding: 0.2rem 0.6rem;
+  border-radius: 0.3rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-top: 0.15rem;
+  &:hover { background: #1e1040; color: #e0e0e0; }
+}
+
+// ---------------------------------------------------------------------------
+// XP Budget display
+// ---------------------------------------------------------------------------
+
+.xp-budget-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: #1a1040;
+  border: 1px solid #533483;
+  border-radius: 0.4rem;
+}
+
+.xp-budget-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #c9b8f0;
+}
+
+.xp-budget-badge {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #a78bfa;
+}
+
+.xp-budget-hint {
+  font-size: 0.78rem;
+  color: #667;
+  font-style: italic;
+}
+
+.xp-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: #1a1040;
+  color: #a78bfa;
+  border: 1px solid #533483;
+  vertical-align: middle;
+}
+
+.diff-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+// ---------------------------------------------------------------------------
+// Encounter summary (collection cards)
+// ---------------------------------------------------------------------------
+
+.encounter-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.25rem;
+}
+
+.enc-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+}
+
+.enc-summary-desc {
+  color: #c0c0d8;
+  font-weight: 500;
+}
+
+.enc-monster-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.monster-chip {
+  background: #0d1e38;
+  border: 1px solid #1a3a60;
+  border-radius: 3px;
+  padding: 0.05rem 0.4rem;
+  font-size: 0.76rem;
+  color: #b0c8e8;
+
+  em {
+    color: #f0c040;
+    font-style: normal;
+    margin-left: 0.2rem;
+    font-size: 0.72rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// NPC — class rows, action cards, badges
+// ---------------------------------------------------------------------------
+
+.class-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  input[type="text"] { flex: 1; }
+}
+
+.level-input {
+  width: 64px !important;
+  text-align: center;
+  font-weight: 700;
+}
+
+.half-list {
+  flex: 1;
+  min-width: 160px;
+}
+
+.action-card {
+  background: #0d1e38;
+  border: 1px solid #1a3a60;
+  border-radius: 0.4rem;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.2rem;
+}
+
+.action-header {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  input[type="text"] { flex: 1; }
+}
+
+// NPC collection card badges
+.npc-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  vertical-align: middle;
+
+  &.race      { background: #1b2d4d; color: #80b8e0; }
+  &.class     { background: #2a1a4a; color: #c9b8f0; }
+  &.alignment { background: #1d3a1d; color: #80d880; }
+  &.cr        { background: #3d2e00; color: #f0c040; }
+}
+
+.npc-equipment-summary {
+  font-size: 0.8rem;
+  color: #8899bb;
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.npc-actions-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.npc-action-chip {
+  background: #1a0d30;
+  border: 1px solid #533483;
+  border-radius: 3px;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.76rem;
+  color: #c9b8f0;
+}
+

@@ -29,7 +29,7 @@ export class ChatComponent implements AfterViewChecked, OnInit {
 
   ngOnInit(): void {
     if (!this.scenarioService.activeScenario()) {
-      this.router.navigate(['/scenario']);
+      this.router.navigate(['/']);
     } else if (this.chatService.messages().length === 0) {
       this.chatService.initializeStory();
     }
@@ -64,7 +64,7 @@ export class ChatComponent implements AfterViewChecked, OnInit {
     if (!confirm('Start a completely new scenario? This will clear everything.')) return;
     this.chatService.resetMessages();
     this.scenarioService.clearScenario();
-    this.router.navigate(['/scenario']);
+    this.router.navigate(['/']);
   }
 
   changeScenario(): void {
@@ -72,7 +72,8 @@ export class ChatComponent implements AfterViewChecked, OnInit {
       if (!confirm('Editing the scenario will reset the current story. Continue?')) return;
       this.chatService.resetMessages();
     }
-    this.router.navigate(['/scenario']);
+    const mode = this.scenarioService.activeScenario()?.scenarioType ?? 'adventure';
+    this.router.navigate(['/scenario', mode]);
   }
 
   send(): void {

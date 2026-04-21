@@ -16,27 +16,18 @@
 
 h1 { font-size: 1.5rem; margin-bottom: 1.5rem; }
 
-.type-selector {
-  display: flex;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+.btn-back {
+  background: transparent;
+  border: 1px solid #0f3460;
+  color: #e0e0e0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
 
-  button {
-    flex: 1;
-    padding: 0.6rem 1rem;
-    border: 1px solid #0f3460;
-    border-radius: 0.5rem;
-    background: #16213e;
-    color: #e0e0e0;
-    font-size: 1rem;
-    cursor: pointer;
-
-    &.active {
-      background: #533483;
-      border-color: #533483;
-    }
-
-    &:hover:not(.active) { background: #0f3460; }
+  &:hover {
+    background: #0f3460;
   }
 }
 
@@ -72,6 +63,91 @@ input, textarea {
   align-items: center;
 
   input { flex: 1; }
+}
+
+.npc-card {
+  border: 1px solid #0f3460;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: #16213e;
+}
+
+.npc-error {
+  color: #e74c3c;
+  font-size: 0.85rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+}
+
+.npc-detail-panel {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #0f3460;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    font-weight: bold;
+    color: #b8b8d0;
+    margin-bottom: 0;
+
+    input[type="number"] {
+      width: 60px;
+      text-align: center;
+      padding: 0.3rem;
+    }
+  }
+}
+
+.npc-list-section {
+  margin-top: 0.5rem;
+
+  h3 {
+    font-size: 0.95rem;
+    margin: 0.5rem 0 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #ccc;
+  }
+}
+
+.btn-toggle {
+  background: #0f3460;
+  border: 1px solid #533483;
+  color: #e0e0e0;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+  white-space: nowrap;
+
+  &:hover { background: #533483; }
+}
+
+.btn-ai-npc {
+  background: transparent;
+  border: 1px solid #e6a817;
+  color: #e6a817;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) { background: #e6a817; color: #1a1a2e; }
+  &:disabled { opacity: 0.4; cursor: not-allowed; }
 }
 
 .btn-small {

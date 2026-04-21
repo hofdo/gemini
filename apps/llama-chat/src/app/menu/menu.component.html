@@ -1,0 +1,26 @@
+<div class="menu-container">
+  <h1>🦙 Llama Chat</h1>
+  <p class="subtitle">Choose your experience</p>
+
+  <div class="mode-grid">
+    <button class="mode-card adventure" (click)="selectMode('adventure')">
+      <span class="mode-icon">🗺️</span>
+      <span class="mode-title">Adventure</span>
+      <span class="mode-desc">Embark on epic quests with NPCs, combat stats, and a living world guided by your AI game master.</span>
+    </button>
+
+    <button class="mode-card interpersonal" (click)="selectMode('interpersonal')">
+      <span class="mode-icon">💬</span>
+      <span class="mode-title">Interpersonal</span>
+      <span class="mode-desc">Engage in deep one-on-one conversations with a richly defined AI partner character.</span>
+    </button>
+
+    <button class="mode-card dm disabled" (click)="selectMode('dm')">
+      <span class="mode-badge">Coming Soon</span>
+      <span class="mode-icon">🎲</span>
+      <span class="mode-title">Dungeon Master</span>
+      <span class="mode-desc">A full DM toolkit with encounter builders, loot tables, and campaign management.</span>
+    </button>
+  </div>
+</div>
+

@@ -168,7 +168,9 @@
 
   textarea {
     flex: 1;
-    resize: none;
+    resize: vertical;
+    min-height: 3rem;
+    max-height: 50vh;
     border-radius: 0.5rem;
     border: 1px solid #0f3460;
     background: #1a1a2e;

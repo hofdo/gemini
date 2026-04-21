@@ -1,10 +1,7 @@
 <div class="scenario-container">
-  <h1>📜 Define Your Story Scenario</h1>
+  <button type="button" class="btn-back" (click)="goBack()">⬅️ Back to Menu</button>
 
-  <div class="type-selector">
-    <button type="button" [class.active]="scenarioType() === 'adventure'" (click)="setType('adventure')">🗺️ Adventure</button>
-    <button type="button" [class.active]="scenarioType() === 'interpersonal'" (click)="setType('interpersonal')">💬 Interpersonal</button>
-  </div>
+  <h1>📜 {{ scenarioType() === 'interpersonal' ? '💬 Interpersonal' : '🗺️ Adventure' }} — Define Your Story</h1>
 
   <section class="ai-generate-section">
     <h2>✨ Write Scenario with AI</h2>
@@ -52,30 +49,120 @@
 
     @if (scenarioType() === 'interpersonal') {
       <section>
-        <h2>Other Character (played by the LLM)</h2>
+        <h2>Partner Character (played by the LLM)</h2>
         <label>
-          Name
+          Name *
           <input formControlName="partnerName" placeholder="Partner character name" />
         </label>
         <label>
-          Description
-          <textarea formControlName="partnerDescription" rows="2" placeholder="Personality, appearance, backstory…"></textarea>
+          Gender
+          <input formControlName="partnerGender" list="genderOptions" placeholder="e.g. Male, Female, Non-binary…" />
+          <datalist id="genderOptions">
+            <option value="Male"></option>
+            <option value="Female"></option>
+            <option value="Non-binary"></option>
+            <option value="Other"></option>
+          </datalist>
         </label>
         <label>
-          Relationship
-          <input formControlName="relationship" placeholder="e.g. Childhood friends, Strangers who just met…" />
+          Personality
+          <textarea formControlName="partnerPersonality" rows="2" placeholder="e.g. Shy, witty, sarcastic, caring…"></textarea>
+        </label>
+        <label>
+          Body Description
+          <textarea formControlName="partnerBodyDescription" rows="2" placeholder="Physical build, height, distinguishing features…"></textarea>
+        </label>
+        <label>
+          Appearance
+          <textarea formControlName="partnerAppearance" rows="2" placeholder="Hair, eyes, clothing style, overall look…"></textarea>
+        </label>
+        <label>
+          Relationship to You
+          <input formControlName="partnerRelationship" placeholder="e.g. Childhood friends, Strangers who just met…" />
+        </label>
+        <label>
+          Likes
+          <textarea formControlName="partnerLikes" rows="2" placeholder="Hobbies, interests, things they enjoy…"></textarea>
+        </label>
+        <label>
+          Dislikes
+          <textarea formControlName="partnerDislikes" rows="2" placeholder="Pet peeves, things they avoid…"></textarea>
+        </label>
+        <label>
+          Turn-ons
+          <textarea formControlName="partnerTurnOns" rows="2" placeholder="What attracts or excites them…"></textarea>
         </label>
       </section>
     }
 
     @if (scenarioType() === 'adventure') {
-      <section>
+      <section formArrayName="npcs">
         <h2>NPCs <button type="button" class="btn-small" (click)="addNpc()">+ Add</button></h2>
-        @for (npc of npcs.controls; track $index) {
-          <div class="npc-row" [formGroupName]="$index">
-            <input formControlName="name" placeholder="NPC name" />
-            <input formControlName="description" placeholder="NPC description" />
-            <button type="button" class="btn-danger" (click)="removeNpc($index)">✕</button>
+        @for (npc of npcs.controls; track npcIdx; let npcIdx = $index) {
+          <div class="npc-card" [formGroupName]="npcIdx">
+            <div class="npc-row">
+              <input formControlName="name" placeholder="NPC name" />
+              <input formControlName="description" placeholder="NPC description" />
+              <button type="button" class="btn-ai-npc" (click)="generateNpcWithAi(npcIdx)" [disabled]="generatingNpc() !== null || generatingScenario()">
+                @if (generatingNpc() === npcIdx) { ⏳ } @else { ✨ }
+              </button>
+              <button type="button" class="btn-toggle" (click)="toggleNpcMode(npcIdx)">
+                @if (getNpcMode(npcIdx) === 'simple') { 🔧 Detailed } @else { 📝 Simple }
+              </button>
+              <button type="button" class="btn-danger" (click)="removeNpc(npcIdx)">✕</button>
+            </div>
+
+            @if (npcGenerationError()) {
+              <p class="npc-error">{{ npcGenerationError() }}</p>
+            }
+
+            @if (getNpcMode(npcIdx) === 'detailed') {
+              <div class="npc-detail-panel">
+                <div class="stats-grid" formGroupName="stats">
+                  <label>STR <input type="number" formControlName="str" min="1" max="20" placeholder="1–20" /></label>
+                  <label>DEX <input type="number" formControlName="dex" min="1" max="20" placeholder="1–20" /></label>
+                  <label>CON <input type="number" formControlName="con" min="1" max="20" placeholder="1–20" /></label>
+                  <label>INT <input type="number" formControlName="int" min="1" max="20" placeholder="1–20" /></label>
+                  <label>WIS <input type="number" formControlName="wis" min="1" max="20" placeholder="1–20" /></label>
+                  <label>CHA <input type="number" formControlName="cha" min="1" max="20" placeholder="1–20" /></label>
+                </div>
+
+                <label>
+                  Personality
+                  <textarea formControlName="personality" rows="2" placeholder="Brave, cunning, mysterious…"></textarea>
+                </label>
+
+                <div class="npc-list-section">
+                  <h3>Foes <button type="button" class="btn-small" (click)="addNpcFoe(npcIdx)">+ Add</button></h3>
+                  @for (foe of getNpcFoes(npcIdx).controls; track $index) {
+                    <div class="rule-row">
+                      <input [formControl]="$any(foe)" placeholder="Enemy name or description" />
+                      <button type="button" class="btn-danger" (click)="removeNpcFoe(npcIdx, $index)">✕</button>
+                    </div>
+                  }
+                </div>
+
+                <div class="npc-list-section">
+                  <h3>Friends <button type="button" class="btn-small" (click)="addNpcFriend(npcIdx)">+ Add</button></h3>
+                  @for (friend of getNpcFriends(npcIdx).controls; track $index) {
+                    <div class="rule-row">
+                      <input [formControl]="$any(friend)" placeholder="Ally name or description" />
+                      <button type="button" class="btn-danger" (click)="removeNpcFriend(npcIdx, $index)">✕</button>
+                    </div>
+                  }
+                </div>
+
+                <div class="npc-list-section">
+                  <h3>Plot Twists <button type="button" class="btn-small" (click)="addNpcPlotTwist(npcIdx)">+ Add</button></h3>
+                  @for (twist of getNpcPlotTwists(npcIdx).controls; track $index) {
+                    <div class="rule-row">
+                      <input [formControl]="$any(twist)" placeholder="A hidden betrayal, secret identity…" />
+                      <button type="button" class="btn-danger" (click)="removeNpcPlotTwist(npcIdx, $index)">✕</button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
         }
       </section>

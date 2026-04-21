@@ -1,7 +1,8 @@
 import { inject, Injectable } from '@angular/core';
-import { InputType, Scenario, ScenarioType } from '../scenario/scenario.model';
+import { InputType, Npc, Scenario, ScenarioType } from '../scenario/scenario.model';
 import { ScenarioService } from '../scenario/scenario.service';
 import { ChatMessage } from '../chat/chat.service';
+import type { Quest, QuestEncounter, QuestMonster } from '../dm/dm.model';
 
 @Injectable({ providedIn: 'root' })
 export class AiAssistService {
@@ -41,7 +42,6 @@ export class AiAssistService {
 
     const data = await response.json();
 
-    // Map snake_case backend response to camelCase frontend model
     return {
       scenarioType: data.scenario_type ?? scenarioType,
       title: data.title ?? '',
@@ -49,14 +49,103 @@ export class AiAssistService {
       tone: data.tone ?? '',
       characterName: data.character_name ?? '',
       characterDescription: data.character_description ?? '',
-      npcs: (data.npcs ?? []).map((n: { name: string; description: string }) => ({
-        name: n.name,
-        description: n.description,
-      })),
+      npcs: (data.npcs ?? []).map(
+        (n: { name: string; description: string; mode?: string; stats?: Record<string, number>;
+               personality?: string; foes?: string[]; friends?: string[]; plot_twists?: string[] }) => ({
+          name: n.name,
+          description: n.description,
+          mode: (n.mode as 'simple' | 'detailed') ?? 'simple',
+          stats: n.stats,
+          personality: n.personality ?? '',
+          foes: n.foes ?? [],
+          friends: n.friends ?? [],
+          plotTwists: n.plot_twists ?? [],
+        }),
+      ),
       rules: data.rules ?? [],
       partnerName: data.partner_name ?? '',
-      partnerDescription: data.partner_description ?? '',
-      relationship: data.relationship ?? '',
+      partnerGender: data.partner_gender ?? '',
+      partnerPersonality: data.partner_personality ?? '',
+      partnerBodyDescription: data.partner_body_description ?? '',
+      partnerAppearance: data.partner_appearance ?? '',
+      partnerRelationship: data.partner_relationship ?? '',
+      partnerLikes: data.partner_likes ?? '',
+      partnerDislikes: data.partner_dislikes ?? '',
+      partnerTurnOns: data.partner_turn_ons ?? '',
+    };
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async generateNpc(
+    npcName: string,
+    npcDescription: string,
+    setting: string,
+    tone: string,
+    title: string,
+  ): Promise<any> {
+    const response = await fetch('/generate-npc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        npc_name: npcName,
+        npc_description: npcDescription,
+        setting,
+        tone,
+        title,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
+  async generateQuest(
+    prompt: string,
+    setting?: string,
+    tone?: string,
+    partyLevel?: number | null,
+  ): Promise<Quest> {
+    const response = await fetch('/generate-quest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt,
+        setting: setting ?? '',
+        tone: tone ?? '',
+        party_level: partyLevel ?? null,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const d = await response.json();
+    return {
+      id: crypto.randomUUID(),
+      title: d.title ?? '',
+      description: d.description ?? '',
+      objectives: d.objectives ?? [],
+      rewards: {
+        gold: d.rewards?.gold ?? 0,
+        silver: d.rewards?.silver ?? 0,
+        items: d.rewards?.items ?? [],
+      },
+      encounters: (d.encounters ?? []).map((e: { description?: string; monsters?: { name?: string; cr?: string }[] }): QuestEncounter => ({
+        description: e.description ?? '',
+        monsters: (e.monsters ?? []).map((m): QuestMonster => ({
+          name: m.name ?? '',
+          cr: m.cr ?? '—',
+        })),
+      })),
+      difficulty: d.difficulty ?? 'Medium',
+      setting: d.setting ?? '',
+      estimatedDuration: d.estimated_duration ?? '',
+      partyLevel: d.party_level ?? partyLevel ?? null,
+      xpBudget: d.xp_budget ?? null,
     };
   }
 
@@ -85,11 +174,26 @@ export class AiAssistService {
             tone: scenario.tone,
             character_name: scenario.characterName,
             character_description: scenario.characterDescription,
-            npcs: scenario.npcs,
+            npcs: (scenario.npcs ?? []).map((n: Npc) => ({
+              name: n.name,
+              description: n.description,
+              mode: n.mode ?? 'simple',
+              stats: n.stats,
+              personality: n.personality ?? '',
+              foes: n.foes ?? [],
+              friends: n.friends ?? [],
+              plot_twists: n.plotTwists ?? [],
+            })),
             rules: scenario.rules,
             partner_name: scenario.partnerName ?? '',
-            partner_description: scenario.partnerDescription ?? '',
-            relationship: scenario.relationship ?? '',
+            partner_gender: scenario.partnerGender ?? '',
+            partner_personality: scenario.partnerPersonality ?? '',
+            partner_body_description: scenario.partnerBodyDescription ?? '',
+            partner_appearance: scenario.partnerAppearance ?? '',
+            partner_relationship: scenario.partnerRelationship ?? '',
+            partner_likes: scenario.partnerLikes ?? '',
+            partner_dislikes: scenario.partnerDislikes ?? '',
+            partner_turn_ons: scenario.partnerTurnOns ?? '',
           }
         : null,
     };
@@ -108,4 +212,3 @@ export class AiAssistService {
     return data.text;
   }
 }
-

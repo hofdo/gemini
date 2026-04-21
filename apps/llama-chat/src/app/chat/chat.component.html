@@ -23,8 +23,8 @@
       <div class="info-row"><strong>You:</strong> {{ scenario.characterName }}</div>
       @if (scenario.scenarioType === 'interpersonal' && scenario.partnerName) {
         <div class="info-row"><strong>Partner:</strong> {{ scenario.partnerName }}</div>
-        @if (scenario.relationship) {
-          <div class="info-row"><strong>Relationship:</strong> {{ scenario.relationship }}</div>
+        @if (scenario.partnerRelationship) {
+          <div class="info-row"><strong>Relationship:</strong> {{ scenario.partnerRelationship }}</div>
         }
       }
     </div>
@@ -70,7 +70,7 @@
       (input)="input.set($any($event.target).value)"
       (keydown)="onKeydown($event)"
       [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : 'Describe an action… (Enter to send)'"
-      rows="2"
+      rows="4"
     ></textarea>
     <button (click)="send()" [disabled]="chatService.loading()">Send</button>
   </div>

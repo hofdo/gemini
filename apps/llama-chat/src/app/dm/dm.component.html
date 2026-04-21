@@ -1,0 +1,644 @@
+<div class="dm-container">
+
+  <!-- Header -->
+  <div class="dm-header">
+    <button class="btn-back" (click)="goBack()">⬅️ Back to Menu</button>
+    <div class="dm-title-row">
+      <span class="dm-icon">🎲</span>
+      <h1>Dungeon Master Mode</h1>
+    </div>
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <button class="tab-btn" [class.active]="activeTab() === 'quests'" (click)="setTab('quests')">
+      📜 Quests
+    </button>
+    <button class="tab-btn" [class.active]="activeTab() === 'npcs'" (click)="setTab('npcs')">
+      🧙 NPCs
+    </button>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- QUESTS TAB                                                        -->
+  <!-- ================================================================ -->
+  @if (activeTab() === 'quests') {
+    <div class="tab-content">
+
+      @if (!currentQuest()) {
+        <!-- Quest Generator Form -->
+        <div class="creator-card">
+          <h2>✨ Quest Creator</h2>
+          <p class="creator-desc">Describe the quest you want to create and let the LLM fill in all the details — D&D 2024 style.</p>
+
+          <textarea
+            class="prompt-area"
+            rows="4"
+            placeholder="e.g. A desperate plea from a village elder — dark creatures have been stealing children from the edge of the forest at night…"
+            [ngModel]="questPrompt()"
+            (ngModelChange)="questPrompt.set($event)"
+          ></textarea>
+
+          <div class="party-level-row">
+            <label class="party-level-label">
+              🎲 Party Level (optional)
+              <input
+                type="number"
+                class="party-level-input"
+                min="1" max="20"
+                placeholder="1–20"
+                [ngModel]="questPartyLevel()"
+                (ngModelChange)="questPartyLevel.set($event ? +$event : null)"
+              />
+            </label>
+            <span class="party-level-hint">Scales encounters, XP budget &amp; gold rewards</span>
+          </div>
+
+          <!-- Advanced Toggle -->
+          <button class="btn-advanced" (click)="questAdvancedOpen.set(!questAdvancedOpen())">
+            ⚙️ Advanced {{ questAdvancedOpen() ? '▲' : '▼' }}
+          </button>
+          @if (questAdvancedOpen()) {
+            <div class="advanced-fields">
+              <label>
+                Setting
+                <input type="text" placeholder="e.g. Dark fantasy, medieval kingdom" [ngModel]="questSetting()" (ngModelChange)="questSetting.set($event)" />
+              </label>
+              <label>
+                Tone
+                <input type="text" placeholder="e.g. Grim, hopeful, mysterious" [ngModel]="questTone()" (ngModelChange)="questTone.set($event)" />
+              </label>
+            </div>
+          }
+
+          @if (questError()) {
+            <p class="error-msg">⚠️ {{ questError() }}</p>
+          }
+
+          <button
+            class="btn-generate"
+            (click)="generateQuest()"
+            [disabled]="!questPrompt().trim() || generatingQuest()"
+          >
+            @if (generatingQuest()) {
+              ⏳ Generating…
+            } @else {
+              ✨ Generate Quest
+            }
+          </button>
+        </div>
+      } @else {
+        <!-- Quest Result Card -->
+        <div class="result-card">
+          <div class="result-card-header">
+            <h2>📜 Quest Details</h2>
+            <div class="result-actions">
+              <button class="btn-save" (click)="saveQuest()">💾 Save to Collection</button>
+              <button class="btn-secondary" (click)="newQuest()">🔄 New Quest</button>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Title
+              <input type="text"
+                [ngModel]="currentQuest()!.title"
+                (ngModelChange)="updateQuestField('title', $event)" />
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label>Description
+              <textarea rows="3"
+                [ngModel]="currentQuest()!.description"
+                (ngModelChange)="updateQuestField('description', $event)"></textarea>
+            </label>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group half">
+              <label>Setting
+                <input type="text"
+                  [ngModel]="currentQuest()!.setting"
+                  (ngModelChange)="updateQuestField('setting', $event)" />
+              </label>
+            </div>
+            <div class="field-group half">
+              <label>Est. Duration
+                <input type="text"
+                  [ngModel]="currentQuest()!.estimatedDuration"
+                  (ngModelChange)="updateQuestField('estimatedDuration', $event)" />
+              </label>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-group half">
+              <label>Party Level
+                <input type="number" min="1" max="20"
+                  [ngModel]="currentQuest()!.partyLevel"
+                  (ngModelChange)="updateQuestField('partyLevel', $event ? +$event : null)" />
+              </label>
+            </div>
+            <div class="field-group half">
+              <label>Difficulty</label>
+              <div class="diff-row">
+                <span class="diff-badge" [ngClass]="difficultyClass(currentQuest()!.difficulty)">
+                  {{ currentQuest()!.difficulty }}
+                </span>
+                <select
+                  [ngModel]="currentQuest()!.difficulty"
+                  (ngModelChange)="updateQuestField('difficulty', $event)"
+                  class="diff-select">
+                  <option>Easy</option>
+                  <option>Medium</option>
+                  <option>Hard</option>
+                  <option>Deadly</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          @if (currentQuest()!.xpBudget) {
+            <div class="xp-budget-row">
+              <span class="xp-budget-label">⚡ XP Budget</span>
+              <span class="xp-budget-badge">{{ currentQuest()!.xpBudget | number }} XP</span>
+              <span class="xp-budget-hint">(total for all encounters)</span>
+            </div>
+          }
+
+          <!-- Objectives -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🎯 Objectives</span>
+              <button class="btn-add-item" (click)="addObjective()">+ Add</button>
+            </div>
+            @for (obj of currentQuest()!.objectives; track $index) {
+              <div class="list-item-row">
+                <input type="text" [ngModel]="obj" (ngModelChange)="updateObjective($index, $event)" />
+                <button class="btn-remove-item" (click)="removeObjective($index)">✕</button>
+              </div>
+            }
+          </div>
+
+          <!-- Rewards -->
+          <div class="rewards-section">
+            <div class="list-header">
+              <span>💰 Rewards</span>
+            </div>
+            <div class="reward-grid">
+              <div class="reward-cell">
+                <label>🪙 Gold (gp)</label>
+                <input type="number" min="0"
+                  [ngModel]="currentQuest()!.rewards.gold"
+                  (ngModelChange)="updateRewardGold($event)" />
+              </div>
+              <div class="reward-cell">
+                <label>🥈 Silver (sp)</label>
+                <input type="number" min="0"
+                  [ngModel]="currentQuest()!.rewards.silver"
+                  (ngModelChange)="updateRewardSilver($event)" />
+              </div>
+            </div>
+            <div class="list-section" style="margin-top: 0.5rem;">
+              <div class="list-header">
+                <span>📦 Items</span>
+                <button class="btn-add-item" (click)="addRewardItem()">+ Add</button>
+              </div>
+              @for (item of currentQuest()!.rewards.items; track $index) {
+                <div class="list-item-row">
+                  <input type="text" placeholder="e.g. Potion of Healing, +1 Longsword"
+                    [ngModel]="item" (ngModelChange)="updateRewardItem($index, $event)" />
+                  <button class="btn-remove-item" (click)="removeRewardItem($index)">✕</button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Encounters -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>⚔️ Encounters</span>
+              <button class="btn-add-item" (click)="addEncounter()">+ Add Encounter</button>
+            </div>
+            @for (enc of currentQuest()!.encounters; track $index; let encIdx = $index) {
+              <div class="encounter-card">
+                <div class="encounter-header">
+                  <input type="text" class="encounter-desc-input"
+                    placeholder="Encounter description…"
+                    [ngModel]="enc.description"
+                    (ngModelChange)="updateEncounterDesc(encIdx, $event)" />
+                  <button class="btn-remove-item" (click)="removeEncounter(encIdx)" title="Remove encounter">✕</button>
+                </div>
+                <!-- Monster table -->
+                <div class="monster-table">
+                  @if (enc.monsters.length > 0) {
+                    <div class="monster-table-header">
+                      <span>Monster</span>
+                      <span>CR</span>
+                      <span></span>
+                    </div>
+                  }
+                  @for (monster of enc.monsters; track $index; let monIdx = $index) {
+                    <div class="monster-row">
+                      <input type="text" placeholder="e.g. Goblin, Adult Red Dragon"
+                        [ngModel]="monster.name" (ngModelChange)="updateMonsterName(encIdx, monIdx, $event)" />
+                      <input type="text" class="cr-input" placeholder="e.g. 1/4"
+                        [ngModel]="monster.cr" (ngModelChange)="updateMonsterCr(encIdx, monIdx, $event)" />
+                      <button class="btn-remove-item" (click)="removeMonster(encIdx, monIdx)">✕</button>
+                    </div>
+                  }
+                  <button class="btn-add-monster" (click)="addMonster(encIdx)">+ Add Monster</button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Saved Quests Collection -->
+      @if (savedQuests().length > 0) {
+        <div class="collection-section">
+          <button class="btn-collection-toggle" (click)="savedQuestsOpen.set(!savedQuestsOpen())">
+            📋 Saved Quests ({{ savedQuests().length }}) {{ savedQuestsOpen() ? '▲' : '▼' }}
+          </button>
+          @if (savedQuestsOpen()) {
+            <div class="collection-list">
+              @for (q of savedQuests(); track q.id) {
+                <div class="collection-card">
+                  <div class="collection-card-header">
+                    <div class="collection-card-title">
+                      <strong>{{ q.title }}</strong>
+                      <span class="diff-badge" [ngClass]="difficultyClass(q.difficulty)">{{ q.difficulty }}</span>
+                      @if (q.partyLevel) {
+                        <span class="level-badge">Lvl {{ q.partyLevel }}</span>
+                      }
+                      @if (q.xpBudget) {
+                        <span class="xp-badge">{{ q.xpBudget | number }} XP</span>
+                      }
+                    </div>
+                    <button class="btn-delete" (click)="deleteQuest(q.id)" title="Delete">🗑️</button>
+                  </div>
+                  <p class="collection-card-desc">{{ q.description }}</p>
+                  <!-- Reward summary -->
+                  <div class="reward-summary">
+                    @if (q.rewards.gold > 0) { <span class="reward-pill gold">🪙 {{ q.rewards.gold }}gp</span> }
+                    @if (q.rewards.silver > 0) { <span class="reward-pill silver">🥈 {{ q.rewards.silver }}sp</span> }
+                    @for (item of q.rewards.items; track $index) {
+                      <span class="reward-pill item">📦 {{ item }}</span>
+                    }
+                  </div>
+                  <!-- Encounter monster summary -->
+                  @if (q.encounters.length > 0) {
+                    <div class="encounter-summary">
+                      @for (enc of q.encounters; track $index) {
+                        <div class="enc-summary-row">
+                          <span class="enc-summary-desc">⚔️ {{ enc.description || 'Encounter' }}</span>
+                          @if (enc.monsters.length > 0) {
+                            <span class="enc-monster-list">
+                              @for (m of enc.monsters; track $index) {
+                                <span class="monster-chip">{{ m.name }} <em>CR {{ m.cr }}</em></span>
+                              }
+                            </span>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                  @if (q.objectives.length > 0) {
+                    <ul class="mini-list">
+                      @for (o of q.objectives; track $index) { <li>{{ o }}</li> }
+                    </ul>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- NPCS TAB                                                          -->
+  <!-- ================================================================ -->
+  @if (activeTab() === 'npcs') {
+    <div class="tab-content">
+
+      @if (!currentNpc()) {
+        <!-- NPC Generator Form -->
+        <div class="creator-card">
+          <h2>✨ NPC Creator</h2>
+          <p class="creator-desc">Provide a name and/or description — or leave blank to let the LLM invent someone that fits the setting.</p>
+
+          <div class="field-row">
+            <div class="field-group half">
+              <label>
+                Name (optional)
+                <input type="text" placeholder="e.g. Mira the Herbalist"
+                  [ngModel]="npcName()" (ngModelChange)="npcName.set($event)" />
+              </label>
+            </div>
+            <div class="field-group half">
+              <label>
+                Description (optional)
+                <input type="text" placeholder="e.g. A grizzled dwarven blacksmith with a scar across his eye"
+                  [ngModel]="npcDescription()" (ngModelChange)="npcDescription.set($event)" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Advanced Toggle -->
+          <button class="btn-advanced" (click)="npcAdvancedOpen.set(!npcAdvancedOpen())">
+            ⚙️ Advanced {{ npcAdvancedOpen() ? '▲' : '▼' }}
+          </button>
+          @if (npcAdvancedOpen()) {
+            <div class="advanced-fields">
+              <label>
+                Setting
+                <input type="text" placeholder="e.g. Steampunk city, elvish forest"
+                  [ngModel]="npcSetting()" (ngModelChange)="npcSetting.set($event)" />
+              </label>
+              <label>
+                Tone
+                <input type="text" placeholder="e.g. Gritty, whimsical, dark"
+                  [ngModel]="npcTone()" (ngModelChange)="npcTone.set($event)" />
+              </label>
+            </div>
+          }
+
+          @if (npcError()) {
+            <p class="error-msg">⚠️ {{ npcError() }}</p>
+          }
+
+          <button
+            class="btn-generate"
+            (click)="generateNpc()"
+            [disabled]="generatingNpc()"
+          >
+            @if (generatingNpc()) {
+              ⏳ Generating…
+            } @else {
+              ✨ Generate NPC
+            }
+          </button>
+        </div>
+      } @else {
+        <!-- NPC Result Card -->
+        <div class="result-card">
+          <div class="result-card-header">
+            <h2>🧙 NPC Details</h2>
+            <div class="result-actions">
+              <button class="btn-save" (click)="saveNpc()">💾 Save to Collection</button>
+              <button class="btn-secondary" (click)="newNpc()">🔄 New NPC</button>
+            </div>
+          </div>
+
+          <!-- Identity row: name + race -->
+          <div class="field-row">
+            <div class="field-group half">
+              <label>Name
+                <input type="text"
+                  [ngModel]="currentNpc()!.name"
+                  (ngModelChange)="updateNpcField('name', $event)" />
+              </label>
+            </div>
+            <div class="field-group half">
+              <label>Race / Species
+                <input type="text" placeholder="e.g. Elf, Tiefling, Human"
+                  [ngModel]="currentNpc()!.race"
+                  (ngModelChange)="updateNpcField('race', $event)" />
+              </label>
+            </div>
+          </div>
+
+          <!-- Alignment + CR row -->
+          <div class="field-row">
+            <div class="field-group half">
+              <label>Alignment
+                <input type="text" placeholder="e.g. Lawful Good, Chaotic Neutral"
+                  [ngModel]="currentNpc()!.alignment"
+                  (ngModelChange)="updateNpcField('alignment', $event)" />
+              </label>
+            </div>
+            <div class="field-group half">
+              <label>Challenge Rating (CR)
+                <input type="text" placeholder="e.g. 1/4, 2, 8"
+                  [ngModel]="currentNpc()!.cr"
+                  (ngModelChange)="updateNpcField('cr', $event)" />
+              </label>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label>Description
+              <textarea rows="2"
+                [ngModel]="currentNpc()!.description"
+                (ngModelChange)="updateNpcField('description', $event)"></textarea>
+            </label>
+          </div>
+
+          <div class="field-group">
+            <label>Personality
+              <textarea rows="2"
+                [ngModel]="currentNpc()!.personality"
+                (ngModelChange)="updateNpcField('personality', $event)"></textarea>
+            </label>
+          </div>
+
+          <!-- Classes -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🛡️ Classes</span>
+              <button class="btn-add-item" (click)="addNpcClass()">+ Add Class</button>
+            </div>
+            @for (cls of currentNpc()!.classes; track $index) {
+              <div class="class-row">
+                <input type="text" placeholder="Class (e.g. Fighter, Wizard)"
+                  [ngModel]="cls.name" (ngModelChange)="updateNpcClassName($index, $event)" />
+                <input type="number" class="level-input" min="1" max="20" placeholder="Lvl"
+                  [ngModel]="cls.level" (ngModelChange)="updateNpcClassLevel($index, $event)" />
+                <button class="btn-remove-item" (click)="removeNpcClass($index)">✕</button>
+              </div>
+            }
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="stats-section">
+            <span class="section-label">📊 Ability Scores</span>
+            <div class="stats-grid">
+              @for (stat of statKeys(); track stat) {
+                <div class="stat-cell">
+                  <label>{{ statLabel(stat) }}</label>
+                  <input type="number" min="1" max="30"
+                    [ngModel]="currentNpc()!.stats[stat]"
+                    (ngModelChange)="updateNpcStat(stat, $event)" />
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Saving Throws + Skills side by side -->
+          <div class="field-row">
+            <div class="list-section half-list">
+              <div class="list-header">
+                <span>🎯 Saving Throws</span>
+                <button class="btn-add-item" (click)="addNpcListItem('savingThrows')">+ Add</button>
+              </div>
+              @for (st of currentNpc()!.savingThrows; track $index) {
+                <div class="list-item-row">
+                  <input type="text" placeholder="e.g. STR, WIS"
+                    [ngModel]="st" (ngModelChange)="updateNpcListItem('savingThrows', $index, $event)" />
+                  <button class="btn-remove-item" (click)="removeNpcListItem('savingThrows', $index)">✕</button>
+                </div>
+              }
+            </div>
+            <div class="list-section half-list">
+              <div class="list-header">
+                <span>🧠 Skills</span>
+                <button class="btn-add-item" (click)="addNpcListItem('skills')">+ Add</button>
+              </div>
+              @for (skill of currentNpc()!.skills; track $index) {
+                <div class="list-item-row">
+                  <input type="text" placeholder="e.g. Perception, Stealth"
+                    [ngModel]="skill" (ngModelChange)="updateNpcListItem('skills', $index, $event)" />
+                  <button class="btn-remove-item" (click)="removeNpcListItem('skills', $index)">✕</button>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Equipment -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🎒 Equipment</span>
+              <button class="btn-add-item" (click)="addNpcListItem('equipment')">+ Add</button>
+            </div>
+            @for (item of currentNpc()!.equipment; track $index) {
+              <div class="list-item-row">
+                <input type="text" placeholder="e.g. Longsword, Chain Mail"
+                  [ngModel]="item" (ngModelChange)="updateNpcListItem('equipment', $index, $event)" />
+                <button class="btn-remove-item" (click)="removeNpcListItem('equipment', $index)">✕</button>
+              </div>
+            }
+          </div>
+
+          <!-- Actions -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>⚔️ Actions</span>
+              <button class="btn-add-item" (click)="addNpcAction()">+ Add Action</button>
+            </div>
+            @for (action of currentNpc()!.actions; track $index) {
+              <div class="action-card">
+                <div class="action-header">
+                  <input type="text" placeholder="Action name (e.g. Longsword, Fireball)"
+                    [ngModel]="action.name" (ngModelChange)="updateNpcActionName($index, $event)" />
+                  <button class="btn-remove-item" (click)="removeNpcAction($index)">✕</button>
+                </div>
+                <textarea rows="2" placeholder="Description (hit bonus, damage dice, effects…)"
+                  [ngModel]="action.description" (ngModelChange)="updateNpcActionDesc($index, $event)"></textarea>
+              </div>
+            }
+          </div>
+
+          <!-- Foes -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🗡️ Foes</span>
+              <button class="btn-add-item" (click)="addNpcListItem('foes')">+ Add</button>
+            </div>
+            @for (foe of currentNpc()!.foes; track $index) {
+              <div class="list-item-row">
+                <input type="text" [ngModel]="foe" (ngModelChange)="updateNpcListItem('foes', $index, $event)" />
+                <button class="btn-remove-item" (click)="removeNpcListItem('foes', $index)">✕</button>
+              </div>
+            }
+          </div>
+
+          <!-- Friends -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🤝 Friends</span>
+              <button class="btn-add-item" (click)="addNpcListItem('friends')">+ Add</button>
+            </div>
+            @for (friend of currentNpc()!.friends; track $index) {
+              <div class="list-item-row">
+                <input type="text" [ngModel]="friend" (ngModelChange)="updateNpcListItem('friends', $index, $event)" />
+                <button class="btn-remove-item" (click)="removeNpcListItem('friends', $index)">✕</button>
+              </div>
+            }
+          </div>
+
+          <!-- Plot Twists -->
+          <div class="list-section">
+            <div class="list-header">
+              <span>🌀 Plot Twists</span>
+              <button class="btn-add-item" (click)="addNpcListItem('plotTwists')">+ Add</button>
+            </div>
+            @for (twist of currentNpc()!.plotTwists; track $index) {
+              <div class="list-item-row">
+                <input type="text" [ngModel]="twist" (ngModelChange)="updateNpcListItem('plotTwists', $index, $event)" />
+                <button class="btn-remove-item" (click)="removeNpcListItem('plotTwists', $index)">✕</button>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Saved NPCs Collection -->
+      @if (savedNpcs().length > 0) {
+        <div class="collection-section">
+          <button class="btn-collection-toggle" (click)="savedNpcsOpen.set(!savedNpcsOpen())">
+            📋 Saved NPCs ({{ savedNpcs().length }}) {{ savedNpcsOpen() ? '▲' : '▼' }}
+          </button>
+          @if (savedNpcsOpen()) {
+            <div class="collection-list">
+              @for (n of savedNpcs(); track n.id) {
+                <div class="collection-card">
+                  <div class="collection-card-header">
+                    <div class="collection-card-title">
+                      <strong>{{ n.name }}</strong>
+                      @if (n.race) { <span class="npc-badge race">{{ n.race }}</span> }
+                      @for (cls of n.classes; track $index) {
+                        <span class="npc-badge class">{{ cls.name }} {{ cls.level }}</span>
+                      }
+                      @if (n.alignment) { <span class="npc-badge alignment">{{ n.alignment }}</span> }
+                      @if (n.cr) { <span class="npc-badge cr">CR {{ n.cr }}</span> }
+                    </div>
+                    <button class="btn-delete" (click)="deleteNpc(n.id)" title="Delete">🗑️</button>
+                  </div>
+                  <p class="collection-card-desc">{{ n.description }}</p>
+                  @if (n.personality) {
+                    <p class="collection-card-personality"><em>{{ n.personality }}</em></p>
+                  }
+                  @if (n.equipment && n.equipment.length > 0) {
+                    <div class="npc-equipment-summary">🎒 {{ n.equipment.join(' · ') }}</div>
+                  }
+                  <div class="stats-grid mini-stats">
+                    @for (stat of statKeys(); track stat) {
+                      <div class="stat-cell">
+                        <label>{{ statLabel(stat) }}</label>
+                        <span>{{ n.stats[stat] ?? '—' }}</span>
+                      </div>
+                    }
+                  </div>
+                  @if (n.actions && n.actions.length > 0) {
+                    <div class="npc-actions-summary">
+                      @for (a of n.actions; track $index) {
+                        <span class="npc-action-chip">⚔️ {{ a.name }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+
+    </div>
+  }
+
+</div>
+

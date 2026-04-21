@@ -1,9 +1,25 @@
 export type InputType = 'dialogue' | 'action';
 export type ScenarioType = 'adventure' | 'interpersonal';
+export type NpcMode = 'simple' | 'detailed';
+
+export interface NpcStats {
+  str?: number;
+  dex?: number;
+  con?: number;
+  int?: number;
+  wis?: number;
+  cha?: number;
+}
 
 export interface Npc {
   name: string;
   description: string;
+  mode: NpcMode;
+  stats?: NpcStats;
+  personality?: string;
+  foes?: string[];
+  friends?: string[];
+  plotTwists?: string[];
 }
 
 export interface Scenario {
@@ -17,7 +33,12 @@ export interface Scenario {
   rules: string[];
   // Interpersonal fields
   partnerName?: string;
-  partnerDescription?: string;
-  relationship?: string;
+  partnerGender?: string;
+  partnerPersonality?: string;
+  partnerBodyDescription?: string;
+  partnerAppearance?: string;
+  partnerRelationship?: string;
+  partnerLikes?: string;
+  partnerDislikes?: string;
+  partnerTurnOns?: string;
 }
-
