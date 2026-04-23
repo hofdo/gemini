@@ -1,0 +1,44 @@
+{
+  "name": "llm",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/llm",
+  "tags": ["scope:infra"],
+  "targets": {
+    "serve": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash scripts/start-llm.sh gemma4-obliterated",
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "obliterated": {
+          "command": "bash scripts/start-llm.sh gemma4-obliterated"
+        },
+        "uncensored": {
+          "command": "bash scripts/start-llm.sh gemma4-uncensored"
+        }
+      },
+      "defaultConfiguration": "obliterated"
+    },
+    "start": {
+      "continuous": true,
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "bash scripts/start-llm.sh gemma4-obliterated",
+        "cwd": "{workspaceRoot}"
+      },
+      "configurations": {
+        "obliterated": {
+          "command": "bash scripts/start-llm.sh gemma4-obliterated"
+        },
+        "uncensored": {
+          "command": "bash scripts/start-llm.sh gemma4-uncensored"
+        }
+      },
+      "defaultConfiguration": "obliterated"
+    }
+  }
+}
+

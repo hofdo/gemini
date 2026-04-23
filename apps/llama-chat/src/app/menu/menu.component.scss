@@ -14,6 +14,34 @@
   background: #1a1a2e;
   color: #e0e0e0;
   font-family: sans-serif;
+  position: relative;
+}
+
+.menu-top-bar {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+.btn-settings {
+  background: transparent;
+  border: 1px solid #0f3460;
+  color: #a0a0c0;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &:hover {
+    background: #16213e;
+    border-color: #533483;
+    color: #e0e0e0;
+  }
 }
 
 h1 {
@@ -65,8 +93,8 @@ h1 {
     border-color: #8e44ad;
   }
 
-  &.dm {
-    border-color: #2c3e50;
+  &.dm:hover:not(.disabled) {
+    border-color: #e2a817;
   }
 
   &.disabled {

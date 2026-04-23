@@ -23,5 +23,15 @@
     "target": "http://localhost:8000",
     "secure": false,
     "changeOrigin": true
+  },
+  "/config": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/health": {
+    "target": "http://localhost:8000",
+    "secure": false,
+    "changeOrigin": true
   }
 }

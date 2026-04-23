@@ -17,5 +17,9 @@ export class MenuComponent {
       this.router.navigate(['/scenario', mode]);
     }
   }
+
+  goToSettings(): void {
+    this.router.navigate(['/settings']);
+  }
 }
 

@@ -9,7 +9,47 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
-LLAMA_CPP_URL = os.getenv("LLAMA_CPP_URL", "http://localhost:8080")
+# ---------------------------------------------------------------------------
+# Backend config
+# ---------------------------------------------------------------------------
+
+_DEFAULT_BACKENDS: list[dict] = [
+    {
+        "id": "gemma4-obliterated",
+        "name": "Gemma 4 Obliterated (Q8_0)",
+        "url": os.getenv("LLAMA_CPP_URL", "http://localhost:8080"),
+        "model": "local-model",
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "top_k": 40,
+        "repeat_penalty": 1.1,
+    },
+    {
+        "id": "gemma4-uncensored",
+        "name": "Gemma 4 Uncensored (Q6_K_P)",
+        "url": os.getenv("LLAMA_CPP_URL", "http://localhost:8080"),
+        "model": "local-model",
+        "temperature": 0.8,
+        "top_p": 0.95,
+        "top_k": 50,
+        "repeat_penalty": 1.0,
+    },
+]
+
+
+def _load_backends() -> list[dict]:
+    raw = os.getenv("AVAILABLE_BACKENDS")
+    if raw:
+        try:
+            return json.loads(raw)
+        except Exception:
+            logger.warning("Failed to parse AVAILABLE_BACKENDS env var — using defaults")
+    return _DEFAULT_BACKENDS
+
+
+BACKENDS: list[dict] = _load_backends()
+_default_id = os.getenv("ACTIVE_BACKEND_ID", "gemma4-obliterated")
+active_backend: dict = next((b for b in BACKENDS if b["id"] == _default_id), BACKENDS[0])
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger("llama-proxy")
@@ -73,7 +113,7 @@ class Scenario(BaseModel):
 class StoryMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str
-    input_type: Literal["dialogue", "action"] = "dialogue"
+    input_type: Literal["dialogue", "action", "direct"] = "dialogue"
 
 
 class ChatRequest(BaseModel):
@@ -89,7 +129,7 @@ class ChatResponse(BaseModel):
 class AssistRequest(BaseModel):
     mode: Literal["suggest", "rewrite"]
     current_text: str = ""
-    input_type: Literal["dialogue", "action"] = "dialogue"
+    input_type: Literal["dialogue", "action", "direct"] = "dialogue"
     scenario: Scenario | None = None
     messages: list[StoryMessage] = []
 
@@ -116,6 +156,59 @@ class GenerateQuestRequest(BaseModel):
     setting: str = ""
     tone: str = ""
     party_level: int | None = None
+
+
+# ---------------------------------------------------------------------------
+# JSON extraction helpers
+# ---------------------------------------------------------------------------
+
+def _strip_fences(text: str) -> str:
+    """Remove markdown code fences from LLM output."""
+    text = text.strip()
+    if text.startswith("```"):
+        # drop the opening fence line
+        text = text.split("\n", 1)[1] if "\n" in text else text[3:]
+        # drop trailing fence
+        if text.rstrip().endswith("```"):
+            text = text.rstrip()[:-3]
+    return text.strip()
+
+
+def _extract_json_object(text: str) -> str:
+    """
+    Find and return the first complete {...} JSON object in text.
+    More robust than fence-stripping alone: handles junk before/after the object,
+    partial trailing text, and models that write prose around the JSON.
+    Falls back to the full stripped text if no balanced braces are found.
+    """
+    text = _strip_fences(text)
+    start = text.find("{")
+    if start == -1:
+        return text  # let caller's json.loads raise a clear error
+    depth = 0
+    for i, ch in enumerate(text[start:], start):
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : i + 1]
+    # unbalanced — return from the opening brace and hope for the best
+    return text[start:]
+
+
+def _fix_retry_messages(raw: str, schema_hint: str = "") -> list[dict]:
+    """Build a fix-retry message list that gives the model clear instructions."""
+    instruction = (
+        "The following text is not valid JSON. Extract or reconstruct it as a single valid JSON object. "
+        "Output ONLY the corrected JSON — no markdown, no explanation, no extra text."
+    )
+    if schema_hint:
+        instruction += f"\n\nExpected schema:\n{schema_hint}"
+    return [
+        {"role": "system", "content": instruction},
+        {"role": "user", "content": raw},
+    ]
 
 
 # ---------------------------------------------------------------------------
@@ -162,6 +255,7 @@ def build_system_prompt(scenario: Scenario) -> str:
         "- Keep responses concise (2–4 paragraphs) unless dramatic scenes call for more.\n"
         "- When the player's message is prefixed with [Action]:, treat it as a narrative action or description.\n"
         "- When the player's message is prefixed with [Dialogue]:, treat it as spoken words from the player character.\n"
+        "- When the player's message is prefixed with [Direct]:, treat it as a director's instruction — steer the story in that direction without the player character speaking or acting. Acknowledge the direction naturally through the narrative.\n"
     )
 
 
@@ -202,6 +296,7 @@ def build_interpersonal_system_prompt(scenario: Scenario) -> str:
         "- Never break character unless the user explicitly says [OOC].\n"
         "- When the user's message is prefixed with [Action]:, treat it as a narrative action.\n"
         "- When the user's message is prefixed with [Dialogue]:, treat it as spoken words.\n"
+        "- When the user's message is prefixed with [Direct]:, treat it as a director's instruction about where the scene should go — respond accordingly through your character's behaviour and words without breaking immersion.\n"
         "- Keep responses concise (1–3 paragraphs) to maintain conversational flow.\n"
     )
 
@@ -227,12 +322,17 @@ def build_kickoff_prompt(scenario: Scenario) -> str:
 # ---------------------------------------------------------------------------
 
 async def stream_chat(api_messages: list[dict[str, str]]) -> AsyncGenerator[str, None]:
+    backend = active_backend
     payload = {
-        "model": "local-model",
+        "model": backend["model"],
         "messages": api_messages,
         "stream": True,
+        "temperature": backend.get("temperature", 0.8),
+        "top_p": backend.get("top_p", 0.95),
+        "top_k": backend.get("top_k", 50),
+        "repeat_penalty": backend.get("repeat_penalty", 1.0),
     }
-    logger.info(">>> LLM stream request (%d messages)", len(api_messages))
+    logger.info(">>> LLM stream request (%d messages, backend=%s)", len(api_messages), backend["id"])
     for msg in api_messages:
         preview = msg["content"][:200] + ("…" if len(msg["content"]) > 200 else "")
         logger.info("    [%s] %s", msg["role"], preview)
@@ -241,7 +341,7 @@ async def stream_chat(api_messages: list[dict[str, str]]) -> AsyncGenerator[str,
     async with httpx.AsyncClient(timeout=120.0) as client:
         async with client.stream(
             "POST",
-            f"{LLAMA_CPP_URL}/v1/chat/completions",
+            f"{backend['url']}/v1/chat/completions",
             json=payload,
         ) as resp:
             async for line in resp.aiter_lines():
@@ -267,9 +367,22 @@ async def stream_chat(api_messages: list[dict[str, str]]) -> AsyncGenerator[str,
 # LLM call helper (non-streaming)
 # ---------------------------------------------------------------------------
 
-async def call_llm(messages: list[dict[str, str]], timeout: float = 30.0) -> str:
-    payload = {"model": "local-model", "messages": messages}
-    logger.info(">>> LLM request (%d messages, timeout=%.0fs)", len(messages), timeout)
+async def call_llm(messages: list[dict[str, str]], timeout: float = 30.0, json_mode: bool = False) -> str:
+    backend = active_backend
+    payload = {
+        "model": backend["model"],
+        "messages": messages,
+        "temperature": backend.get("temperature", 0.8),
+        "top_p": backend.get("top_p", 0.95),
+        "top_k": backend.get("top_k", 50),
+        "repeat_penalty": backend.get("repeat_penalty", 1.0),
+    }
+    if json_mode:
+        # Force llama.cpp's JSON grammar mode — constrains token sampling to valid JSON only.
+        # Eliminates preamble / reasoning text that instruction-tuned models (e.g. obliterated)
+        # sometimes emit before the actual JSON object.
+        payload["response_format"] = {"type": "json_object"}
+    logger.info(">>> LLM request (%d messages, timeout=%.0fs, backend=%s, json_mode=%s)", len(messages), timeout, backend["id"], json_mode)
     for msg in messages:
         role = msg["role"]
         content = msg["content"]
@@ -279,7 +392,7 @@ async def call_llm(messages: list[dict[str, str]], timeout: float = 30.0) -> str
     async with httpx.AsyncClient(timeout=timeout) as client:
         try:
             resp = await client.post(
-                f"{LLAMA_CPP_URL}/v1/chat/completions", json=payload,
+                f"{backend['url']}/v1/chat/completions", json=payload,
             )
             resp.raise_for_status()
         except httpx.HTTPStatusError as exc:
@@ -318,7 +431,12 @@ async def chat(request: ChatRequest):
         # Format user messages with input-type prefix
         for m in request.messages:
             if m.role == "user" and request.scenario:
-                prefix = "[Dialogue]:" if m.input_type == "dialogue" else "[Action]:"
+                if m.input_type == "dialogue":
+                    prefix = "[Dialogue]:"
+                elif m.input_type == "action":
+                    prefix = "[Action]:"
+                else:
+                    prefix = "[Direct]:"
                 api_messages.append({"role": m.role, "content": f"{prefix} {m.content}"})
             else:
                 api_messages.append({"role": m.role, "content": m.content})
@@ -333,14 +451,18 @@ async def chat(request: ChatRequest):
 
     # Non-streaming mode (legacy)
     payload = {
-        "model": "local-model",
+        "model": active_backend["model"],
         "messages": api_messages,
+        "temperature": active_backend.get("temperature", 0.8),
+        "top_p": active_backend.get("top_p", 0.95),
+        "top_k": active_backend.get("top_k", 50),
+        "repeat_penalty": active_backend.get("repeat_penalty", 1.0),
     }
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         try:
             resp = await client.post(
-                f"{LLAMA_CPP_URL}/v1/chat/completions",
+                f"{active_backend['url']}/v1/chat/completions",
                 json=payload,
             )
             resp.raise_for_status()
@@ -381,7 +503,11 @@ async def assist(request: AssistRequest) -> AssistResponse:
             if request.scenario.partner_relationship:
                 scenario_context += f"Relationship: {request.scenario.partner_relationship}\n"
 
-    input_mode = "dialogue (spoken words)" if request.input_type == "dialogue" else "action (narrative description)"
+    input_mode = (
+        "dialogue (spoken words)" if request.input_type == "dialogue"
+        else "action (narrative action/description)" if request.input_type == "action"
+        else "direct (director instruction — steer where the story goes next)"
+    )
 
     if request.mode == "suggest":
         system = (
@@ -488,34 +614,30 @@ async def generate_scenario(request: GenerateScenarioRequest) -> Scenario:
         {"role": "user", "content": request.description},
     ]
 
-    raw = await call_llm(api_messages, timeout=60.0)
+    raw = await call_llm(api_messages, timeout=60.0, json_mode=True)
 
-    # Try to extract JSON from the response
+    # First attempt — extract and parse the JSON object
     try:
-        # Strip markdown code fences if present
-        cleaned = raw.strip()
-        if cleaned.startswith("```"):
-            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
-            if cleaned.endswith("```"):
-                cleaned = cleaned[:-3]
-            cleaned = cleaned.strip()
-        scenario = Scenario.model_validate_json(cleaned)
+        scenario = Scenario.model_validate_json(_extract_json_object(raw))
+        return scenario
     except Exception:
-        # Retry: ask LLM to fix the JSON
-        fix_messages = [
-            {"role": "system", "content": "Fix the following to be valid JSON matching the schema. Output ONLY the corrected JSON."},
-            {"role": "user", "content": raw},
-        ]
-        raw2 = await call_llm(fix_messages, timeout=30.0)
-        cleaned2 = raw2.strip()
-        if cleaned2.startswith("```"):
-            cleaned2 = cleaned2.split("\n", 1)[1] if "\n" in cleaned2 else cleaned2[3:]
-            if cleaned2.endswith("```"):
-                cleaned2 = cleaned2[:-3]
-            cleaned2 = cleaned2.strip()
-        scenario = Scenario.model_validate_json(cleaned2)
+        logger.warning("/generate-scenario: first parse failed, retrying with fix prompt")
 
-    return scenario
+    # Second attempt — ask the LLM to fix it, with schema hint
+    raw2 = await call_llm(
+        _fix_retry_messages(raw, schema_hint=schema_fields),
+        timeout=45.0,
+        json_mode=True,
+    )
+    try:
+        scenario = Scenario.model_validate_json(_extract_json_object(raw2))
+        return scenario
+    except Exception as exc:
+        logger.error("/generate-scenario: retry also failed. raw=%r raw2=%r err=%s", raw[:200], raw2[:200], exc)
+        raise HTTPException(
+            status_code=422,
+            detail="The LLM did not return valid scenario JSON after two attempts. Try again.",
+        ) from exc
 
 
 @app.post("/generate-npc")
@@ -576,29 +698,22 @@ async def generate_npc(request: GenerateNpcRequest) -> dict:
         {"role": "user", "content": "Generate this NPC's full D&D 2024 profile."},
     ]
 
-    raw = await call_llm(api_messages, timeout=120.0)
+    raw = await call_llm(api_messages, timeout=120.0, json_mode=True)
 
     try:
-        cleaned = raw.strip()
-        if cleaned.startswith("```"):
-            cleaned = cleaned.split("\n", 1)[1] if "\n" in cleaned else cleaned[3:]
-            if cleaned.endswith("```"):
-                cleaned = cleaned[:-3]
-            cleaned = cleaned.strip()
-        return json.loads(cleaned)
+        return json.loads(_extract_json_object(raw))
     except Exception:
-        fix_messages = [
-            {"role": "system", "content": "Fix the following to be valid JSON. Output ONLY the corrected JSON."},
-            {"role": "user", "content": raw},
-        ]
-        raw2 = await call_llm(fix_messages, timeout=30.0)
-        cleaned2 = raw2.strip()
-        if cleaned2.startswith("```"):
-            cleaned2 = cleaned2.split("\n", 1)[1] if "\n" in cleaned2 else cleaned2[3:]
-            if cleaned2.endswith("```"):
-                cleaned2 = cleaned2[:-3]
-            cleaned2 = cleaned2.strip()
-        return json.loads(cleaned2)
+        logger.warning("/generate-npc: first parse failed, retrying with fix prompt")
+
+    raw2 = await call_llm(_fix_retry_messages(raw), timeout=45.0, json_mode=True)
+    try:
+        return json.loads(_extract_json_object(raw2))
+    except Exception as exc:
+        logger.error("/generate-npc: retry also failed. raw=%r raw2=%r err=%s", raw[:200], raw2[:200], exc)
+        raise HTTPException(
+            status_code=422,
+            detail="The LLM did not return valid NPC JSON after two attempts. Try again.",
+        ) from exc
 
 
 @app.post("/generate-quest")
@@ -654,27 +769,44 @@ async def generate_quest(request: GenerateQuestRequest) -> dict:
         {"role": "user", "content": request.prompt},
     ]
 
-    raw = await call_llm(api_messages, timeout=180.0)
-
-    def _strip_fences(text: str) -> str:
-        text = text.strip()
-        if text.startswith("```"):
-            text = text.split("\n", 1)[1] if "\n" in text else text[3:]
-            if text.endswith("```"):
-                text = text[:-3]
-        return text.strip()
+    raw = await call_llm(api_messages, timeout=180.0, json_mode=True)
 
     try:
-        return json.loads(_strip_fences(raw))
+        return json.loads(_extract_json_object(raw))
     except Exception:
-        fix_messages = [
-            {"role": "system", "content": "Fix the following to be valid JSON. Output ONLY the corrected JSON."},
-            {"role": "user", "content": raw},
-        ]
-        raw2 = await call_llm(fix_messages, timeout=60.0)
-        return json.loads(_strip_fences(raw2))
+        logger.warning("/generate-quest: first parse failed, retrying with fix prompt")
+
+    raw2 = await call_llm(_fix_retry_messages(raw), timeout=60.0, json_mode=True)
+    try:
+        return json.loads(_extract_json_object(raw2))
+    except Exception as exc:
+        logger.error("/generate-quest: retry also failed. raw=%r raw2=%r err=%s", raw[:200], raw2[:200], exc)
+        raise HTTPException(
+            status_code=422,
+            detail="The LLM did not return valid quest JSON after two attempts. Try again.",
+        ) from exc
 
 
 @app.get("/health")
 async def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "active_backend": active_backend["id"]}
+
+
+class BackendPatchRequest(BaseModel):
+    id: str
+
+
+@app.get("/config/backends")
+async def get_backends() -> dict:
+    return {"backends": BACKENDS, "active_id": active_backend["id"]}
+
+
+@app.patch("/config/backend")
+async def set_backend(request: BackendPatchRequest) -> dict:
+    global active_backend
+    backend = next((b for b in BACKENDS if b["id"] == request.id), None)
+    if not backend:
+        raise HTTPException(status_code=404, detail=f"Backend '{request.id}' not found")
+    active_backend = backend
+    logger.info("Switched active backend to: %s (%s)", backend["name"], backend["url"])
+    return {"active_id": backend["id"]}

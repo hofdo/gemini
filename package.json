@@ -2,7 +2,10 @@
   "name": "@nx-monorepo-experiment/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dev": "npx nx run-many -t serve -p llama-chat llama-proxy llm --parallel=3",
+    "dev:uncensored": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=uncensored & npx nx serve llama-chat"
+  },
   "private": true,
   "dependencies": {
     "@angular/common": "~21.1.0",

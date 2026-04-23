@@ -45,7 +45,11 @@ export class ChatComponent implements AfterViewChecked, OnInit {
   }
 
   toggleInputType(): void {
-    this.inputType.update((t) => (t === 'dialogue' ? 'action' : 'dialogue'));
+    this.inputType.update((t) => {
+      if (t === 'dialogue') return 'action';
+      if (t === 'action') return 'direct';
+      return 'dialogue';
+    });
     this.focusInput();
   }
 

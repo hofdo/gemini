@@ -157,6 +157,10 @@
   font-size: 1.1rem;
   align-self: flex-start;
   margin-top: 0.3rem;
+
+  &.tag-direct {
+    filter: hue-rotate(120deg);
+  }
 }
 
 .input-row {
@@ -213,8 +217,13 @@
     cursor: pointer;
     padding: 0.5rem;
     align-self: flex-end;
+    transition: background 0.15s, border-color 0.15s;
 
     &:hover { background: #533483; }
+
+    &.mode-dialogue { background: #0f3460; border-color: #533483; }
+    &.mode-action   { background: #3a1a0a; border-color: #c04020; }
+    &.mode-direct   { background: #0a2a1a; border-color: #20a050; }
   }
 
   .btn-ai {

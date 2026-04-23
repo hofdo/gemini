@@ -1,4 +1,4 @@
-export type InputType = 'dialogue' | 'action';
+export type InputType = 'dialogue' | 'action' | 'direct';
 export type ScenarioType = 'adventure' | 'interpersonal';
 export type NpcMode = 'simple' | 'detailed';
 

@@ -1,4 +1,8 @@
 <div class="menu-container">
+  <div class="menu-top-bar">
+    <button class="btn-settings" (click)="goToSettings()" title="Settings">⚙️</button>
+  </div>
+
   <h1>🦙 Llama Chat</h1>
   <p class="subtitle">Choose your experience</p>
 
@@ -15,11 +19,10 @@
       <span class="mode-desc">Engage in deep one-on-one conversations with a richly defined AI partner character.</span>
     </button>
 
-    <button class="mode-card dm disabled" (click)="selectMode('dm')">
-      <span class="mode-badge">Coming Soon</span>
+    <button class="mode-card dm" (click)="selectMode('dm')">
       <span class="mode-icon">🎲</span>
       <span class="mode-title">Dungeon Master</span>
-      <span class="mode-desc">A full DM toolkit with encounter builders, loot tables, and campaign management.</span>
+      <span class="mode-desc">A full DM toolkit — quest creator, NPC builder, encounter tables and campaign management.</span>
     </button>
   </div>
 </div>

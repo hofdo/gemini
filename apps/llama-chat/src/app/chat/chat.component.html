@@ -34,7 +34,7 @@
     @if (chatService.messages().length === 0 && !chatService.loading()) {
       <div class="empty-state">
         <p>✨ Your story awaits!</p>
-        <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue and ⚔️ action mode.</p>
+        <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue, ⚔️ action, and 🎬 direct mode.</p>
       </div>
     }
     @if (chatService.messages().length === 0 && chatService.loading()) {
@@ -45,7 +45,9 @@
     @for (msg of chatService.messages(); track $index) {
       <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
         @if (msg.role === 'user' && msg.inputType) {
-          <span class="input-tag">{{ msg.inputType === 'dialogue' ? '🗣' : '⚔️' }}</span>
+          <span class="input-tag" [class.tag-dialogue]="msg.inputType === 'dialogue'" [class.tag-action]="msg.inputType === 'action'" [class.tag-direct]="msg.inputType === 'direct'">
+            {{ msg.inputType === 'dialogue' ? '🗣' : msg.inputType === 'action' ? '⚔️' : '🎬' }}
+          </span>
         }
         <span class="bubble">{{ msg.content }}</span>
       </div>
@@ -58,8 +60,8 @@
   </div>
 
   <div class="input-row">
-    <button class="btn-toggle" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue mode' : 'Action mode'">
-      {{ inputType() === 'dialogue' ? '🗣' : '⚔️' }}
+    <button class="btn-toggle" [class.mode-dialogue]="inputType() === 'dialogue'" [class.mode-action]="inputType() === 'action'" [class.mode-direct]="inputType() === 'direct'" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue — click for Action' : inputType() === 'action' ? 'Action — click for Direct' : 'Direct — click for Dialogue'">
+      {{ inputType() === 'dialogue' ? '🗣' : inputType() === 'action' ? '⚔️' : '🎬' }}
     </button>
     <button class="btn-ai" (click)="aiSuggestOrRewrite()" [disabled]="aiAssisting() || chatService.loading()" [title]="input().trim() ? '✨ Enhance text' : '✨ Suggest text'">
       @if (aiAssisting()) { ⏳ } @else { ✨ }
@@ -69,7 +71,7 @@
       [value]="input()"
       (input)="input.set($any($event.target).value)"
       (keydown)="onKeydown($event)"
-      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : 'Describe an action… (Enter to send)'"
+      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : inputType() === 'action' ? 'Describe an action… (Enter to send)' : 'Direct what happens next… (Enter to send)'"
       rows="4"
     ></textarea>
     <button (click)="send()" [disabled]="chatService.loading()">Send</button>
