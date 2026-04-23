@@ -11,6 +11,11 @@
       "options": {
         "command": ".venv/bin/uvicorn main:app --reload --port 8000",
         "cwd": "apps/llama-proxy"
+      },
+      "configurations": {
+        "uncensored": {
+          "command": "ACTIVE_BACKEND_ID=gemma4-uncensored .venv/bin/uvicorn main:app --reload --port 8000"
+        }
       }
     },
     "lint": {
