@@ -1,0 +1,23 @@
+{
+  "extraKnownMarketplaces": {
+    "nx-claude-plugins": {
+      "source": {
+        "source": "github",
+        "repo": "nrwl/nx-ai-agents-config"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "nx@nx-claude-plugins": true
+  },
+  "mcpServers": {
+    "graphify": {
+      "command": "/Users/dominique/.local/share/uv/tools/graphifyy/bin/python",
+      "args": [
+        "-m",
+        "graphify.serve",
+        "/Users/dominique/IdeaProjects/nx-monorepo-experiment/graphify-out/graph.json"
+      ]
+    }
+  }
+}
