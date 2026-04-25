@@ -15,23 +15,24 @@ from pydantic import BaseModel, Field
 
 _DEFAULT_BACKENDS: list[dict] = [
     {
-        "id": "gemma4-obliterated",
-        "name": "Gemma 4 Obliterated (Q8_0)",
-        "url": os.getenv("LLAMA_CPP_URL", "http://localhost:8080"),
-        "model": "local-model",
-        "temperature": 0.7,
-        "top_p": 0.9,
-        "top_k": 40,
-        "repeat_penalty": 1.1,
-    },
-    {
         "id": "gemma4-uncensored",
         "name": "Gemma 4 Uncensored (Q6_K_P)",
         "url": os.getenv("LLAMA_CPP_URL", "http://localhost:8080"),
         "model": "local-model",
-        "temperature": 0.8,
+        "temperature": 1.0,
         "top_p": 0.95,
-        "top_k": 50,
+        "top_k": 64,
+        "repeat_penalty": 1.0,
+    },
+    {
+        "id": "qwen3-uncensored",
+        "name": "Qwen 3.5 9B Uncensored (Q8_0)",
+        "url": os.getenv("LLAMA_CPP_URL", "http://localhost:8080"),
+        "model": "local-model",
+        "temperature": 0.7,
+        "top_p": 0.8,
+        "top_k": 20,
+        "min_p": 0.0,
         "repeat_penalty": 1.0,
     },
 ]
@@ -48,7 +49,7 @@ def _load_backends() -> list[dict]:
 
 
 BACKENDS: list[dict] = _load_backends()
-_default_id = os.getenv("ACTIVE_BACKEND_ID", "gemma4-obliterated")
+_default_id = os.getenv("ACTIVE_BACKEND_ID", "gemma4-uncensored")
 active_backend: dict = next((b for b in BACKENDS if b["id"] == _default_id), BACKENDS[0])
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
@@ -331,6 +332,7 @@ async def stream_chat(api_messages: list[dict[str, str]]) -> AsyncGenerator[str,
         "top_p": backend.get("top_p", 0.95),
         "top_k": backend.get("top_k", 50),
         "repeat_penalty": backend.get("repeat_penalty", 1.0),
+        "min_p": backend.get("min_p", 0.05),
     }
     logger.info(">>> LLM stream request (%d messages, backend=%s)", len(api_messages), backend["id"])
     for msg in api_messages:
@@ -376,6 +378,7 @@ async def call_llm(messages: list[dict[str, str]], timeout: float = 30.0, json_m
         "top_p": backend.get("top_p", 0.95),
         "top_k": backend.get("top_k", 50),
         "repeat_penalty": backend.get("repeat_penalty", 1.0),
+        "min_p": backend.get("min_p", 0.05),
     }
     if json_mode:
         # Force llama.cpp's JSON grammar mode — constrains token sampling to valid JSON only.
@@ -457,6 +460,7 @@ async def chat(request: ChatRequest):
         "top_p": active_backend.get("top_p", 0.95),
         "top_k": active_backend.get("top_k", 50),
         "repeat_penalty": active_backend.get("repeat_penalty", 1.0),
+        "min_p": active_backend.get("min_p", 0.05),
     }
 
     async with httpx.AsyncClient(timeout=120.0) as client:

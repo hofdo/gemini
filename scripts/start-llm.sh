@@ -3,7 +3,7 @@
 # start-llm.sh — Start llama-server with a Gemma-4 model from HuggingFace
 #
 # Usage:
-#   bash scripts/start-llm.sh [gemma4-obliterated|gemma4-uncensored]
+#   bash scripts/start-llm.sh [gemma4-uncensored|qwen3-uncensored]
 #
 # Environment:
 #   HF_TOKEN   — HuggingFace token (required for private/gated repos)
@@ -11,25 +11,25 @@
 # ---------------------------------------------------------------------------
 set -euo pipefail
 
-MODEL="${1:-gemma4-obliterated}"
+MODEL="${1:-gemma4-uncensored}"
 PORT="${LLAMA_PORT:-8080}"
 
 case "$MODEL" in
-  gemma4-obliterated)
-    HF_REPO="OBLITERATUS/gemma-4-E4B-it-OBLITERATED"
-    HF_QUANT="Q8_0"
-    ;;
   gemma4-uncensored)
     HF_REPO="HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive"
     HF_QUANT="Q6_K_P"
     ;;
+  qwen3-uncensored)
+    HF_REPO="HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive"
+    HF_QUANT="Q8_0"
+    ;;
   *)
     echo "❌ Unknown model: $MODEL"
     echo ""
-    echo "Usage: $0 [gemma4-obliterated|gemma4-uncensored]"
+    echo "Usage: $0 [gemma4-uncensored|qwen3-uncensored]"
     echo ""
-    echo "  gemma4-obliterated  OBLITERATUS/gemma-4-E4B-it-OBLITERATED (Q8_0)"
-    echo "  gemma4-uncensored   HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive (Q6_K_P)"
+    echo "  gemma4-uncensored  HauhauCS/Gemma-4-E4B-Uncensored-HauhauCS-Aggressive (Q6_K_P)"
+    echo "  qwen3-uncensored   HauhauCS/Qwen3.5-9B-Uncensored-HauhauCS-Aggressive (Q8_0)"
     exit 1
     ;;
 esac
@@ -42,7 +42,7 @@ echo "   Port:   $PORT"
 echo "   GPU:    Metal (-ngl 99, Apple M5)"
 echo ""
 
-ARGS="-hf ${HF_REPO}:${HF_QUANT} --port ${PORT} -ngl 99"
+ARGS="-hf ${HF_REPO}:${HF_QUANT} --port ${PORT} -ngl 99 --jinja"
 
 if [ -n "${HF_TOKEN:-}" ]; then
   ARGS="$ARGS --hf-token ${HF_TOKEN}"

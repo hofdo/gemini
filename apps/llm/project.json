@@ -9,35 +9,35 @@
       "continuous": true,
       "executor": "nx:run-commands",
       "options": {
-        "command": "bash scripts/start-llm.sh gemma4-obliterated",
+        "command": "bash scripts/start-llm.sh gemma4-uncensored",
         "cwd": "{workspaceRoot}"
       },
       "configurations": {
-        "obliterated": {
-          "command": "bash scripts/start-llm.sh gemma4-obliterated"
-        },
         "uncensored": {
           "command": "bash scripts/start-llm.sh gemma4-uncensored"
+        },
+        "qwen3-uncensored": {
+          "command": "bash scripts/start-llm.sh qwen3-uncensored"
         }
       },
-      "defaultConfiguration": "obliterated"
+      "defaultConfiguration": "uncensored"
     },
     "start": {
       "continuous": true,
       "executor": "nx:run-commands",
       "options": {
-        "command": "bash scripts/start-llm.sh gemma4-obliterated",
+        "command": "bash scripts/start-llm.sh gemma4-uncensored",
         "cwd": "{workspaceRoot}"
       },
       "configurations": {
-        "obliterated": {
-          "command": "bash scripts/start-llm.sh gemma4-obliterated"
-        },
         "uncensored": {
           "command": "bash scripts/start-llm.sh gemma4-uncensored"
+        },
+        "qwen3-uncensored": {
+          "command": "bash scripts/start-llm.sh qwen3-uncensored"
         }
       },
-      "defaultConfiguration": "obliterated"
+      "defaultConfiguration": "uncensored"
     }
   }
 }

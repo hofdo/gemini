@@ -5,6 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ScenarioService } from '../scenario.service';
 import { AiAssistService } from '../../shared/ai-assist.service';
 import { Scenario, ScenarioType, NpcMode } from '../scenario.model';
+import { PresetScenarioService, PresetMeta } from '../preset-scenario.service';
 
 @Component({
   selector: 'llama-scenario-form',
@@ -19,12 +20,15 @@ export class ScenarioFormComponent {
   private route = inject(ActivatedRoute);
   private scenarioService = inject(ScenarioService);
   private aiAssist = inject(AiAssistService);
+  private presetService = inject(PresetScenarioService);
 
   scenarioType = signal<ScenarioType>('adventure');
   aiDescription = signal('');
   generatingScenario = signal(false);
   generatingNpc = signal<number | null>(null);
   npcGenerationError = signal<string | null>(null);
+  presets = signal<PresetMeta[]>([]);
+  loadingPreset = signal(false);
 
   form: FormGroup = this.fb.group({
     scenarioType: ['adventure'],
@@ -62,6 +66,37 @@ export class ScenarioFormComponent {
         this.addNpc(n.name, n.description, n.mode ?? 'simple', n.stats, n.personality, n.foes, n.friends, n.plotTwists)
       );
       existing.rules.forEach((r) => this.addRule(r));
+    }
+
+    this.presetService.loadIndex()
+      .then(all => this.presets.set(all.filter(p => p.type === this.scenarioType())))
+      .catch(() => {});
+  }
+
+  async loadPreset(id: string): Promise<void> {
+    const meta = this.presets().find(p => p.id === id);
+    if (!meta || this.loadingPreset()) return;
+    this.loadingPreset.set(true);
+    try {
+      const scenario = await this.presetService.loadScenario(meta);
+      this.form.patchValue({
+        scenarioType: scenario.scenarioType,
+        title: scenario.title,
+        setting: scenario.setting,
+        tone: scenario.tone,
+        characterName: scenario.characterName,
+        characterDescription: scenario.characterDescription,
+      });
+      this.npcs.clear();
+      (scenario.npcs ?? []).forEach((n) =>
+        this.addNpc(n.name, n.description, n.mode ?? 'simple', n.stats, n.personality, n.foes, n.friends, n.plotTwists)
+      );
+      this.rules.clear();
+      (scenario.rules ?? []).forEach((r) => this.addRule(r));
+    } catch (err) {
+      console.error('Failed to load preset', err);
+    } finally {
+      this.loadingPreset.set(false);
     }
   }
 

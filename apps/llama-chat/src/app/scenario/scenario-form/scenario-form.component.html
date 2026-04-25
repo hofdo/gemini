@@ -3,6 +3,24 @@
 
   <h1>📜 {{ scenarioType() === 'interpersonal' ? '💬 Interpersonal' : '🗺️ Adventure' }} — Define Your Story</h1>
 
+  @if (presets().length > 0) {
+    <section class="preset-section">
+      <h2>📦 Load a Preset Scenario</h2>
+      <div class="preset-row">
+        <select #presetSelect [disabled]="loadingPreset()">
+          <option value="">— choose a preset —</option>
+          @for (p of presets(); track p.id) {
+            <option [value]="p.id">{{ p.label }}</option>
+          }
+        </select>
+        <button type="button" class="btn-preset-load" (click)="loadPreset(presetSelect.value)" [disabled]="!presetSelect.value || loadingPreset()">
+          @if (loadingPreset()) { ⏳ Loading… } @else { Load }
+        </button>
+      </div>
+    </section>
+    <hr class="divider" />
+  }
+
   <section class="ai-generate-section">
     <h2>✨ Write Scenario with AI</h2>
     <textarea

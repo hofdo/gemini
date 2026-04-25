@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx nx run-many -t serve -p llama-chat llama-proxy llm --parallel=3",
-    "dev:uncensored": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=uncensored & npx nx serve llama-chat"
+    "dev": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=uncensored & npx nx serve llama-chat",
+    "dev:qwen3": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=qwen3-uncensored & npx nx serve llama-chat"
   },
   "private": true,
   "dependencies": {

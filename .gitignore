@@ -43,3 +43,7 @@ Thumbs.db
 
 .angular
 .venv
+
+.nx/polygraph
+.claude/worktrees
+.claude/settings.local.json

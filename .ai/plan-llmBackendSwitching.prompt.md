@@ -22,17 +22,17 @@ repeat_penalty: 1.1
 
 ## Steps
 
-1. **Extend [`main.py`](apps/llama-proxy/main.py)**:
+1. **Extend [`main.py`](../apps/llama-proxy/main.py)**:
    - Replace the module-level `LLAMA_CPP_URL` constant with an in-memory `active_backend` dict holding `{id, name, url, model, temperature, top_p, top_k, repeat_penalty}`.
    - Define a `BACKENDS` list from an `AVAILABLE_BACKENDS` env var (JSON) with the two Gemma models as defaults, each carrying their own inference parameters.
    - Thread the active backend's parameters into every `call_llm` and `stream_chat` payload (`temperature`, `top_p`, `top_k`, `repeat_penalty`).
    - Add `GET /config/backends` (list all backends + active id) and `PATCH /config/backend` (switch active by id) endpoints.
 
-2. **Add [`scripts/start-llm.sh`](scripts/start-llm.sh)** — a bash script that accepts a model id argument (`gemma4-uncensored` or `gemma4-obliterated`, defaulting to the obliterated one) and runs the matching `llama-server -hf <repo>:<quant>` command with `--port 8080`. Reads an optional `HF_TOKEN` env var for HuggingFace authentication. Includes a GPU-offload flag (`-ngl 99`) which is a no-op when no GPU is present but accelerates inference on Metal/CUDA.
+2. **Add [`scripts/start-llm.sh`](../scripts/start-llm.sh)** — a bash script that accepts a model id argument (`gemma4-uncensored` or `gemma4-obliterated`, defaulting to the obliterated one) and runs the matching `llama-server -hf <repo>:<quant>` command with `--port 8080`. Reads an optional `HF_TOKEN` env var for HuggingFace authentication. Includes a GPU-offload flag (`-ngl 99`) which is a no-op when no GPU is present but accelerates inference on Metal/CUDA.
 
-3. **Add [`apps/llm/project.json`](apps/llm/project.json)** with an Nx `start` target that calls `scripts/start-llm.sh` via `nx:run-commands`, so `npx nx start llm` (optionally `-- --model=gemma4-uncensored`) starts the server.
+3. **Add [`apps/llm/project.json`](../apps/llm/project.json)** with an Nx `start` target that calls `scripts/start-llm.sh` via `nx:run-commands`, so `npx nx start llm` (optionally `-- --model=gemma4-uncensored`) starts the server.
 
-4. **Add [`apps/llama-proxy/.env.example`](apps/llama-proxy/.env.example)** documenting:
+4. **Add [`apps/llama-proxy/.env.example`](../apps/llama-proxy/.env.example)** documenting:
    - `LLAMA_CPP_URL` (default `http://localhost:8080`)
    - `ACTIVE_BACKEND_ID` (default `gemma4-obliterated`)
    - `AVAILABLE_BACKENDS` (JSON array override to add custom endpoints)
@@ -45,7 +45,7 @@ repeat_penalty: 1.1
 
 6. **Create `SettingsComponent`** at `/settings` — displays each backend as a selectable card showing name, URL, model, and inference parameter chips. The active card is highlighted. A live indicator pings `GET /health` on the proxy to confirm connectivity.
 
-7. **Update [`app.routes.ts`](apps/llama-chat/src/app/app.routes.ts) and [`menu.component.html`](apps/llama-chat/src/app/menu/menu.component.html)** to add the `/settings` route and a ⚙️ settings icon-button in the menu header.
+7. **Update [`app.routes.ts`](../apps/llama-chat/src/app/app.routes.ts) and [`menu.component.html`](../apps/llama-chat/src/app/menu/menu.component.html)** to add the `/settings` route and a ⚙️ settings icon-button in the menu header.
 
 ## Further Considerations
 
