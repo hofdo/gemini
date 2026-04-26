@@ -9,7 +9,7 @@
       "source_file": "jest.preset.js",
       "source_location": "L1",
       "id": "jest_preset_js",
-      "community": 14,
+      "community": 16,
       "norm_label": "jest.preset.js"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "eslint.config.mjs",
       "source_location": "L1",
       "id": "eslint_config_mjs",
-      "community": 10,
+      "community": 12,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "jest.config.ts",
       "source_location": "L1",
       "id": "jest_config_ts",
-      "community": 15,
+      "community": 17,
       "norm_label": "jest.config.ts"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "apps/llama-chat-e2e/playwright.config.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_e2e_playwright_config_ts",
-      "community": 16,
+      "community": 18,
       "norm_label": "playwright.config.ts"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "apps/llama-chat-e2e/eslint.config.mjs",
       "source_location": "L1",
       "id": "apps_llama_chat_e2e_eslint_config_mjs",
-      "community": 10,
+      "community": 12,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -54,7 +54,7 @@
       "source_file": "apps/llama-chat-e2e/src/example.spec.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_e2e_src_example_spec_ts",
-      "community": 17,
+      "community": 19,
       "norm_label": "example.spec.ts"
     },
     {
@@ -63,7 +63,7 @@
       "source_file": "apps/llama-proxy/config.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_config_py",
-      "community": 11,
+      "community": 13,
       "norm_label": "config.py"
     },
     {
@@ -72,7 +72,7 @@
       "source_file": "apps/llama-proxy/config.py",
       "source_location": "L36",
       "id": "config_load_backends",
-      "community": 11,
+      "community": 13,
       "norm_label": "_load_backends()"
     },
     {
@@ -81,7 +81,7 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_models_py",
-      "community": 5,
+      "community": 3,
       "norm_label": "models.py"
     },
     {
@@ -90,7 +90,7 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L6",
       "id": "models_npcstats",
-      "community": 5,
+      "community": 3,
       "norm_label": "npcstats"
     },
     {
@@ -99,7 +99,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basemodel",
-      "community": 5,
+      "community": 3,
       "norm_label": "basemodel"
     },
     {
@@ -108,7 +108,7 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L17",
       "id": "models_npc",
-      "community": 5,
+      "community": 3,
       "norm_label": "npc"
     },
     {
@@ -117,7 +117,7 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L28",
       "id": "models_scenario",
-      "community": 5,
+      "community": 3,
       "norm_label": "scenario"
     },
     {
@@ -126,7 +126,7 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L48",
       "id": "models_storymessage",
-      "community": 5,
+      "community": 3,
       "norm_label": "storymessage"
     },
     {
@@ -135,71 +135,188 @@
       "source_file": "apps/llama-proxy/models.py",
       "source_location": "L54",
       "id": "models_chatrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "chatrequest"
     },
     {
       "label": "ChatResponse",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L61",
+      "source_location": "L62",
       "id": "models_chatresponse",
-      "community": 5,
+      "community": 3,
       "norm_label": "chatresponse"
     },
     {
       "label": "AssistRequest",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L65",
+      "source_location": "L66",
       "id": "models_assistrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "assistrequest"
     },
     {
       "label": "AssistResponse",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L73",
+      "source_location": "L74",
       "id": "models_assistresponse",
-      "community": 5,
+      "community": 3,
       "norm_label": "assistresponse"
     },
     {
       "label": "GenerateScenarioRequest",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L77",
+      "source_location": "L78",
       "id": "models_generatescenariorequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "generatescenariorequest"
     },
     {
       "label": "GenerateNpcRequest",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L82",
+      "source_location": "L83",
       "id": "models_generatenpcrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "generatenpcrequest"
     },
     {
       "label": "GenerateQuestRequest",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L90",
+      "source_location": "L91",
       "id": "models_generatequestrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "generatequestrequest"
     },
     {
       "label": "BackendPatchRequest",
       "file_type": "code",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L97",
+      "source_location": "L98",
       "id": "models_backendpatchrequest",
-      "community": 5,
+      "community": 3,
       "norm_label": "backendpatchrequest"
+    },
+    {
+      "label": "FactionState",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L102",
+      "id": "models_factionstate",
+      "community": 3,
+      "norm_label": "factionstate"
+    },
+    {
+      "label": "NpcRelationship",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L113",
+      "id": "models_npcrelationship",
+      "community": 3,
+      "norm_label": "npcrelationship"
+    },
+    {
+      "label": "NpcStateModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L119",
+      "id": "models_npcstatemodel",
+      "community": 3,
+      "norm_label": "npcstatemodel"
+    },
+    {
+      "label": "StoryEventModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L130",
+      "id": "models_storyeventmodel",
+      "community": 3,
+      "norm_label": "storyeventmodel"
+    },
+    {
+      "label": "WorldLocationModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L143",
+      "id": "models_worldlocationmodel",
+      "community": 3,
+      "norm_label": "worldlocationmodel"
+    },
+    {
+      "label": "CurrentSceneModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L152",
+      "id": "models_currentscenemodel",
+      "community": 3,
+      "norm_label": "currentscenemodel"
+    },
+    {
+      "label": "WorldClockModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L159",
+      "id": "models_worldclockmodel",
+      "community": 3,
+      "norm_label": "worldclockmodel"
+    },
+    {
+      "label": "WorldStateModel",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L166",
+      "id": "models_worldstatemodel",
+      "community": 3,
+      "norm_label": "worldstatemodel"
+    },
+    {
+      "label": "FactionChange",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L182",
+      "id": "models_factionchange",
+      "community": 3,
+      "norm_label": "factionchange"
+    },
+    {
+      "label": "NpcChange",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L188",
+      "id": "models_npcchange",
+      "community": 3,
+      "norm_label": "npcchange"
+    },
+    {
+      "label": "SceneUpdate",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L196",
+      "id": "models_sceneupdate",
+      "community": 3,
+      "norm_label": "sceneupdate"
+    },
+    {
+      "label": "WorldStateDelta",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L204",
+      "id": "models_worldstatedelta",
+      "community": 3,
+      "norm_label": "worldstatedelta"
+    },
+    {
+      "label": "WorldStateUpdateRequest",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L213",
+      "id": "models_worldstateupdaterequest",
+      "community": 3,
+      "norm_label": "worldstateupdaterequest"
     },
     {
       "label": "llm.py",
@@ -207,7 +324,7 @@
       "source_file": "apps/llama-proxy/llm.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_llm_py",
-      "community": 2,
+      "community": 5,
       "norm_label": "llm.py"
     },
     {
@@ -216,25 +333,25 @@
       "source_file": "apps/llama-proxy/llm.py",
       "source_location": "L10",
       "id": "llm_build_payload",
-      "community": 2,
+      "community": 5,
       "norm_label": "_build_payload()"
     },
     {
       "label": "stream_chat()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L37",
+      "source_location": "L38",
       "id": "llm_stream_chat",
-      "community": 2,
+      "community": 5,
       "norm_label": "stream_chat()"
     },
     {
       "label": "call_llm()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L79",
+      "source_location": "L80",
       "id": "llm_call_llm",
-      "community": 2,
+      "community": 5,
       "norm_label": "call_llm()"
     },
     {
@@ -243,34 +360,52 @@
       "source_file": "apps/llama-proxy/prompts.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_prompts_py",
-      "community": 2,
+      "community": 8,
       "norm_label": "prompts.py"
+    },
+    {
+      "label": "standing_label()",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L11",
+      "id": "prompts_standing_label",
+      "community": 8,
+      "norm_label": "standing_label()"
+    },
+    {
+      "label": "_build_world_state_block()",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L27",
+      "id": "prompts_build_world_state_block",
+      "community": 8,
+      "norm_label": "_build_world_state_block()"
     },
     {
       "label": "build_system_prompt()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L4",
+      "source_location": "L117",
       "id": "prompts_build_system_prompt",
-      "community": 2,
+      "community": 8,
       "norm_label": "build_system_prompt()"
     },
     {
       "label": "build_interpersonal_system_prompt()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L55",
+      "source_location": "L170",
       "id": "prompts_build_interpersonal_system_prompt",
-      "community": 2,
+      "community": 8,
       "norm_label": "build_interpersonal_system_prompt()"
     },
     {
       "label": "build_kickoff_prompt()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L99",
+      "source_location": "L216",
       "id": "prompts_build_kickoff_prompt",
-      "community": 2,
+      "community": 8,
       "norm_label": "build_kickoff_prompt()"
     },
     {
@@ -279,7 +414,7 @@
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_main_py",
-      "community": 12,
+      "community": 14,
       "norm_label": "main.py"
     },
     {
@@ -288,7 +423,7 @@
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L24",
       "id": "main_global_exception_handler",
-      "community": 12,
+      "community": 14,
       "norm_label": "global_exception_handler()"
     },
     {
@@ -297,7 +432,7 @@
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_json_utils_py",
-      "community": 2,
+      "community": 5,
       "norm_label": "json_utils.py"
     },
     {
@@ -306,7 +441,7 @@
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L11",
       "id": "json_utils_strip_fences",
-      "community": 2,
+      "community": 5,
       "norm_label": "_strip_fences()"
     },
     {
@@ -315,7 +450,7 @@
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L20",
       "id": "json_utils_extract_json_object",
-      "community": 2,
+      "community": 5,
       "norm_label": "_extract_json_object()"
     },
     {
@@ -324,7 +459,7 @@
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L37",
       "id": "json_utils_parse_with_repair",
-      "community": 2,
+      "community": 5,
       "norm_label": "_parse_with_repair()"
     },
     {
@@ -333,7 +468,7 @@
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L47",
       "id": "json_utils_fix_retry_messages",
-      "community": 2,
+      "community": 5,
       "norm_label": "_fix_retry_messages()"
     },
     {
@@ -341,7 +476,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L21",
-      "community": 2,
+      "community": 5,
       "norm_label": "find and return the first complete {...} json object in text.",
       "id": "json_utils_rationale_21"
     },
@@ -350,7 +485,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/json_utils.py",
       "source_location": "L38",
-      "community": 2,
+      "community": 5,
       "norm_label": "parse json with json-repair fallback for malformed llm output.",
       "id": "json_utils_rationale_38"
     },
@@ -360,44 +495,53 @@
       "source_file": "apps/llama-proxy/routes/generate.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_routes_generate_py",
-      "community": 2,
+      "community": 5,
       "norm_label": "generate.py"
     },
     {
       "label": "assist()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L21",
+      "source_location": "L23",
       "id": "generate_assist",
-      "community": 2,
+      "community": 5,
       "norm_label": "assist()"
     },
     {
       "label": "generate_scenario()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L88",
+      "source_location": "L90",
       "id": "generate_generate_scenario",
-      "community": 2,
+      "community": 5,
       "norm_label": "generate_scenario()"
     },
     {
       "label": "generate_npc()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L191",
+      "source_location": "L193",
       "id": "generate_generate_npc",
-      "community": 2,
+      "community": 5,
       "norm_label": "generate_npc()"
     },
     {
       "label": "generate_quest()",
       "file_type": "code",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L278",
+      "source_location": "L280",
       "id": "generate_generate_quest",
-      "community": 2,
+      "community": 5,
       "norm_label": "generate_quest()"
+    },
+    {
+      "label": "update_world_state()",
+      "file_type": "code",
+      "source_file": "apps/llama-proxy/routes/generate.py",
+      "source_location": "L366",
+      "id": "generate_update_world_state",
+      "community": 5,
+      "norm_label": "update_world_state()"
     },
     {
       "label": "__init__.py",
@@ -405,7 +549,7 @@
       "source_file": "apps/llama-proxy/routes/__init__.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_routes_init_py",
-      "community": 18,
+      "community": 20,
       "norm_label": "__init__.py"
     },
     {
@@ -414,7 +558,7 @@
       "source_file": "apps/llama-proxy/routes/backends.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_routes_backends_py",
-      "community": 8,
+      "community": 10,
       "norm_label": "backends.py"
     },
     {
@@ -423,7 +567,7 @@
       "source_file": "apps/llama-proxy/routes/backends.py",
       "source_location": "L10",
       "id": "backends_health",
-      "community": 8,
+      "community": 10,
       "norm_label": "health()"
     },
     {
@@ -432,7 +576,7 @@
       "source_file": "apps/llama-proxy/routes/backends.py",
       "source_location": "L15",
       "id": "backends_get_backends",
-      "community": 8,
+      "community": 10,
       "norm_label": "get_backends()"
     },
     {
@@ -441,7 +585,7 @@
       "source_file": "apps/llama-proxy/routes/backends.py",
       "source_location": "L20",
       "id": "backends_set_backend",
-      "community": 8,
+      "community": 10,
       "norm_label": "set_backend()"
     },
     {
@@ -450,7 +594,7 @@
       "source_file": "apps/llama-proxy/routes/chat.py",
       "source_location": "L1",
       "id": "apps_llama_proxy_routes_chat_py",
-      "community": 2,
+      "community": 8,
       "norm_label": "chat.py"
     },
     {
@@ -459,7 +603,7 @@
       "source_file": "apps/llama-proxy/routes/chat.py",
       "source_location": "L13",
       "id": "chat_chat",
-      "community": 2,
+      "community": 8,
       "norm_label": "chat()"
     },
     {
@@ -468,7 +612,7 @@
       "source_file": "apps/llama-chat/eslint.config.mjs",
       "source_location": "L1",
       "id": "apps_llama_chat_eslint_config_mjs",
-      "community": 10,
+      "community": 12,
       "norm_label": "eslint.config.mjs"
     },
     {
@@ -477,7 +621,7 @@
       "source_file": "apps/llama-chat/src/main.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_main_ts",
-      "community": 19,
+      "community": 21,
       "norm_label": "main.ts"
     },
     {
@@ -486,7 +630,7 @@
       "source_file": "apps/llama-chat/src/test-setup.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_test_setup_ts",
-      "community": 20,
+      "community": 22,
       "norm_label": "test-setup.ts"
     },
     {
@@ -495,7 +639,7 @@
       "source_file": "apps/llama-chat/src/app/app.spec.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_app_spec_ts",
-      "community": 21,
+      "community": 23,
       "norm_label": "app.spec.ts"
     },
     {
@@ -504,7 +648,7 @@
       "source_file": "apps/llama-chat/src/app/app.routes.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_app_routes_ts",
-      "community": 22,
+      "community": 24,
       "norm_label": "app.routes.ts"
     },
     {
@@ -513,7 +657,7 @@
       "source_file": "apps/llama-chat/src/app/app.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_app_ts",
-      "community": 13,
+      "community": 15,
       "norm_label": "app.ts"
     },
     {
@@ -522,7 +666,7 @@
       "source_file": "apps/llama-chat/src/app/app.ts",
       "source_location": "L10",
       "id": "app_app",
-      "community": 13,
+      "community": 15,
       "norm_label": "app"
     },
     {
@@ -531,7 +675,7 @@
       "source_file": "apps/llama-chat/src/app/app.config.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_app_config_ts",
-      "community": 23,
+      "community": 25,
       "norm_label": "app.config.ts"
     },
     {
@@ -540,7 +684,7 @@
       "source_file": "apps/llama-chat/src/app/settings/settings.component.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_settings_settings_component_ts",
-      "community": 6,
+      "community": 7,
       "norm_label": "settings.component.ts"
     },
     {
@@ -549,7 +693,7 @@
       "source_file": "apps/llama-chat/src/app/settings/settings.component.ts",
       "source_location": "L13",
       "id": "settings_component_settingscomponent",
-      "community": 6,
+      "community": 7,
       "norm_label": "settingscomponent"
     },
     {
@@ -558,7 +702,7 @@
       "source_file": "apps/llama-chat/src/app/settings/settings.component.ts",
       "source_location": "L17",
       "id": "settings_component_settingscomponent_ngoninit",
-      "community": 6,
+      "community": 7,
       "norm_label": ".ngoninit()"
     },
     {
@@ -567,7 +711,7 @@
       "source_file": "apps/llama-chat/src/app/settings/settings.component.ts",
       "source_location": "L22",
       "id": "settings_component_settingscomponent_selectbackend",
-      "community": 6,
+      "community": 7,
       "norm_label": ".selectbackend()"
     },
     {
@@ -576,7 +720,7 @@
       "source_file": "apps/llama-chat/src/app/settings/settings.component.ts",
       "source_location": "L26",
       "id": "settings_component_settingscomponent_goback",
-      "community": 6,
+      "community": 7,
       "norm_label": ".goback()"
     },
     {
@@ -585,32 +729,32 @@
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_chat_chat_service_ts",
-      "community": 4,
+      "community": 6,
       "norm_label": "chat.service.ts"
     },
     {
       "label": "ChatService",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L14",
+      "source_location": "L15",
       "id": "chat_service_chatservice",
-      "community": 4,
+      "community": 6,
       "norm_label": "chatservice"
     },
     {
       "label": ".resetMessages()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L29",
+      "source_location": "L31",
       "id": "chat_service_chatservice_resetmessages",
-      "community": 4,
+      "community": 6,
       "norm_label": ".resetmessages()"
     },
     {
       "label": ".loadPersistedMessages()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "id": "chat_service_chatservice_loadpersistedmessages",
       "community": 4,
       "norm_label": ".loadpersistedmessages()"
@@ -619,90 +763,90 @@
       "label": ".cancelStream()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L49",
+      "source_location": "L51",
       "id": "chat_service_chatservice_cancelstream",
-      "community": 4,
+      "community": 6,
       "norm_label": ".cancelstream()"
     },
     {
       "label": ".trimContext()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L53",
+      "source_location": "L55",
       "id": "chat_service_chatservice_trimcontext",
-      "community": 4,
+      "community": 6,
       "norm_label": ".trimcontext()"
     },
     {
       "label": ".initializeStory()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L60",
+      "source_location": "L62",
       "id": "chat_service_chatservice_initializestory",
-      "community": 4,
+      "community": 6,
       "norm_label": ".initializestory()"
     },
     {
       "label": ".sendMessage()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L73",
+      "source_location": "L76",
       "id": "chat_service_chatservice_sendmessage",
-      "community": 4,
+      "community": 6,
       "norm_label": ".sendmessage()"
     },
     {
       "label": ".regenerateLastResponse()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L90",
+      "source_location": "L94",
       "id": "chat_service_chatservice_regeneratelastresponse",
-      "community": 4,
+      "community": 6,
       "norm_label": ".regeneratelastresponse()"
     },
     {
       "label": ".buildScenarioPayload()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L110",
+      "source_location": "L115",
       "id": "chat_service_chatservice_buildscenariopayload",
-      "community": 4,
+      "community": 6,
       "norm_label": ".buildscenariopayload()"
     },
     {
       "label": ".streamRequest()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L143",
+      "source_location": "L148",
       "id": "chat_service_chatservice_streamrequest",
-      "community": 4,
+      "community": 6,
       "norm_label": ".streamrequest()"
     },
     {
       "label": ".streamWithRetry()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L199",
+      "source_location": "L204",
       "id": "chat_service_chatservice_streamwithretry",
-      "community": 4,
+      "community": 6,
       "norm_label": ".streamwithretry()"
     },
     {
       "label": ".appendToLastMessage()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L211",
+      "source_location": "L216",
       "id": "chat_service_chatservice_appendtolastmessage",
-      "community": 4,
+      "community": 6,
       "norm_label": ".appendtolastmessage()"
     },
     {
       "label": ".persistMessages()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L220",
+      "source_location": "L225",
       "id": "chat_service_chatservice_persistmessages",
-      "community": 4,
+      "community": 6,
       "norm_label": ".persistmessages()"
     },
     {
@@ -711,7 +855,7 @@
       "source_file": "apps/llama-chat/src/app/chat/chat.service.spec.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_chat_chat_service_spec_ts",
-      "community": 24,
+      "community": 26,
       "norm_label": "chat.service.spec.ts"
     },
     {
@@ -720,23 +864,23 @@
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_chat_chat_component_ts",
-      "community": 3,
+      "community": 2,
       "norm_label": "chat.component.ts"
     },
     {
       "label": "ChatComponent",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L18",
+      "source_location": "L20",
       "id": "chat_component_chatcomponent",
-      "community": 3,
+      "community": 2,
       "norm_label": "chatcomponent"
     },
     {
       "label": ".ngOnInit()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L48",
+      "source_location": "L65",
       "id": "chat_component_chatcomponent_ngoninit",
       "community": 4,
       "norm_label": ".ngoninit()"
@@ -745,135 +889,198 @@
       "label": ".renderMarkdown()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L59",
+      "source_location": "L80",
       "id": "chat_component_chatcomponent_rendermarkdown",
-      "community": 3,
+      "community": 2,
       "norm_label": ".rendermarkdown()"
     },
     {
       "label": ".focusInput()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L68",
+      "source_location": "L89",
       "id": "chat_component_chatcomponent_focusinput",
-      "community": 3,
+      "community": 2,
       "norm_label": ".focusinput()"
     },
     {
       "label": ".toggleInputType()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L72",
+      "source_location": "L93",
       "id": "chat_component_chatcomponent_toggleinputtype",
-      "community": 3,
+      "community": 2,
       "norm_label": ".toggleinputtype()"
     },
     {
       "label": ".toggleScenarioInfo()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L81",
+      "source_location": "L102",
       "id": "chat_component_chatcomponent_togglescenarioinfo",
-      "community": 3,
+      "community": 2,
       "norm_label": ".togglescenarioinfo()"
     },
     {
       "label": ".requestReset()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L85",
+      "source_location": "L106",
       "id": "chat_component_chatcomponent_requestreset",
-      "community": 3,
+      "community": 2,
       "norm_label": ".requestreset()"
     },
     {
       "label": ".requestNew()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L90",
+      "source_location": "L111",
       "id": "chat_component_chatcomponent_requestnew",
-      "community": 3,
+      "community": 2,
       "norm_label": ".requestnew()"
     },
     {
       "label": ".requestChange()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L94",
+      "source_location": "L115",
       "id": "chat_component_chatcomponent_requestchange",
-      "community": 4,
+      "community": 2,
       "norm_label": ".requestchange()"
     },
     {
       "label": ".requestTrim()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L102",
+      "source_location": "L123",
       "id": "chat_component_chatcomponent_requesttrim",
-      "community": 3,
+      "community": 2,
       "norm_label": ".requesttrim()"
     },
     {
       "label": ".confirmAction()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L106",
+      "source_location": "L127",
       "id": "chat_component_chatcomponent_confirmaction",
-      "community": 4,
+      "community": 6,
       "norm_label": ".confirmaction()"
     },
     {
       "label": ".cancelAction()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L128",
+      "source_location": "L149",
       "id": "chat_component_chatcomponent_cancelaction",
-      "community": 3,
+      "community": 2,
       "norm_label": ".cancelaction()"
     },
     {
       "label": ".executeChange()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L132",
+      "source_location": "L153",
       "id": "chat_component_chatcomponent_executechange",
-      "community": 4,
+      "community": 2,
       "norm_label": ".executechange()"
     },
     {
       "label": ".send()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L138",
+      "source_location": "L159",
       "id": "chat_component_chatcomponent_send",
-      "community": 3,
+      "community": 2,
       "norm_label": ".send()"
     },
     {
       "label": ".onKeydown()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L146",
+      "source_location": "L167",
       "id": "chat_component_chatcomponent_onkeydown",
-      "community": 3,
+      "community": 2,
       "norm_label": ".onkeydown()"
     },
     {
       "label": ".onInput()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L153",
+      "source_location": "L174",
       "id": "chat_component_chatcomponent_oninput",
-      "community": 3,
+      "community": 2,
       "norm_label": ".oninput()"
+    },
+    {
+      "label": ".toggleWorldPanel()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L178",
+      "id": "chat_component_chatcomponent_toggleworldpanel",
+      "community": 2,
+      "norm_label": ".toggleworldpanel()"
+    },
+    {
+      "label": ".setWorldTab()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L182",
+      "id": "chat_component_chatcomponent_setworldtab",
+      "community": 2,
+      "norm_label": ".setworldtab()"
+    },
+    {
+      "label": ".dismissContradictions()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L186",
+      "id": "chat_component_chatcomponent_dismisscontradictions",
+      "community": 2,
+      "norm_label": ".dismisscontradictions()"
+    },
+    {
+      "label": ".standingLabel()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L190",
+      "id": "chat_component_chatcomponent_standinglabel",
+      "community": 2,
+      "norm_label": ".standinglabel()"
+    },
+    {
+      "label": ".standingColor()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L200",
+      "id": "chat_component_chatcomponent_standingcolor",
+      "community": 2,
+      "norm_label": ".standingcolor()"
+    },
+    {
+      "label": ".findNpcById()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L207",
+      "id": "chat_component_chatcomponent_findnpcbyid",
+      "community": 2,
+      "norm_label": ".findnpcbyid()"
+    },
+    {
+      "label": ".triggerWorldStateUpdate()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L211",
+      "id": "chat_component_chatcomponent_triggerworldstateupdate",
+      "community": 2,
+      "norm_label": ".triggerworldstateupdate()"
     },
     {
       "label": ".aiSuggestOrRewrite()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L157",
+      "source_location": "L240",
       "id": "chat_component_chatcomponent_aisuggestorrewrite",
-      "community": 3,
+      "community": 2,
       "norm_label": ".aisuggestorrewrite()"
     },
     {
@@ -882,41 +1089,41 @@
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_shared_ai_assist_service_ts",
-      "community": 3,
+      "community": 2,
       "norm_label": "ai-assist.service.ts"
     },
     {
       "label": "AiAssistService",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "id": "ai_assist_service_aiassistservice",
-      "community": 3,
+      "community": 2,
       "norm_label": "aiassistservice"
     },
     {
       "label": ".suggestInput()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "ai_assist_service_aiassistservice_suggestinput",
-      "community": 3,
+      "community": 2,
       "norm_label": ".suggestinput()"
     },
     {
       "label": ".rewriteInput()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L19",
+      "source_location": "L20",
       "id": "ai_assist_service_aiassistservice_rewriteinput",
-      "community": 3,
+      "community": 2,
       "norm_label": ".rewriteinput()"
     },
     {
       "label": ".generateScenario()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L27",
+      "source_location": "L28",
       "id": "ai_assist_service_aiassistservice_generatescenario",
       "community": 1,
       "norm_label": ".generatescenario()"
@@ -925,27 +1132,36 @@
       "label": ".generateNpc()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L80",
+      "source_location": "L81",
       "id": "ai_assist_service_aiassistservice_generatenpc",
-      "community": 3,
+      "community": 2,
       "norm_label": ".generatenpc()"
     },
     {
       "label": ".generateQuest()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L107",
+      "source_location": "L108",
       "id": "ai_assist_service_aiassistservice_generatequest",
-      "community": 3,
+      "community": 2,
       "norm_label": ".generatequest()"
+    },
+    {
+      "label": ".updateWorldState()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
+      "source_location": "L156",
+      "id": "ai_assist_service_aiassistservice_updateworldstate",
+      "community": 2,
+      "norm_label": ".updateworldstate()"
     },
     {
       "label": ".callAssist()",
       "file_type": "code",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L155",
+      "source_location": "L171",
       "id": "ai_assist_service_aiassistservice_callassist",
-      "community": 3,
+      "community": 2,
       "norm_label": ".callassist()"
     },
     {
@@ -954,7 +1170,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_shared_settings_service_ts",
-      "community": 6,
+      "community": 7,
       "norm_label": "settings.service.ts"
     },
     {
@@ -963,7 +1179,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L25",
       "id": "settings_service_settingsservice",
-      "community": 6,
+      "community": 7,
       "norm_label": "settingsservice"
     },
     {
@@ -972,7 +1188,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L33",
       "id": "settings_service_settingsservice_loadconfig",
-      "community": 6,
+      "community": 7,
       "norm_label": ".loadconfig()"
     },
     {
@@ -981,7 +1197,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L61",
       "id": "settings_service_settingsservice_setactivebackend",
-      "community": 6,
+      "community": 7,
       "norm_label": ".setactivebackend()"
     },
     {
@@ -990,7 +1206,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L72",
       "id": "settings_service_settingsservice_checkhealth",
-      "community": 6,
+      "community": 7,
       "norm_label": ".checkhealth()"
     },
     {
@@ -999,7 +1215,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L81",
       "id": "settings_service_settingsservice_activebackend",
-      "community": 6,
+      "community": 7,
       "norm_label": ".activebackend()"
     },
     {
@@ -1008,7 +1224,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L85",
       "id": "settings_service_settingsservice_setenablethinking",
-      "community": 6,
+      "community": 7,
       "norm_label": ".setenablethinking()"
     },
     {
@@ -1017,7 +1233,7 @@
       "source_file": "apps/llama-chat/src/app/shared/settings.service.ts",
       "source_location": "L90",
       "id": "settings_service_settingsservice_patchbackend",
-      "community": 6,
+      "community": 7,
       "norm_label": "._patchbackend()"
     },
     {
@@ -1062,7 +1278,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.service.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_scenario_scenario_service_ts",
-      "community": 7,
+      "community": 9,
       "norm_label": "scenario.service.ts"
     },
     {
@@ -1071,7 +1287,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.service.ts",
       "source_location": "L7",
       "id": "scenario_service_scenarioservice",
-      "community": 7,
+      "community": 9,
       "norm_label": "scenarioservice"
     },
     {
@@ -1080,7 +1296,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.service.ts",
       "source_location": "L10",
       "id": "scenario_service_scenarioservice_setscenario",
-      "community": 7,
+      "community": 9,
       "norm_label": ".setscenario()"
     },
     {
@@ -1089,7 +1305,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.service.ts",
       "source_location": "L15",
       "id": "scenario_service_scenarioservice_clearscenario",
-      "community": 7,
+      "community": 9,
       "norm_label": ".clearscenario()"
     },
     {
@@ -1098,7 +1314,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.service.ts",
       "source_location": "L20",
       "id": "scenario_service_scenarioservice_load",
-      "community": 7,
+      "community": 9,
       "norm_label": ".load()"
     },
     {
@@ -1107,7 +1323,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario.model.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_scenario_scenario_model_ts",
-      "community": 25,
+      "community": 27,
       "norm_label": "scenario.model.ts"
     },
     {
@@ -1377,7 +1593,7 @@
       "source_file": "apps/llama-chat/src/app/scenario/scenario-form/scenario-form.component.ts",
       "source_location": "L288",
       "id": "scenario_form_component_scenarioformcomponent_start",
-      "community": 7,
+      "community": 9,
       "norm_label": ".start()"
     },
     {
@@ -1395,7 +1611,7 @@
       "source_file": "apps/llama-chat/src/app/dm/dm.model.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_dm_dm_model_ts",
-      "community": 26,
+      "community": 28,
       "norm_label": "dm.model.ts"
     },
     {
@@ -1836,7 +2052,7 @@
       "source_file": "apps/llama-chat/src/app/menu/menu.component.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_app_menu_menu_component_ts",
-      "community": 9,
+      "community": 11,
       "norm_label": "menu.component.ts"
     },
     {
@@ -1845,7 +2061,7 @@
       "source_file": "apps/llama-chat/src/app/menu/menu.component.ts",
       "source_location": "L10",
       "id": "menu_component_menucomponent",
-      "community": 9,
+      "community": 11,
       "norm_label": "menucomponent"
     },
     {
@@ -1854,7 +2070,7 @@
       "source_file": "apps/llama-chat/src/app/menu/menu.component.ts",
       "source_location": "L13",
       "id": "menu_component_menucomponent_selectmode",
-      "community": 9,
+      "community": 11,
       "norm_label": ".selectmode()"
     },
     {
@@ -1863,8 +2079,179 @@
       "source_file": "apps/llama-chat/src/app/menu/menu.component.ts",
       "source_location": "L21",
       "id": "menu_component_menucomponent_gotosettings",
-      "community": 9,
+      "community": 11,
       "norm_label": ".gotosettings()"
+    },
+    {
+      "label": "world-state.service.ts",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L1",
+      "id": "apps_llama_chat_src_app_world_state_world_state_service_ts",
+      "community": 4,
+      "norm_label": "world-state.service.ts"
+    },
+    {
+      "label": "standingLabel()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L19",
+      "id": "world_state_service_standinglabel",
+      "community": 4,
+      "norm_label": "standinglabel()"
+    },
+    {
+      "label": "WorldStateService",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L30",
+      "id": "world_state_service_worldstateservice",
+      "community": 4,
+      "norm_label": "worldstateservice"
+    },
+    {
+      "label": ".constructor()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L33",
+      "id": "world_state_service_worldstateservice_constructor",
+      "community": 4,
+      "norm_label": ".constructor()"
+    },
+    {
+      "label": ".initForScenario()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L44",
+      "id": "world_state_service_worldstateservice_initforscenario",
+      "community": 4,
+      "norm_label": ".initforscenario()"
+    },
+    {
+      "label": ".loadForScenario()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L78",
+      "id": "world_state_service_worldstateservice_loadforscenario",
+      "community": 4,
+      "norm_label": ".loadforscenario()"
+    },
+    {
+      "label": ".applyDelta()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L97",
+      "id": "world_state_service_worldstateservice_applydelta",
+      "community": 4,
+      "norm_label": ".applydelta()"
+    },
+    {
+      "label": ".updateFaction()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L206",
+      "id": "world_state_service_worldstateservice_updatefaction",
+      "community": 4,
+      "norm_label": ".updatefaction()"
+    },
+    {
+      "label": ".updateNpcState()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L214",
+      "id": "world_state_service_worldstateservice_updatenpcstate",
+      "community": 4,
+      "norm_label": ".updatenpcstate()"
+    },
+    {
+      "label": ".updateScene()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L222",
+      "id": "world_state_service_worldstateservice_updatescene",
+      "community": 4,
+      "norm_label": ".updatescene()"
+    },
+    {
+      "label": ".addFaction()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L230",
+      "id": "world_state_service_worldstateservice_addfaction",
+      "community": 4,
+      "norm_label": ".addfaction()"
+    },
+    {
+      "label": ".addNpcState()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L239",
+      "id": "world_state_service_worldstateservice_addnpcstate",
+      "community": 4,
+      "norm_label": ".addnpcstate()"
+    },
+    {
+      "label": ".addEvent()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L247",
+      "id": "world_state_service_worldstateservice_addevent",
+      "community": 4,
+      "norm_label": ".addevent()"
+    },
+    {
+      "label": ".toCompactPrompt()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L261",
+      "id": "world_state_service_worldstateservice_tocompactprompt",
+      "community": 4,
+      "norm_label": ".tocompactprompt()"
+    },
+    {
+      "label": ".detectContradictions()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L334",
+      "id": "world_state_service_worldstateservice_detectcontradictions",
+      "community": 4,
+      "norm_label": ".detectcontradictions()"
+    },
+    {
+      "label": ".clearState()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L342",
+      "id": "world_state_service_worldstateservice_clearstate",
+      "community": 4,
+      "norm_label": ".clearstate()"
+    },
+    {
+      "label": ".persistNow()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L346",
+      "id": "world_state_service_worldstateservice_persistnow",
+      "community": 4,
+      "norm_label": ".persistnow()"
+    },
+    {
+      "label": ".migrate()",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L354",
+      "id": "world_state_service_worldstateservice_migrate",
+      "community": 4,
+      "norm_label": ".migrate()"
+    },
+    {
+      "label": "world-state.model.ts",
+      "file_type": "code",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.model.ts",
+      "source_location": "L1",
+      "id": "apps_llama_chat_src_app_world_state_world_state_model_ts",
+      "community": 29,
+      "norm_label": "world-state.model.ts"
     },
     {
       "label": "environment.prod.ts",
@@ -1872,7 +2259,7 @@
       "source_file": "apps/llama-chat/src/environments/environment.prod.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_environments_environment_prod_ts",
-      "community": 27,
+      "community": 30,
       "norm_label": "environment.prod.ts"
     },
     {
@@ -1881,7 +2268,7 @@
       "source_file": "apps/llama-chat/src/environments/environment.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_environments_environment_ts",
-      "community": 28,
+      "community": 31,
       "norm_label": "environment.ts"
     },
     {
@@ -1890,7 +2277,7 @@
       "source_file": "apps/llama-chat/src/environments/environment.development.ts",
       "source_location": "L1",
       "id": "apps_llama_chat_src_environments_environment_development_ts",
-      "community": 29,
+      "community": 32,
       "norm_label": "environment.development.ts"
     },
     {
@@ -1898,7 +2285,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L167",
-      "community": 30,
+      "community": 33,
       "norm_label": "remove markdown code fences from llm output.",
       "id": "main_rationale_167"
     },
@@ -1907,7 +2294,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L179",
-      "community": 31,
+      "community": 34,
       "norm_label": "find and return the first complete {...} json object in text.     more robust th",
       "id": "main_rationale_179"
     },
@@ -1916,7 +2303,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L202",
-      "community": 32,
+      "community": 35,
       "norm_label": "build a fix-retry message list that gives the model clear instructions.",
       "id": "main_rationale_202"
     },
@@ -1925,7 +2312,7 @@
       "file_type": "rationale",
       "source_file": "apps/llama-proxy/main.py",
       "source_location": "L306",
-      "community": 33,
+      "community": 36,
       "norm_label": "hidden user message to trigger the opening narration when no messages exist.",
       "id": "main_rationale_306"
     }
@@ -2031,7 +2418,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L61",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_chatresponse",
@@ -2043,7 +2430,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_assistrequest",
@@ -2055,7 +2442,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_assistresponse",
@@ -2067,7 +2454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L77",
+      "source_location": "L78",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_generatescenariorequest",
@@ -2079,7 +2466,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L82",
+      "source_location": "L83",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_generatenpcrequest",
@@ -2091,7 +2478,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L90",
+      "source_location": "L91",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_generatequestrequest",
@@ -2103,12 +2490,168 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L97",
+      "source_location": "L98",
       "weight": 1.0,
       "_src": "apps_llama_proxy_models_py",
       "_tgt": "models_backendpatchrequest",
       "source": "apps_llama_proxy_models_py",
       "target": "models_backendpatchrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L102",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_factionstate",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_factionstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_npcrelationship",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_npcrelationship",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_npcstatemodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_npcstatemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_storyeventmodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_storyeventmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_worldlocationmodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_worldlocationmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_currentscenemodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_currentscenemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_worldclockmodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_worldclockmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_worldstatemodel",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_worldstatemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_factionchange",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_factionchange",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_npcchange",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_npcchange",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L196",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_sceneupdate",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_sceneupdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_worldstatedelta",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_worldstatedelta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_models_py",
+      "_tgt": "models_worldstateupdaterequest",
+      "source": "apps_llama_proxy_models_py",
+      "target": "models_worldstateupdaterequest",
       "confidence_score": 1.0
     },
     {
@@ -2175,7 +2718,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L61",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "models_chatresponse",
       "_tgt": "basemodel",
@@ -2187,7 +2730,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L65",
+      "source_location": "L66",
       "weight": 1.0,
       "_src": "models_assistrequest",
       "_tgt": "basemodel",
@@ -2199,7 +2742,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L73",
+      "source_location": "L74",
       "weight": 1.0,
       "_src": "models_assistresponse",
       "_tgt": "basemodel",
@@ -2211,7 +2754,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L77",
+      "source_location": "L78",
       "weight": 1.0,
       "_src": "models_generatescenariorequest",
       "_tgt": "basemodel",
@@ -2223,7 +2766,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L82",
+      "source_location": "L83",
       "weight": 1.0,
       "_src": "models_generatenpcrequest",
       "_tgt": "basemodel",
@@ -2235,7 +2778,7 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L90",
+      "source_location": "L91",
       "weight": 1.0,
       "_src": "models_generatequestrequest",
       "_tgt": "basemodel",
@@ -2247,12 +2790,168 @@
       "relation": "inherits",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/models.py",
-      "source_location": "L97",
+      "source_location": "L98",
       "weight": 1.0,
       "_src": "models_backendpatchrequest",
       "_tgt": "basemodel",
       "source": "basemodel",
       "target": "models_backendpatchrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L102",
+      "weight": 1.0,
+      "_src": "models_factionstate",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_factionstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_src": "models_npcrelationship",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_npcrelationship",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L119",
+      "weight": 1.0,
+      "_src": "models_npcstatemodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_npcstatemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_src": "models_storyeventmodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_storyeventmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "_src": "models_worldlocationmodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_worldlocationmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L152",
+      "weight": 1.0,
+      "_src": "models_currentscenemodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_currentscenemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "_src": "models_worldclockmodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_worldclockmodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "_src": "models_worldstatemodel",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_worldstatemodel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "_src": "models_factionchange",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_factionchange",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "_src": "models_npcchange",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_npcchange",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L196",
+      "weight": 1.0,
+      "_src": "models_sceneupdate",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_sceneupdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L204",
+      "weight": 1.0,
+      "_src": "models_worldstatedelta",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_worldstatedelta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "inherits",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/models.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "_src": "models_worldstateupdaterequest",
+      "_tgt": "basemodel",
+      "source": "basemodel",
+      "target": "models_worldstateupdaterequest",
       "confidence_score": 1.0
     },
     {
@@ -2280,6 +2979,18 @@
       "target": "generate_assist"
     },
     {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-proxy/routes/generate.py",
+      "source_location": "L421",
+      "weight": 1.0,
+      "_src": "models_worldstatedelta",
+      "_tgt": "generate_update_world_state",
+      "source": "models_worldstatedelta",
+      "target": "generate_update_world_state"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/llm.py",
@@ -2295,7 +3006,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L37",
+      "source_location": "L38",
       "weight": 1.0,
       "_src": "apps_llama_proxy_llm_py",
       "_tgt": "llm_stream_chat",
@@ -2307,7 +3018,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L79",
+      "source_location": "L80",
       "weight": 1.0,
       "_src": "apps_llama_proxy_llm_py",
       "_tgt": "llm_call_llm",
@@ -2319,7 +3030,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0,
       "_src": "llm_stream_chat",
       "_tgt": "llm_build_payload",
@@ -2331,7 +3042,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/llm.py",
-      "source_location": "L87",
+      "source_location": "L89",
       "weight": 1.0,
       "_src": "llm_call_llm",
       "_tgt": "llm_build_payload",
@@ -2403,6 +3114,18 @@
       "relation": "calls",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
+      "source_file": "apps/llama-proxy/routes/generate.py",
+      "source_location": "L419",
+      "weight": 1.0,
+      "_src": "llm_call_llm",
+      "_tgt": "generate_update_world_state",
+      "source": "llm_call_llm",
+      "target": "generate_update_world_state"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
       "source_file": "apps/llama-proxy/routes/chat.py",
       "source_location": "L51",
       "weight": 1.0,
@@ -2415,7 +3138,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L4",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_prompts_py",
+      "_tgt": "prompts_standing_label",
+      "source": "apps_llama_proxy_prompts_py",
+      "target": "prompts_standing_label",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_prompts_py",
+      "_tgt": "prompts_build_world_state_block",
+      "source": "apps_llama_proxy_prompts_py",
+      "target": "prompts_build_world_state_block",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "apps_llama_proxy_prompts_py",
       "_tgt": "prompts_build_system_prompt",
@@ -2427,7 +3174,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L55",
+      "source_location": "L170",
       "weight": 1.0,
       "_src": "apps_llama_proxy_prompts_py",
       "_tgt": "prompts_build_interpersonal_system_prompt",
@@ -2439,12 +3186,48 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/prompts.py",
-      "source_location": "L99",
+      "source_location": "L216",
       "weight": 1.0,
       "_src": "apps_llama_proxy_prompts_py",
       "_tgt": "prompts_build_kickoff_prompt",
       "source": "apps_llama_proxy_prompts_py",
       "target": "prompts_build_kickoff_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L66",
+      "weight": 1.0,
+      "_src": "prompts_build_world_state_block",
+      "_tgt": "prompts_standing_label",
+      "source": "prompts_standing_label",
+      "target": "prompts_build_world_state_block",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_src": "prompts_build_system_prompt",
+      "_tgt": "prompts_build_world_state_block",
+      "source": "prompts_build_world_state_block",
+      "target": "prompts_build_system_prompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/prompts.py",
+      "source_location": "L192",
+      "weight": 1.0,
+      "_src": "prompts_build_interpersonal_system_prompt",
+      "_tgt": "prompts_build_world_state_block",
+      "source": "prompts_build_world_state_block",
+      "target": "prompts_build_interpersonal_system_prompt",
       "confidence_score": 1.0
     },
     {
@@ -2616,6 +3399,18 @@
       "target": "generate_generate_quest"
     },
     {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-proxy/routes/generate.py",
+      "source_location": "L420",
+      "weight": 1.0,
+      "_src": "json_utils_extract_json_object",
+      "_tgt": "generate_update_world_state",
+      "source": "json_utils_extract_json_object",
+      "target": "generate_update_world_state"
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/json_utils.py",
@@ -2703,7 +3498,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L21",
+      "source_location": "L23",
       "weight": 1.0,
       "_src": "apps_llama_proxy_routes_generate_py",
       "_tgt": "generate_assist",
@@ -2715,7 +3510,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L88",
+      "source_location": "L90",
       "weight": 1.0,
       "_src": "apps_llama_proxy_routes_generate_py",
       "_tgt": "generate_generate_scenario",
@@ -2727,7 +3522,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L191",
+      "source_location": "L193",
       "weight": 1.0,
       "_src": "apps_llama_proxy_routes_generate_py",
       "_tgt": "generate_generate_npc",
@@ -2739,12 +3534,24 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-proxy/routes/generate.py",
-      "source_location": "L278",
+      "source_location": "L280",
       "weight": 1.0,
       "_src": "apps_llama_proxy_routes_generate_py",
       "_tgt": "generate_generate_quest",
       "source": "apps_llama_proxy_routes_generate_py",
       "target": "generate_generate_quest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-proxy/routes/generate.py",
+      "source_location": "L366",
+      "weight": 1.0,
+      "_src": "apps_llama_proxy_routes_generate_py",
+      "_tgt": "generate_update_world_state",
+      "source": "apps_llama_proxy_routes_generate_py",
+      "target": "generate_update_world_state",
       "confidence_score": 1.0
     },
     {
@@ -2895,7 +3702,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L14",
+      "source_location": "L15",
       "weight": 1.0,
       "_src": "apps_llama_chat_src_app_chat_chat_service_ts",
       "_tgt": "chat_service_chatservice",
@@ -2907,7 +3714,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L29",
+      "source_location": "L31",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_resetmessages",
@@ -2919,7 +3726,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_loadpersistedmessages",
@@ -2931,7 +3738,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L49",
+      "source_location": "L51",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_cancelstream",
@@ -2943,7 +3750,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_trimcontext",
@@ -2955,7 +3762,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L60",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_initializestory",
@@ -2967,7 +3774,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L73",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_sendmessage",
@@ -2979,7 +3786,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L90",
+      "source_location": "L94",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_regeneratelastresponse",
@@ -2991,7 +3798,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L110",
+      "source_location": "L115",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_buildscenariopayload",
@@ -3003,7 +3810,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L143",
+      "source_location": "L148",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_streamrequest",
@@ -3015,7 +3822,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L199",
+      "source_location": "L204",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_streamwithretry",
@@ -3027,7 +3834,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L211",
+      "source_location": "L216",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_appendtolastmessage",
@@ -3039,7 +3846,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L220",
+      "source_location": "L225",
       "weight": 1.0,
       "_src": "chat_service_chatservice",
       "_tgt": "chat_service_chatservice_persistmessages",
@@ -3051,7 +3858,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0,
       "_src": "chat_service_chatservice_resetmessages",
       "_tgt": "chat_service_chatservice_persistmessages",
@@ -3099,7 +3906,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L57",
+      "source_location": "L59",
       "weight": 1.0,
       "_src": "chat_service_chatservice_trimcontext",
       "_tgt": "chat_service_chatservice_persistmessages",
@@ -3123,7 +3930,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L65",
+      "source_location": "L67",
       "weight": 1.0,
       "_src": "chat_service_chatservice_initializestory",
       "_tgt": "chat_service_chatservice_streamwithretry",
@@ -3135,7 +3942,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L68",
+      "source_location": "L70",
       "weight": 1.0,
       "_src": "chat_service_chatservice_initializestory",
       "_tgt": "chat_service_chatservice_buildscenariopayload",
@@ -3171,7 +3978,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L78",
+      "source_location": "L81",
       "weight": 1.0,
       "_src": "chat_service_chatservice_sendmessage",
       "_tgt": "chat_service_chatservice_streamwithretry",
@@ -3183,7 +3990,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L85",
+      "source_location": "L88",
       "weight": 1.0,
       "_src": "chat_service_chatservice_sendmessage",
       "_tgt": "chat_service_chatservice_buildscenariopayload",
@@ -3207,7 +4014,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L98",
+      "source_location": "L102",
       "weight": 1.0,
       "_src": "chat_service_chatservice_regeneratelastresponse",
       "_tgt": "chat_service_chatservice_streamwithretry",
@@ -3219,7 +4026,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L105",
+      "source_location": "L109",
       "weight": 1.0,
       "_src": "chat_service_chatservice_regeneratelastresponse",
       "_tgt": "chat_service_chatservice_buildscenariopayload",
@@ -3229,9 +4036,21 @@
     },
     {
       "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "chat_service_chatservice_buildscenariopayload",
+      "_tgt": "chat_component_chatcomponent_triggerworldstateupdate",
+      "source": "chat_service_chatservice_buildscenariopayload",
+      "target": "chat_component_chatcomponent_triggerworldstateupdate"
+    },
+    {
+      "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L178",
+      "source_location": "L183",
       "weight": 1.0,
       "_src": "chat_service_chatservice_streamrequest",
       "_tgt": "chat_service_chatservice_appendtolastmessage",
@@ -3243,7 +4062,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L195",
+      "source_location": "L200",
       "weight": 1.0,
       "_src": "chat_service_chatservice_streamrequest",
       "_tgt": "chat_service_chatservice_persistmessages",
@@ -3255,7 +4074,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.service.ts",
-      "source_location": "L202",
+      "source_location": "L207",
       "weight": 1.0,
       "_src": "chat_service_chatservice_streamwithretry",
       "_tgt": "chat_service_chatservice_streamrequest",
@@ -3267,7 +4086,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L18",
+      "source_location": "L20",
       "weight": 1.0,
       "_src": "apps_llama_chat_src_app_chat_chat_component_ts",
       "_tgt": "chat_component_chatcomponent",
@@ -3279,7 +4098,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L48",
+      "source_location": "L65",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_ngoninit",
@@ -3291,7 +4110,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L59",
+      "source_location": "L80",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_rendermarkdown",
@@ -3303,7 +4122,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L68",
+      "source_location": "L89",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_focusinput",
@@ -3315,7 +4134,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L72",
+      "source_location": "L93",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_toggleinputtype",
@@ -3327,7 +4146,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L81",
+      "source_location": "L102",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_togglescenarioinfo",
@@ -3339,7 +4158,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L85",
+      "source_location": "L106",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_requestreset",
@@ -3351,7 +4170,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L90",
+      "source_location": "L111",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_requestnew",
@@ -3363,7 +4182,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L94",
+      "source_location": "L115",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_requestchange",
@@ -3375,7 +4194,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L102",
+      "source_location": "L123",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_requesttrim",
@@ -3387,7 +4206,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L106",
+      "source_location": "L127",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_confirmaction",
@@ -3399,7 +4218,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L128",
+      "source_location": "L149",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_cancelaction",
@@ -3411,7 +4230,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L132",
+      "source_location": "L153",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_executechange",
@@ -3423,7 +4242,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L138",
+      "source_location": "L159",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_send",
@@ -3435,7 +4254,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L146",
+      "source_location": "L167",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_onkeydown",
@@ -3447,7 +4266,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L153",
+      "source_location": "L174",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_oninput",
@@ -3459,7 +4278,91 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L157",
+      "source_location": "L178",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_toggleworldpanel",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_toggleworldpanel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L182",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_setworldtab",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_setworldtab",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_dismisscontradictions",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_dismisscontradictions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L190",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_standinglabel",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_standinglabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L200",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_standingcolor",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_standingcolor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L207",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_findnpcbyid",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_findnpcbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L211",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent",
+      "_tgt": "chat_component_chatcomponent_triggerworldstateupdate",
+      "source": "chat_component_chatcomponent",
+      "target": "chat_component_chatcomponent_triggerworldstateupdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L240",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent",
       "_tgt": "chat_component_chatcomponent_aisuggestorrewrite",
@@ -3469,9 +4372,33 @@
     },
     {
       "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent_ngoninit",
+      "_tgt": "world_state_service_worldstateservice_loadforscenario",
+      "source": "chat_component_chatcomponent_ngoninit",
+      "target": "world_state_service_worldstateservice_loadforscenario"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L71",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent_ngoninit",
+      "_tgt": "world_state_service_worldstateservice_initforscenario",
+      "source": "chat_component_chatcomponent_ngoninit",
+      "target": "world_state_service_worldstateservice_initforscenario"
+    },
+    {
+      "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L78",
+      "source_location": "L99",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_toggleinputtype",
       "_tgt": "chat_component_chatcomponent_focusinput",
@@ -3483,7 +4410,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L143",
+      "source_location": "L164",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_send",
       "_tgt": "chat_component_chatcomponent_focusinput",
@@ -3495,7 +4422,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L168",
+      "source_location": "L251",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_aisuggestorrewrite",
       "_tgt": "chat_component_chatcomponent_focusinput",
@@ -3507,7 +4434,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L96",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_requestchange",
       "_tgt": "chat_component_chatcomponent_executechange",
@@ -3519,7 +4446,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L120",
+      "source_location": "L141",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_confirmaction",
       "_tgt": "chat_component_chatcomponent_executechange",
@@ -3543,13 +4470,25 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
-      "source_location": "L149",
+      "source_location": "L170",
       "weight": 1.0,
       "_src": "chat_component_chatcomponent_onkeydown",
       "_tgt": "chat_component_chatcomponent_send",
       "source": "chat_component_chatcomponent_send",
       "target": "chat_component_chatcomponent_onkeydown",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "apps/llama-chat/src/app/chat/chat.component.ts",
+      "source_location": "L220",
+      "weight": 1.0,
+      "_src": "chat_component_chatcomponent_triggerworldstateupdate",
+      "_tgt": "ai_assist_service_aiassistservice_updateworldstate",
+      "source": "chat_component_chatcomponent_triggerworldstateupdate",
+      "target": "ai_assist_service_aiassistservice_updateworldstate"
     },
     {
       "relation": "calls",
@@ -3579,7 +4518,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "_src": "apps_llama_chat_src_app_shared_ai_assist_service_ts",
       "_tgt": "ai_assist_service_aiassistservice",
@@ -3591,7 +4530,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_suggestinput",
@@ -3603,7 +4542,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L19",
+      "source_location": "L20",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_rewriteinput",
@@ -3615,7 +4554,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L27",
+      "source_location": "L28",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_generatescenario",
@@ -3627,7 +4566,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L80",
+      "source_location": "L81",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_generatenpc",
@@ -3639,7 +4578,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L107",
+      "source_location": "L108",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_generatequest",
@@ -3651,7 +4590,19 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L155",
+      "source_location": "L156",
+      "weight": 1.0,
+      "_src": "ai_assist_service_aiassistservice",
+      "_tgt": "ai_assist_service_aiassistservice_updateworldstate",
+      "source": "ai_assist_service_aiassistservice",
+      "target": "ai_assist_service_aiassistservice_updateworldstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
+      "source_location": "L171",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice",
       "_tgt": "ai_assist_service_aiassistservice_callassist",
@@ -3663,7 +4614,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L16",
+      "source_location": "L17",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice_suggestinput",
       "_tgt": "ai_assist_service_aiassistservice_callassist",
@@ -3675,7 +4626,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "apps/llama-chat/src/app/shared/ai-assist.service.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "_src": "ai_assist_service_aiassistservice_rewriteinput",
       "_tgt": "ai_assist_service_aiassistservice_callassist",
@@ -5073,6 +6024,246 @@
       "_tgt": "menu_component_menucomponent_gotosettings",
       "source": "menu_component_menucomponent",
       "target": "menu_component_menucomponent_gotosettings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_src": "apps_llama_chat_src_app_world_state_world_state_service_ts",
+      "_tgt": "world_state_service_standinglabel",
+      "source": "apps_llama_chat_src_app_world_state_world_state_service_ts",
+      "target": "world_state_service_standinglabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_src": "apps_llama_chat_src_app_world_state_world_state_service_ts",
+      "_tgt": "world_state_service_worldstateservice",
+      "source": "apps_llama_chat_src_app_world_state_world_state_service_ts",
+      "target": "world_state_service_worldstateservice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L298",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice_tocompactprompt",
+      "_tgt": "world_state_service_standinglabel",
+      "source": "world_state_service_standinglabel",
+      "target": "world_state_service_worldstateservice_tocompactprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_constructor",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_initforscenario",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_initforscenario",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L78",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_loadforscenario",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_loadforscenario",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L97",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_applydelta",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_applydelta",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L206",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_updatefaction",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_updatefaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L214",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_updatenpcstate",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_updatenpcstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L222",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_updatescene",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_updatescene",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L230",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_addfaction",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_addfaction",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L239",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_addnpcstate",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_addnpcstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L247",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_addevent",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_addevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L261",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_tocompactprompt",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_tocompactprompt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L334",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_detectcontradictions",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_detectcontradictions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L342",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_clearstate",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_clearstate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L346",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_persistnow",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_persistnow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L354",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice",
+      "_tgt": "world_state_service_worldstateservice_migrate",
+      "source": "world_state_service_worldstateservice",
+      "target": "world_state_service_worldstateservice_migrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L87",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice_loadforscenario",
+      "_tgt": "world_state_service_worldstateservice_migrate",
+      "source": "world_state_service_worldstateservice_loadforscenario",
+      "target": "world_state_service_worldstateservice_migrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "apps/llama-chat/src/app/world-state/world-state.service.ts",
+      "source_location": "L203",
+      "weight": 1.0,
+      "_src": "world_state_service_worldstateservice_applydelta",
+      "_tgt": "world_state_service_worldstateservice_persistnow",
+      "source": "world_state_service_worldstateservice_applydelta",
+      "target": "world_state_service_worldstateservice_persistnow",
       "confidence_score": 1.0
     }
   ],
