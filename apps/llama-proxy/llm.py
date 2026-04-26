@@ -14,11 +14,12 @@ def _build_payload(
     stream: bool = False,
     json_mode: bool = False,
     enable_thinking: bool = False,
+    temperature: float | None = None,
 ) -> dict:
     payload: dict = {
         "model": backend["model"],
         "messages": messages,
-        "temperature": backend.get("temperature", 0.8),
+        "temperature": temperature if temperature is not None else backend.get("temperature", 0.8),
         "top_p": backend.get("top_p", 0.95),
         "top_k": backend.get("top_k", 50),
         "repeat_penalty": backend.get("repeat_penalty", 1.0),
@@ -81,10 +82,17 @@ async def call_llm(
     timeout: float = 30.0,
     json_mode: bool = False,
     enable_thinking: bool = False,
+    temperature: float | None = None,
 ) -> str:
     with config._backend_lock:
         backend = config.active_backend
-    payload = _build_payload(backend, messages, json_mode=json_mode, enable_thinking=enable_thinking)
+    payload = _build_payload(
+        backend,
+        messages,
+        json_mode=json_mode,
+        enable_thinking=enable_thinking,
+        temperature=temperature,
+    )
     config.logger.info(
         ">>> LLM request (%d messages, timeout=%.0fs, backend=%s, json_mode=%s)",
         len(messages),

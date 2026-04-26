@@ -208,3 +208,9 @@ class WorldStateDelta(BaseModel):
     scene_update: SceneUpdate | None = None
     clock_advance: bool = False
     key_facts_append: list[str] = []
+
+
+class WorldStateUpdateRequest(BaseModel):
+    scenario: Scenario
+    world_state: WorldStateModel
+    last_exchanges: list[StoryMessage]

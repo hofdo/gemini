@@ -4,6 +4,7 @@ import { InputType, Npc, Scenario, ScenarioType } from '../scenario/scenario.mod
 import { ScenarioService } from '../scenario/scenario.service';
 import { ChatMessage } from '../chat/chat.service';
 import type { GeneratedNpcRaw, Quest, QuestEncounter, QuestMonster } from '../dm/dm.model';
+import { WorldStateDelta } from '../world-state/world-state.model';
 
 @Injectable({ providedIn: 'root' })
 export class AiAssistService {
@@ -150,6 +151,21 @@ export class AiAssistService {
       partyLevel: d.party_level ?? partyLevel ?? null,
       xpBudget: d.xp_budget ?? null,
     };
+  }
+
+  async updateWorldState(payload: {
+    scenario: unknown;
+    world_state: unknown;
+    last_exchanges: { role: string; content: string; input_type: string }[];
+  }): Promise<WorldStateDelta> {
+    const response = await fetch(`${environment.apiBaseUrl}/world-state/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(environment.timeoutMs),
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) throw new Error(`world-state/update HTTP ${response.status}`);
+    return await response.json() as WorldStateDelta;
   }
 
   private async callAssist(

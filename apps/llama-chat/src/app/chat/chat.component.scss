@@ -3,6 +3,18 @@
   height: 100%;
 }
 
+.chat-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  width: 100%;
+
+  .chat-container {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
 .chat-container {
   display: flex;
   flex-direction: column;
@@ -353,4 +365,218 @@
     &:hover:not(:disabled) { background: #533483; border-color: #533483; }
     &:disabled { opacity: 0.4; cursor: not-allowed; }
   }
+}
+
+.world-panel {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid #333;
+  background: #1a1a2e;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    font-weight: 600;
+
+    .btn-close-panel {
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 4px;
+
+      &:hover { color: #fff; }
+    }
+  }
+
+  .panel-tabs {
+    display: flex;
+    border-bottom: 1px solid #333;
+
+    button {
+      flex: 1;
+      padding: 0.5rem;
+      background: none;
+      border: none;
+      color: #888;
+      cursor: pointer;
+      font-size: 0.8rem;
+
+      &.active {
+        color: #fff;
+        border-bottom: 2px solid #7c4dff;
+      }
+
+      &:hover:not(.active) { color: #ccc; }
+    }
+  }
+
+  .panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+}
+
+.scene-block {
+  margin-bottom: 1rem;
+
+  .clock {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.5rem;
+  }
+
+  .scene-note {
+    font-size: 0.85rem;
+    color: #ccc;
+    margin: 0.5rem 0;
+    font-style: italic;
+  }
+}
+
+.present-npcs {
+  font-size: 0.85rem;
+
+  .npc-tag {
+    display: inline-block;
+    background: rgba(124, 77, 255, 0.2);
+    color: #b39ddb;
+    border-radius: 12px;
+    padding: 2px 8px;
+    margin: 2px;
+    font-size: 0.8rem;
+  }
+}
+
+.faction-row, .npc-row {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #2a2a3e;
+
+  &:last-child { border-bottom: none; }
+}
+
+.faction-name, .npc-name {
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.npc-status {
+  font-weight: normal;
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.npc-notes {
+  font-size: 0.8rem;
+  color: #888;
+  margin: 4px 0 0;
+  font-style: italic;
+}
+
+.standing-bar-wrap {
+  background: #333;
+  border-radius: 4px;
+  height: 6px;
+  margin: 4px 0;
+  overflow: hidden;
+
+  .standing-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+  }
+}
+
+.standing-label-text {
+  font-size: 0.8rem;
+}
+
+.npc-row.dead { opacity: 0.4; }
+
+.event-row {
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #2a2a3e;
+  font-size: 0.85rem;
+
+  &:last-child { border-bottom: none; }
+
+  .event-certainty {
+    display: inline-block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-right: 6px;
+  }
+
+  .event-title-text {
+    font-weight: 500;
+  }
+
+  .event-desc {
+    color: #aaa;
+    margin: 4px 0 0;
+    font-style: italic;
+  }
+}
+
+.scene-tension {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(255,255,255,0.05);
+}
+
+.tension-calm    { color: #4caf50; }
+.tension-tense   { color: #ff9800; }
+.tension-hostile { color: #f44336; }
+.tension-combat  { color: #9c27b0; }
+
+.certainty-witnessed { color: #4caf50; }
+.certainty-rumored   { color: #ff9800; }
+.certainty-deduced   { color: #2196f3; }
+.certainty-false     { color: #666; text-decoration: line-through; }
+
+.btn-contradiction {
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  margin-right: 4px;
+}
+
+.btn-header.active {
+  background: rgba(124, 77, 255, 0.2);
+  color: #7c4dff;
+}
+
+.empty-tab {
+  color: #666;
+  font-style: italic;
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.archived-note {
+  color: #666;
+  font-size: 0.8rem;
+  text-align: center;
+  padding-top: 0.5rem;
 }

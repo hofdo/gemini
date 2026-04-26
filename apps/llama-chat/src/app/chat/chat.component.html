@@ -1,117 +1,224 @@
-<div class="chat-container">
-  <header class="chat-header">
-    <div class="header-left">
-      <span class="title" (click)="toggleScenarioInfo()" (keyup.enter)="toggleScenarioInfo()" tabindex="0" role="button" title="Click to toggle scenario details">
-        🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}
-        <span class="scenario-badge">{{ scenarioService.activeScenario()?.scenarioType === 'interpersonal' ? '💬' : '🗺️' }}</span>
-      </span>
-      @if (chatService.messages().length > 0) {
-        <span class="msg-count">{{ chatService.messages().length }} messages</span>
-      }
-    </div>
-    <div class="header-actions">
-      <button class="btn-header" (click)="chatService.regenerateLastResponse()" [disabled]="chatService.loading() || chatService.messages().length === 0" title="Regenerate last response">♻️</button>
-      <button class="btn-header" (click)="requestReset()" title="Reset story (keep scenario)" [disabled]="chatService.messages().length === 0">🔄</button>
-      <button class="btn-header" (click)="requestChange()" title="Edit scenario">✏️</button>
-      <button class="btn-header" (click)="requestNew()" title="New scenario">🆕</button>
-    </div>
-  </header>
-
-  @if (showScenarioInfo() && scenarioService.activeScenario(); as scenario) {
-    <div class="scenario-info">
-      <div class="info-row"><strong>Setting:</strong> {{ scenario.setting }}</div>
-      <div class="info-row"><strong>Tone:</strong> {{ scenario.tone }}</div>
-      <div class="info-row"><strong>You:</strong> {{ scenario.characterName }}</div>
-      @if (scenario.scenarioType === 'interpersonal' && scenario.partnerName) {
-        <div class="info-row"><strong>Partner:</strong> {{ scenario.partnerName }}</div>
-        @if (scenario.partnerRelationship) {
-          <div class="info-row"><strong>Relationship:</strong> {{ scenario.partnerRelationship }}</div>
+<div class="chat-layout" [class.panel-open]="showWorldPanel()">
+  <div class="chat-container">
+    <header class="chat-header">
+      <div class="header-left">
+        <span class="title" (click)="toggleScenarioInfo()" (keyup.enter)="toggleScenarioInfo()" tabindex="0" role="button" title="Click to toggle scenario details">
+          🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}
+          <span class="scenario-badge">{{ scenarioService.activeScenario()?.scenarioType === 'interpersonal' ? '💬' : '🗺️' }}</span>
+        </span>
+        @if (chatService.messages().length > 0) {
+          <span class="msg-count">{{ chatService.messages().length }} messages</span>
         }
-      }
-    </div>
-  }
-
-  @if (pendingAction()) {
-    <div class="confirm-bar">
-      <span class="confirm-msg">
-        @switch (pendingAction()) {
-          @case ('reset') { Reset story? Keeps scenario, clears all messages. }
-          @case ('new') { Start a completely new scenario? This clears everything. }
-          @case ('change') { Editing the scenario resets the current story. Continue? }
-          @case ('trim') { Keep only the last 10 messages? Earlier messages will be lost. }
+      </div>
+      <div class="header-actions">
+        @if (contradictions().length > 0) {
+          <button class="btn-contradiction" (click)="dismissContradictions()" [title]="contradictions().join('\n')">
+            ⚠ {{ contradictions().length }}
+          </button>
         }
-      </span>
-      <button class="btn-confirm" (click)="confirmAction()">Confirm</button>
-      <button class="btn-cancel-action" (click)="cancelAction()">Cancel</button>
-    </div>
-  }
-
-  @if (!pendingAction() && (chatService.contextWarning() || chatService.contextCritical())) {
-    <div class="context-banner" [class.critical]="chatService.contextCritical()">
-      <span class="context-msg">
-        {{ chatService.contextCritical() ? '🔴' : '🟡' }}
-        ~{{ chatService.estimatedTokens() }} tokens —
-        {{ chatService.contextCritical() ? 'context nearly full' : 'context getting long' }}
-      </span>
-      <button class="btn-trim" (click)="requestTrim()">Trim to last 10</button>
-    </div>
-  }
-
-  <div class="message-list" #messageList>
-    @if (chatService.messages().length === 0 && !chatService.loading()) {
-      <div class="empty-state">
-        <p>✨ Your story awaits!</p>
-        <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue, ⚔️ action, and 🎬 direct mode.</p>
+        @if (worldStateService.state()) {
+          <button class="btn-header" (click)="toggleWorldPanel()" [class.active]="showWorldPanel()" title="World state">🌍</button>
+        }
+        <button class="btn-header" (click)="chatService.regenerateLastResponse()" [disabled]="chatService.loading() || chatService.messages().length === 0" title="Regenerate last response">♻️</button>
+        <button class="btn-header" (click)="requestReset()" title="Reset story (keep scenario)" [disabled]="chatService.messages().length === 0">🔄</button>
+        <button class="btn-header" (click)="requestChange()" title="Edit scenario">✏️</button>
+        <button class="btn-header" (click)="requestNew()" title="New scenario">🆕</button>
       </div>
-    }
-    @if (chatService.messages().length === 0 && chatService.loading()) {
-      <div class="empty-state">
-        <p class="scene-loading">🎭 Setting the scene…</p>
-      </div>
-    }
-    @for (msg of chatService.messages(); track $index; let last = $last) {
-      <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-        @if (msg.role === 'user') {
-          @if (msg.inputType) {
-            <span class="input-tag" [class.tag-dialogue]="msg.inputType === 'dialogue'" [class.tag-action]="msg.inputType === 'action'" [class.tag-direct]="msg.inputType === 'direct'">
-              {{ msg.inputType === 'dialogue' ? '🗣' : msg.inputType === 'action' ? '⚔️' : '🎬' }}
-            </span>
+    </header>
+
+    @if (showScenarioInfo() && scenarioService.activeScenario(); as scenario) {
+      <div class="scenario-info">
+        <div class="info-row"><strong>Setting:</strong> {{ scenario.setting }}</div>
+        <div class="info-row"><strong>Tone:</strong> {{ scenario.tone }}</div>
+        <div class="info-row"><strong>You:</strong> {{ scenario.characterName }}</div>
+        @if (scenario.scenarioType === 'interpersonal' && scenario.partnerName) {
+          <div class="info-row"><strong>Partner:</strong> {{ scenario.partnerName }}</div>
+          @if (scenario.partnerRelationship) {
+            <div class="info-row"><strong>Relationship:</strong> {{ scenario.partnerRelationship }}</div>
           }
-          <span class="bubble">{{ msg.content }}</span>
-        } @else {
-          @if (chatService.loading() && last) {
-            <span class="bubble markdown-body">{{ msg.content }}</span>
+        }
+      </div>
+    }
+
+    @if (pendingAction()) {
+      <div class="confirm-bar">
+        <span class="confirm-msg">
+          @switch (pendingAction()) {
+            @case ('reset') { Reset story? Keeps scenario, clears all messages. }
+            @case ('new') { Start a completely new scenario? This clears everything. }
+            @case ('change') { Editing the scenario resets the current story. Continue? }
+            @case ('trim') { Keep only the last 10 messages? Earlier messages will be lost. }
+          }
+        </span>
+        <button class="btn-confirm" (click)="confirmAction()">Confirm</button>
+        <button class="btn-cancel-action" (click)="cancelAction()">Cancel</button>
+      </div>
+    }
+
+    @if (!pendingAction() && (chatService.contextWarning() || chatService.contextCritical())) {
+      <div class="context-banner" [class.critical]="chatService.contextCritical()">
+        <span class="context-msg">
+          {{ chatService.contextCritical() ? '🔴' : '🟡' }}
+          ~{{ chatService.estimatedTokens() }} tokens —
+          {{ chatService.contextCritical() ? 'context nearly full' : 'context getting long' }}
+        </span>
+        <button class="btn-trim" (click)="requestTrim()">Trim to last 10</button>
+      </div>
+    }
+
+    <div class="message-list" #messageList>
+      @if (chatService.messages().length === 0 && !chatService.loading()) {
+        <div class="empty-state">
+          <p>✨ Your story awaits!</p>
+          <p class="hint">Type your first message to begin. Use the toggle to switch between 🗣 dialogue, ⚔️ action, and 🎬 direct mode.</p>
+        </div>
+      }
+      @if (chatService.messages().length === 0 && chatService.loading()) {
+        <div class="empty-state">
+          <p class="scene-loading">🎭 Setting the scene…</p>
+        </div>
+      }
+      @for (msg of chatService.messages(); track $index; let last = $last) {
+        <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
+          @if (msg.role === 'user') {
+            @if (msg.inputType) {
+              <span class="input-tag" [class.tag-dialogue]="msg.inputType === 'dialogue'" [class.tag-action]="msg.inputType === 'action'" [class.tag-direct]="msg.inputType === 'direct'">
+                {{ msg.inputType === 'dialogue' ? '🗣' : msg.inputType === 'action' ? '⚔️' : '🎬' }}
+              </span>
+            }
+            <span class="bubble">{{ msg.content }}</span>
           } @else {
-            <span class="bubble markdown-body" [innerHTML]="renderMarkdown(msg.content)"></span>
+            @if (chatService.loading() && last) {
+              <span class="bubble markdown-body">{{ msg.content }}</span>
+            } @else {
+              <span class="bubble markdown-body" [innerHTML]="renderMarkdown(msg.content)"></span>
+            }
           }
-        }
-      </div>
-    }
-    @if (chatService.loading() && chatService.messages().length > 0 && chatService.messages()[chatService.messages().length - 1].content === '') {
-      <div class="message assistant">
-        <span class="bubble typing">▋</span>
-      </div>
-    }
+        </div>
+      }
+      @if (chatService.loading() && chatService.messages().length > 0 && chatService.messages()[chatService.messages().length - 1].content === '') {
+        <div class="message assistant">
+          <span class="bubble typing">▋</span>
+        </div>
+      }
+    </div>
+
+    <div class="input-row">
+      <button class="btn-toggle" [class.mode-dialogue]="inputType() === 'dialogue'" [class.mode-action]="inputType() === 'action'" [class.mode-direct]="inputType() === 'direct'" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue — click for Action' : inputType() === 'action' ? 'Action — click for Direct' : 'Direct — click for Dialogue'">
+        {{ inputType() === 'dialogue' ? '🗣' : inputType() === 'action' ? '⚔️' : '🎬' }}
+      </button>
+      <button class="btn-ai" (click)="aiSuggestOrRewrite()" [disabled]="aiAssisting() || chatService.loading()" [title]="input().trim() ? '✨ Enhance text' : '✨ Suggest text'">
+        @if (aiAssisting()) { ⏳ } @else { ✨ }
+      </button>
+      <textarea
+        #chatInput
+        [value]="input()"
+        (input)="onInput($event)"
+        (keydown)="onKeydown($event)"
+        [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : inputType() === 'action' ? 'Describe an action… (Enter to send)' : 'Direct what happens next… (Enter to send)'"
+        rows="4"
+      ></textarea>
+      @if (chatService.loading()) {
+        <button class="btn-stop" (click)="chatService.cancelStream()" title="Stop generation">⏹</button>
+      }
+      <button (click)="send()" [disabled]="chatService.loading()">Send</button>
+    </div>
   </div>
 
-  <div class="input-row">
-    <button class="btn-toggle" [class.mode-dialogue]="inputType() === 'dialogue'" [class.mode-action]="inputType() === 'action'" [class.mode-direct]="inputType() === 'direct'" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue — click for Action' : inputType() === 'action' ? 'Action — click for Direct' : 'Direct — click for Dialogue'">
-      {{ inputType() === 'dialogue' ? '🗣' : inputType() === 'action' ? '⚔️' : '🎬' }}
-    </button>
-    <button class="btn-ai" (click)="aiSuggestOrRewrite()" [disabled]="aiAssisting() || chatService.loading()" [title]="input().trim() ? '✨ Enhance text' : '✨ Suggest text'">
-      @if (aiAssisting()) { ⏳ } @else { ✨ }
-    </button>
-    <textarea
-      #chatInput
-      [value]="input()"
-      (input)="onInput($event)"
-      (keydown)="onKeydown($event)"
-      [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : inputType() === 'action' ? 'Describe an action… (Enter to send)' : 'Direct what happens next… (Enter to send)'"
-      rows="4"
-    ></textarea>
-    @if (chatService.loading()) {
-      <button class="btn-stop" (click)="chatService.cancelStream()" title="Stop generation">⏹</button>
-    }
-    <button (click)="send()" [disabled]="chatService.loading()">Send</button>
-  </div>
+  @if (showWorldPanel() && worldStateService.state(); as ws) {
+    <aside class="world-panel">
+      <div class="panel-header">
+        <span class="panel-title">World State</span>
+        <button class="btn-close-panel" (click)="toggleWorldPanel()">✕</button>
+      </div>
+      <div class="panel-tabs">
+        <button [class.active]="worldTab() === 'scene'" (click)="setWorldTab('scene')">Scene</button>
+        <button [class.active]="worldTab() === 'factions'" (click)="setWorldTab('factions')">Factions</button>
+        <button [class.active]="worldTab() === 'npcs'" (click)="setWorldTab('npcs')">NPCs</button>
+        <button [class.active]="worldTab() === 'events'" (click)="setWorldTab('events')">Events</button>
+      </div>
+
+      @if (worldTab() === 'scene') {
+        <div class="panel-content">
+          <div class="scene-block">
+            <div class="scene-tension" [class]="'tension-' + (ws.currentScene?.tension ?? 'calm')">
+              {{ ws.currentScene?.tension ?? 'calm' }}
+            </div>
+            @if (ws.currentScene?.sceneNote) {
+              <p class="scene-note">{{ ws.currentScene!.sceneNote }}</p>
+            }
+            <div class="clock">Day {{ ws.worldClock.dayNumber }} · {{ ws.worldClock.timeOfDay }} · {{ ws.worldClock.season }}</div>
+          </div>
+          @if (ws.currentScene?.presentNpcIds?.length) {
+            <div class="present-npcs">
+              <strong>Present:</strong>
+              @for (id of ws.currentScene!.presentNpcIds; track id) {
+                @if (findNpcById(ws, id); as npc) {
+                  <span class="npc-tag">{{ npc.name }}</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @if (worldTab() === 'factions') {
+        <div class="panel-content">
+          @for (f of ws.factions; track f.id) {
+            <div class="faction-row">
+              <div class="faction-name">{{ f.name }}</div>
+              <div class="standing-bar-wrap">
+                <div class="standing-bar" [style.width.%]="(f.standing + 100) / 2" [style.background]="standingColor(f.standing)"></div>
+              </div>
+              <span class="standing-label-text" [style.color]="standingColor(f.standing)">{{ standingLabel(f.standing) }} ({{ f.standing > 0 ? '+' : '' }}{{ f.standing }})</span>
+            </div>
+          }
+          @if (!ws.factions.length) {
+            <p class="empty-tab">No factions tracked yet.</p>
+          }
+        </div>
+      }
+
+      @if (worldTab() === 'npcs') {
+        <div class="panel-content">
+          @for (npc of ws.npcStates; track npc.npcId) {
+            <div class="npc-row" [class.dead]="npc.status === 'dead'">
+              <div class="npc-name">{{ npc.name }} @if (npc.status !== 'alive') { <span class="npc-status">({{ npc.status }})</span> }</div>
+              @if (npc.status !== 'dead') {
+                <div class="standing-bar-wrap">
+                  <div class="standing-bar" [style.width.%]="(npc.disposition + 100) / 2" [style.background]="standingColor(npc.disposition)"></div>
+                </div>
+                <span class="standing-label-text" [style.color]="standingColor(npc.disposition)">{{ standingLabel(npc.disposition) }}</span>
+              }
+              @if (npc.notes) {
+                <p class="npc-notes">{{ npc.notes }}</p>
+              }
+            </div>
+          }
+          @if (!ws.npcStates.length) {
+            <p class="empty-tab">No NPCs tracked yet.</p>
+          }
+        </div>
+      }
+
+      @if (worldTab() === 'events') {
+        <div class="panel-content">
+          @for (e of ws.storyEvents.slice().reverse(); track e.id) {
+            <div class="event-row">
+              <span class="event-certainty" [class]="'certainty-' + e.certainty">{{ e.certainty }}</span>
+              <span class="event-title-text">Turn {{ e.turn }} — {{ e.title }}</span>
+              <p class="event-desc">{{ e.description }}</p>
+            </div>
+          }
+          @if (!ws.storyEvents.length) {
+            <p class="empty-tab">No events recorded yet.</p>
+          }
+          @if (ws.archivedEventCount > 0) {
+            <p class="archived-note">+{{ ws.archivedEventCount }} archived events not shown</p>
+          }
+        </div>
+      }
+
+    </aside>
+  }
 </div>

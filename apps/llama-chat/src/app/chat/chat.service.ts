@@ -112,7 +112,7 @@ export class ChatService {
     });
   }
 
-  private buildScenarioPayload(
+  protected buildScenarioPayload(
     scenario: NonNullable<ReturnType<ScenarioService['activeScenario']>>,
   ) {
     return {
