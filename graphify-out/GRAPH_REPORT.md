@@ -1,7 +1,7 @@
 # Graph Report - nx-monorepo-experiment  (2026-04-26)
 
 ## Corpus Check
-- 40 files · ~14,071 words
+- 40 files · ~14,087 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -38,16 +38,16 @@
 10. `_parse_with_repair()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `chat()` --calls--> `ChatResponse`  [INFERRED]
-  apps/llama-proxy/routes/chat.py → apps/llama-proxy/models.py
-- `assist()` --calls--> `AssistResponse`  [INFERRED]
-  apps/llama-proxy/routes/generate.py → apps/llama-proxy/models.py
-- `chat()` --calls--> `build_system_prompt()`  [INFERRED]
-  apps/llama-proxy/routes/chat.py → apps/llama-proxy/prompts.py
-- `chat()` --calls--> `build_interpersonal_system_prompt()`  [INFERRED]
-  apps/llama-proxy/routes/chat.py → apps/llama-proxy/prompts.py
-- `chat()` --calls--> `build_kickoff_prompt()`  [INFERRED]
-  apps/llama-proxy/routes/chat.py → apps/llama-proxy/prompts.py
+- `ChatResponse` --calls--> `chat()`  [INFERRED]
+  apps/llama-proxy/models.py → apps/llama-proxy/routes/chat.py
+- `AssistResponse` --calls--> `assist()`  [INFERRED]
+  apps/llama-proxy/models.py → apps/llama-proxy/routes/generate.py
+- `build_system_prompt()` --calls--> `chat()`  [INFERRED]
+  apps/llama-proxy/prompts.py → apps/llama-proxy/routes/chat.py
+- `build_interpersonal_system_prompt()` --calls--> `chat()`  [INFERRED]
+  apps/llama-proxy/prompts.py → apps/llama-proxy/routes/chat.py
+- `build_kickoff_prompt()` --calls--> `chat()`  [INFERRED]
+  apps/llama-proxy/prompts.py → apps/llama-proxy/routes/chat.py
 
 ## Communities
 
