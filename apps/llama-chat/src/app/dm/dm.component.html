@@ -140,12 +140,13 @@
               </label>
             </div>
             <div class="field-group half">
-              <label>Difficulty</label>
+              <label for="quest-difficulty">Difficulty</label>
               <div class="diff-row">
                 <span class="diff-badge" [ngClass]="difficultyClass(currentQuest()!.difficulty)">
                   {{ currentQuest()!.difficulty }}
                 </span>
                 <select
+                  id="quest-difficulty"
                   [ngModel]="currentQuest()!.difficulty"
                   (ngModelChange)="updateQuestField('difficulty', $event)"
                   class="diff-select">
@@ -187,14 +188,14 @@
             </div>
             <div class="reward-grid">
               <div class="reward-cell">
-                <label>🪙 Gold (gp)</label>
-                <input type="number" min="0"
+                <label for="quest-gold">🪙 Gold (gp)</label>
+                <input id="quest-gold" type="number" min="0"
                   [ngModel]="currentQuest()!.rewards.gold"
                   (ngModelChange)="updateRewardGold($event)" />
               </div>
               <div class="reward-cell">
-                <label>🥈 Silver (sp)</label>
-                <input type="number" min="0"
+                <label for="quest-silver">🥈 Silver (sp)</label>
+                <input id="quest-silver" type="number" min="0"
                   [ngModel]="currentQuest()!.rewards.silver"
                   (ngModelChange)="updateRewardSilver($event)" />
               </div>
@@ -469,8 +470,8 @@
             <div class="stats-grid">
               @for (stat of statKeys(); track stat) {
                 <div class="stat-cell">
-                  <label>{{ statLabel(stat) }}</label>
-                  <input type="number" min="1" max="30"
+                  <label [for]="'npc-stat-' + stat">{{ statLabel(stat) }}</label>
+                  <input [id]="'npc-stat-' + stat" type="number" min="1" max="30"
                     [ngModel]="currentNpc()!.stats[stat]"
                     (ngModelChange)="updateNpcStat(stat, $event)" />
                 </div>
@@ -618,7 +619,7 @@
                   <div class="stats-grid mini-stats">
                     @for (stat of statKeys(); track stat) {
                       <div class="stat-cell">
-                        <label>{{ statLabel(stat) }}</label>
+                        <span class="stat-label">{{ statLabel(stat) }}</span>
                         <span>{{ n.stats[stat] ?? '—' }}</span>
                       </div>
                     }

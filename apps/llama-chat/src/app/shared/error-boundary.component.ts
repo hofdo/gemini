@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 
 @Component({
-  selector: 'error-boundary',
+  selector: 'llama-error-boundary',
   standalone: true,
   template: `
   @if (!error()) {

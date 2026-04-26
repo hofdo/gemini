@@ -60,7 +60,7 @@ export class ScenarioFormComponent {
     }
     const mode = rawMode as ScenarioType;
     this.scenarioType.set(mode);
-    this.form.get('scenarioType')!.setValue(mode);
+    this.form.get('scenarioType')?.setValue(mode);
     this.applyTypeValidators(mode);
 
     const existing = this.scenarioService.activeScenario();
@@ -74,7 +74,7 @@ export class ScenarioFormComponent {
 
     this.presetService.loadIndex()
       .then(all => this.presets.set(all.filter(p => p.type === this.scenarioType())))
-      .catch(() => {});
+      .catch(() => undefined);
   }
 
   async loadPreset(id: string): Promise<void> {
@@ -110,11 +110,11 @@ export class ScenarioFormComponent {
 
   private applyTypeValidators(type: ScenarioType): void {
     if (type === 'interpersonal') {
-      this.form.get('partnerName')!.setValidators(Validators.required);
+      this.form.get('partnerName')?.setValidators(Validators.required);
     } else {
-      this.form.get('partnerName')!.clearValidators();
+      this.form.get('partnerName')?.clearValidators();
     }
-    this.form.get('partnerName')!.updateValueAndValidity();
+    this.form.get('partnerName')?.updateValueAndValidity();
   }
 
   get npcs(): FormArray {
@@ -166,31 +166,31 @@ export class ScenarioFormComponent {
 
     try {
       const npcGroup = this.npcs.at(i) as FormGroup;
-      const name = npcGroup.get('name')!.value ?? '';
-      const description = npcGroup.get('description')!.value ?? '';
-      const setting = this.form.get('setting')!.value ?? '';
-      const tone = this.form.get('tone')!.value ?? '';
-      const title = this.form.get('title')!.value ?? '';
+      const name = npcGroup.get('name')?.value ?? '';
+      const description = npcGroup.get('description')?.value ?? '';
+      const setting = this.form.get('setting')?.value ?? '';
+      const tone = this.form.get('tone')?.value ?? '';
+      const title = this.form.get('title')?.value ?? '';
 
       const result = await this.aiAssist.generateNpc(name, description, setting, tone, title);
 
       // Update name/description only if they were empty
-      if (result.name && !name) npcGroup.get('name')!.setValue(result.name);
-      if (result.description && !description) npcGroup.get('description')!.setValue(result.description);
+      if (result.name && !name) npcGroup.get('name')?.setValue(result.name);
+      if (result.description && !description) npcGroup.get('description')?.setValue(result.description);
 
       // Switch to detailed mode and fill all detail fields
-      npcGroup.get('mode')!.setValue('detailed');
-      npcGroup.get('personality')!.setValue(result.personality ?? '');
+      npcGroup.get('mode')?.setValue('detailed');
+      npcGroup.get('personality')?.setValue(result.personality ?? '');
 
       // Update stats
       const statsGroup = npcGroup.get('stats') as FormGroup;
       if (result.stats) {
-        statsGroup.get('str')!.setValue(result.stats['str'] ?? null);
-        statsGroup.get('dex')!.setValue(result.stats['dex'] ?? null);
-        statsGroup.get('con')!.setValue(result.stats['con'] ?? null);
-        statsGroup.get('int')!.setValue(result.stats['int'] ?? null);
-        statsGroup.get('wis')!.setValue(result.stats['wis'] ?? null);
-        statsGroup.get('cha')!.setValue(result.stats['cha'] ?? null);
+        statsGroup.get('str')?.setValue(result.stats['str'] ?? null);
+        statsGroup.get('dex')?.setValue(result.stats['dex'] ?? null);
+        statsGroup.get('con')?.setValue(result.stats['con'] ?? null);
+        statsGroup.get('int')?.setValue(result.stats['int'] ?? null);
+        statsGroup.get('wis')?.setValue(result.stats['wis'] ?? null);
+        statsGroup.get('cha')?.setValue(result.stats['cha'] ?? null);
       }
 
       // Replace foes
@@ -217,12 +217,12 @@ export class ScenarioFormComponent {
 
   toggleNpcMode(i: number): void {
     const npcGroup = this.npcs.at(i) as FormGroup;
-    const current = npcGroup.get('mode')!.value as NpcMode;
-    npcGroup.get('mode')!.setValue(current === 'simple' ? 'detailed' : 'simple');
+    const current = (npcGroup.get('mode')?.value as NpcMode) ?? 'simple';
+    npcGroup.get('mode')?.setValue(current === 'simple' ? 'detailed' : 'simple');
   }
 
   getNpcMode(i: number): NpcMode {
-    return (this.npcs.at(i) as FormGroup).get('mode')!.value;
+    return ((this.npcs.at(i) as FormGroup).get('mode')?.value as NpcMode) ?? 'simple';
   }
 
   getNpcFoes(i: number): FormArray {

@@ -42,7 +42,7 @@ export class SettingsService {
       // Prefer the id the user last chose (localStorage), fall back to proxy default
       const savedId = localStorage.getItem(STORAGE_KEY);
       const savedValid = savedId && data.backends.some(b => b.id === savedId);
-      const targetId = savedValid ? savedId! : data.active_id;
+      const targetId = savedValid && savedId ? savedId : data.active_id;
       this.activeId.set(targetId);
 
       // Sync proxy if localStorage differs

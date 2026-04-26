@@ -155,8 +155,9 @@ export class ChatService {
       });
 
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.body) throw new Error('Response body is null');
 
-      const reader = response.body!.getReader();
+      const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
 

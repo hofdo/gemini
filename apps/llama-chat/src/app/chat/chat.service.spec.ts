@@ -5,8 +5,6 @@ import { SettingsService } from '../shared/settings.service';
 
 describe('ChatService', () => {
   let service: ChatService;
-  let scenarioService: jasmine.SpyObj<ScenarioService>;
-  let settingsService: jasmine.SpyObj<SettingsService>;
 
   beforeEach(() => {
     const scenarioSpy = jasmine.createSpyObj('ScenarioService', ['activeScenario']);
@@ -21,8 +19,6 @@ describe('ChatService', () => {
     });
 
     service = TestBed.inject(ChatService);
-    scenarioService = TestBed.inject(ScenarioService) as jasmine.SpyObj<ScenarioService>;
-    settingsService = TestBed.inject(SettingsService) as jasmine.SpyObj<SettingsService>;
   });
 
   it('should be created', () => {

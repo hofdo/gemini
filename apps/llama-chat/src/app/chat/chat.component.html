@@ -1,7 +1,7 @@
 <div class="chat-container">
   <header class="chat-header">
     <div class="header-left">
-      <span class="title" (click)="toggleScenarioInfo()" title="Click to toggle scenario details">
+      <span class="title" (click)="toggleScenarioInfo()" (keyup.enter)="toggleScenarioInfo()" tabindex="0" role="button" title="Click to toggle scenario details">
         🦙 {{ scenarioService.activeScenario()?.title ?? 'Llama Chat' }}
         <span class="scenario-badge">{{ scenarioService.activeScenario()?.scenarioType === 'interpersonal' ? '💬' : '🗺️' }}</span>
       </span>
