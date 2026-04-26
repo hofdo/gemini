@@ -4,7 +4,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=uncensored & npx nx serve llama-chat",
-    "dev:qwen3": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=qwen3-uncensored & npx nx serve llama-chat"
+    "dev:qwen3": "npx nx run-many -t serve -p llama-proxy llm --parallel=2 --configuration=qwen3-uncensored & npx nx serve llama-chat",
+    "serve:chat": "npx nx serve llama-chat",
+    "serve:proxy": "npx nx serve llama-proxy",
+    "serve:llm": "npx nx serve llm --configuration=uncensored",
+    "serve:llm:qwen3": "npx nx serve llm --configuration=qwen3-uncensored"
   },
   "private": true,
   "dependencies": {
