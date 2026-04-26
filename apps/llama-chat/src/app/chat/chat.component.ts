@@ -63,17 +63,17 @@ export class ChatComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    if (!this.scenarioService.activeScenario()) {
+    const scenario = this.scenarioService.activeScenario();
+    if (!scenario) {
       this.router.navigate(['/']);
-    } else {
-      const scenario = this.scenarioService.activeScenario()!;
-      if (!this.worldStateService.loadForScenario(scenario.title)) {
-        this.worldStateService.initForScenario(scenario);
-      }
-      this.chatService.loadPersistedMessages();
-      if (this.chatService.messages().length === 0) {
-        this.chatService.initializeStory();
-      }
+      return;
+    }
+    if (!this.worldStateService.loadForScenario(scenario.title)) {
+      this.worldStateService.initForScenario(scenario);
+    }
+    this.chatService.loadPersistedMessages();
+    if (this.chatService.messages().length === 0) {
+      this.chatService.initializeStory();
     }
   }
 
