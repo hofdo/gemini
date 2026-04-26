@@ -21,9 +21,9 @@ async def chat(request: ChatRequest):
 
     if request.scenario:
         if request.scenario.scenario_type == "interpersonal":
-            system_prompt = build_interpersonal_system_prompt(request.scenario)
+            system_prompt = build_interpersonal_system_prompt(request.scenario, request.world_state)
         else:
-            system_prompt = build_system_prompt(request.scenario)
+            system_prompt = build_system_prompt(request.scenario, request.world_state)
         api_messages.append({"role": "system", "content": system_prompt})
 
     if not request.messages and request.scenario:

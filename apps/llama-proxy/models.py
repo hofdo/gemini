@@ -54,6 +54,7 @@ class StoryMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: list[StoryMessage]
     scenario: Scenario | None = None
+    world_state: "WorldStateModel | None" = None
     stream: bool = False
     enable_thinking: bool = False
 

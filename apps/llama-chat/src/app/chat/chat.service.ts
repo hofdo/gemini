@@ -1,6 +1,7 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
 import { InputType } from '../scenario/scenario.model';
 import { ScenarioService } from '../scenario/scenario.service';
+import { WorldStateService } from '../world-state/world-state.service';
 import { SettingsService } from '../shared/settings.service';
 import { environment } from '../../environments/environment';
 
@@ -14,6 +15,7 @@ export interface ChatMessage {
 export class ChatService {
   private scenarioService = inject(ScenarioService);
   private settingsService = inject(SettingsService);
+  private worldStateService = inject(WorldStateService);
   private _abortController: AbortController | null = null;
   private readonly STORAGE_KEY = 'llama_chat_messages';
 
@@ -66,6 +68,7 @@ export class ChatService {
       messages: [] as never[],
       stream: true,
       scenario: this.buildScenarioPayload(scenario),
+      world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
     });
   }
@@ -83,6 +86,7 @@ export class ChatService {
       })),
       stream: true,
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
+      world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
     });
   }
@@ -103,6 +107,7 @@ export class ChatService {
       })),
       stream: true,
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
+      world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
     });
   }
