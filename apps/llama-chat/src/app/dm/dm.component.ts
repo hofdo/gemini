@@ -54,10 +54,10 @@ export class DmComponent {
   // -----------------------------------------------------------------------
 
   async generateQuest(): Promise<void> {
+    this.questError.set(null);
     const prompt = this.questPrompt().trim();
     if (!prompt || this.generatingQuest()) return;
     this.generatingQuest.set(true);
-    this.questError.set(null);
     try {
       const quest = await this.aiAssist.generateQuest(
         prompt,
@@ -196,7 +196,7 @@ export class DmComponent {
     if (!q) return;
     const updated = [q, ...this.savedQuests().filter(s => s.id !== q.id)];
     this.savedQuests.set(updated);
-    localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(updated));
+    this.saveToStorage(STORAGE_KEY_QUESTS, updated);
     this.currentQuest.set(null);
     this.questPrompt.set('');
     this.savedQuestsOpen.set(true);
@@ -205,7 +205,7 @@ export class DmComponent {
   deleteQuest(id: string): void {
     const updated = this.savedQuests().filter(q => q.id !== id);
     this.savedQuests.set(updated);
-    localStorage.setItem(STORAGE_KEY_QUESTS, JSON.stringify(updated));
+    this.saveToStorage(STORAGE_KEY_QUESTS, updated);
   }
 
   newQuest(): void {
@@ -220,9 +220,9 @@ export class DmComponent {
   // -----------------------------------------------------------------------
 
   async generateNpc(): Promise<void> {
+    this.npcError.set(null);
     if (this.generatingNpc()) return;
     this.generatingNpc.set(true);
-    this.npcError.set(null);
     try {
       const raw = await this.aiAssist.generateNpc(
         this.npcName(), this.npcDescription(), this.npcSetting(), this.npcTone(), '',
@@ -348,7 +348,7 @@ export class DmComponent {
     if (!n) return;
     const updated = [n, ...this.savedNpcs().filter(s => s.id !== n.id)];
     this.savedNpcs.set(updated);
-    localStorage.setItem(STORAGE_KEY_NPCS, JSON.stringify(updated));
+    this.saveToStorage(STORAGE_KEY_NPCS, updated);
     this.currentNpc.set(null);
     this.npcName.set('');
     this.npcDescription.set('');
@@ -357,7 +357,7 @@ export class DmComponent {
   deleteNpc(id: string): void {
     const updated = this.savedNpcs().filter(n => n.id !== id);
     this.savedNpcs.set(updated);
-    localStorage.setItem(STORAGE_KEY_NPCS, JSON.stringify(updated));
+    this.saveToStorage(STORAGE_KEY_NPCS, updated);
   }
   newNpc(): void {
     this.currentNpc.set(null);
@@ -381,7 +381,12 @@ export class DmComponent {
     const map: Record<string, string> = { str: 'STR', dex: 'DEX', con: 'CON', int: 'INT', wis: 'WIS', cha: 'CHA' };
     return map[key] ?? key.toUpperCase();
   }
-  trackByIdx(_: number, __: unknown): number { return _; }
+
+  private saveToStorage<T>(key: string, value: T): void {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch { /* quota / private browsing */ }
+  }
 
   private loadQuests(): Quest[] {
     try {

@@ -27,6 +27,7 @@ export class ScenarioFormComponent {
   generatingScenario = signal(false);
   generatingNpc = signal<number | null>(null);
   npcGenerationError = signal<string | null>(null);
+  scenarioGenerationError = signal<string | null>(null);
   presets = signal<PresetMeta[]>([]);
   loadingPreset = signal(false);
 
@@ -52,12 +53,15 @@ export class ScenarioFormComponent {
 
   constructor() {
     // Read mode from route param
-    const mode = this.route.snapshot.paramMap.get('mode') as ScenarioType;
-    if (mode === 'adventure' || mode === 'interpersonal') {
-      this.scenarioType.set(mode);
-      this.form.get('scenarioType')!.setValue(mode);
-      this.applyTypeValidators(mode);
+    const rawMode = this.route.snapshot.paramMap.get('mode');
+    if (rawMode !== 'adventure' && rawMode !== 'interpersonal') {
+      this.router.navigate(['/']);
+      return;
     }
+    const mode = rawMode as ScenarioType;
+    this.scenarioType.set(mode);
+    this.form.get('scenarioType')!.setValue(mode);
+    this.applyTypeValidators(mode);
 
     const existing = this.scenarioService.activeScenario();
     if (existing && existing.scenarioType === this.scenarioType()) {
@@ -289,6 +293,7 @@ export class ScenarioFormComponent {
   }
 
   async generateWithAi(): Promise<void> {
+    this.scenarioGenerationError.set(null);
     const desc = this.aiDescription().trim();
     if (!desc || this.generatingScenario()) return;
     this.generatingScenario.set(true);
@@ -323,6 +328,7 @@ export class ScenarioFormComponent {
       (scenario.rules ?? []).forEach((r) => this.addRule(r));
     } catch (err) {
       console.error('AI scenario generation error', err);
+      this.scenarioGenerationError.set(err instanceof Error ? err.message : 'Generation failed');
     } finally {
       this.generatingScenario.set(false);
     }

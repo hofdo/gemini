@@ -20,7 +20,13 @@
             "input": "apps/llama-chat/public"
           }
         ],
-        "styles": ["apps/llama-chat/src/styles.scss"]
+        "styles": ["apps/llama-chat/src/styles.scss"],
+        "fileReplacements": [
+          {
+            "replace": "apps/llama-chat/src/environments/environment.ts",
+            "with": "apps/llama-chat/src/environments/environment.prod.ts"
+          }
+        ]
       },
       "configurations": {
         "production": {
@@ -41,7 +47,13 @@
         "development": {
           "optimization": false,
           "extractLicenses": false,
-          "sourceMap": true
+          "sourceMap": true,
+          "fileReplacements": [
+            {
+              "replace": "apps/llama-chat/src/environments/environment.ts",
+              "with": "apps/llama-chat/src/environments/environment.development.ts"
+            }
+          ]
         }
       },
       "defaultConfiguration": "production"

@@ -1,0 +1,48 @@
+{
+  "scenarioType": "adventure",
+  "title": "Reborn in Another World",
+  "setting": "The kingdom of Eldoria — a sprawling medieval fantasy realm of magic, monsters, and adventurer guilds. You died suddenly in your modern life and awoke in the body of a young, unremarkable villager at the kingdom's frontier town of Ashfen. Your memories of the old world are hazy but intact: you remember technology, history, fiction — including countless fantasy stories that now seem suspiciously prescient. No one in this world would believe a word of it. Upon your awakening, you were granted a rare Gift by the Goddess of Fate: a Status Window only you can see, showing your stats, skills, and slow but real growth. The world does not know you are not who you appear to be.",
+  "tone": "Epic isekai adventure — wonder, humor, and danger in equal measure. Fish-out-of-water comedy from your modern perspective balanced with genuine stakes, a growing sense of purpose, and an expanding world full of secrets.",
+  "characterName": "",
+  "characterDescription": "A person from modern-day Earth who died unexpectedly and was reborn in Eldoria. You retain all your memories but inhabit a young frontier villager's body with average base stats and no trained skills. Your edge is knowledge — of how the world works, of fantasy tropes, of strategy — not raw power. You are starting at F-rank in the Adventurer's Guild.",
+  "npcs": [
+    {
+      "name": "Lyra Voss",
+      "description": "Adventurer's Guild receptionist in Ashfen. Cheerful, sharp-eyed, and professional. She has processed hundreds of rookie registrations and can smell recklessness from across the desk.",
+      "mode": "detailed",
+      "personality": "Warm but no-nonsense. Genuinely invested in adventurer safety — she keeps a private record of who comes back and who doesn't. Dry humor she deploys rarely and with precision. Subtly curious about you.",
+      "foes": ["merchants who exploit new adventurers", "the guild branch in the capital that falsifies completion records"],
+      "friends": ["Kael Draven", "Sister Maren (town healer)", "the blacksmith Gorren"],
+      "plotTwists": [
+        "She noticed something unusual about your Status the day you registered — your Gift reads differently from normal ones",
+        "She secretly files reports to the Temple of Fate whenever an adventurer with an unusual Gift registers"
+      ],
+      "stats": { "str": 9, "dex": 13, "con": 11, "int": 16, "wis": 15, "cha": 17 }
+    },
+    {
+      "name": "Kael Draven",
+      "description": "A weathered B-rank adventurer who uses Ashfen as a base between solo jobs. Scarred, efficient, deeply competent. He retired from party work after losing his last team to a dungeon collapse three years ago.",
+      "mode": "detailed",
+      "personality": "Terse and blunt. Respects demonstrated competence above social graces. Has zero patience for glory-seekers, reckless rookies, or nobles playing at adventuring. Will grudgingly — almost resentfully — invest in someone he sees real potential in.",
+      "foes": [
+        "Lord Cavanis, the noble who commissioned the dungeon expedition that killed Kael's party",
+        "rank-padding adventurers who take credit for others' work"
+      ],
+      "friends": ["Lyra Voss", "Gorren the blacksmith"],
+      "plotTwists": [
+        "He suspects you are not who you claim to be — your instincts and reactions do not match a frontier villager's",
+        "He knows the location of an uncategorised dungeon he has been waiting to take someone worthy into"
+      ],
+      "stats": { "str": 18, "dex": 15, "con": 16, "int": 12, "wis": 14, "cha": 9 }
+    }
+  ],
+  "rules": [
+    "You have a Status Window only you can see — track your level, class, and skills narratively as they evolve",
+    "Your past-life memories are an asset: knowledge of tactics, history, and fantasy tropes gives insight — but not power",
+    "Never explain modern technology to NPCs — it is dismissed as madness, heresy, or a cover story",
+    "Adventurer's Guild rank system: F (new) → E → D → C → B → A → S (legendary, fewer than ten living)",
+    "Magic exists and is learnable — study, talent, or a rare Skill unlock are all valid paths",
+    "Death carries real weight — consequences persist and NPCs remember losses",
+    "The Goddess of Fate is watching — extraordinary deeds attract divine attention, which is not always comfortable"
+  ]
+}

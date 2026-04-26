@@ -243,6 +243,70 @@ h2 {
 }
 
 // ---------------------------------------------------------------------------
+// Toggle rows (model options)
+// ---------------------------------------------------------------------------
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: #16213e;
+  border: 1px solid #0f3460;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1.2rem;
+}
+
+.toggle-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.toggle-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2d5f8;
+}
+
+.toggle-desc {
+  font-size: 0.8rem;
+  color: #888;
+  line-height: 1.4;
+
+  code {
+    background: #0f1b30;
+    border: 1px solid #1e3a6e;
+    border-radius: 3px;
+    padding: 0.05rem 0.35rem;
+    font-size: 0.78rem;
+    color: #c9b8f0;
+  }
+}
+
+.toggle-btn {
+  flex-shrink: 0;
+  min-width: 3.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 2rem;
+  border: 2px solid #333;
+  background: #111;
+  color: #888;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &.on {
+    background: #2a1a4a;
+    border-color: #7b52ab;
+    color: #c9b8f0;
+  }
+
+  &:hover { opacity: 0.85; }
+}
+
+// ---------------------------------------------------------------------------
 // Code blocks (startup instructions)
 // ---------------------------------------------------------------------------
 

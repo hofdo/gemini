@@ -32,6 +32,9 @@
     <button type="button" class="btn-ai-generate" (click)="generateWithAi()" [disabled]="generatingScenario() || !aiDescription().trim()">
       @if (generatingScenario()) { ⏳ Generating… } @else { ✨ Generate Scenario }
     </button>
+    @if (scenarioGenerationError()) {
+      <p class="npc-error">{{ scenarioGenerationError() }}</p>
+    }
   </section>
 
   <hr class="divider" />

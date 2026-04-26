@@ -10,9 +10,10 @@
       }
     </div>
     <div class="header-actions">
-      <button class="btn-header" (click)="resetStory()" title="Reset story (keep scenario)" [disabled]="chatService.messages().length === 0">🔄</button>
-      <button class="btn-header" (click)="changeScenario()" title="Edit scenario">✏️</button>
-      <button class="btn-header" (click)="newScenario()" title="New scenario">🆕</button>
+      <button class="btn-header" (click)="chatService.regenerateLastResponse()" [disabled]="chatService.loading() || chatService.messages().length === 0" title="Regenerate last response">♻️</button>
+      <button class="btn-header" (click)="requestReset()" title="Reset story (keep scenario)" [disabled]="chatService.messages().length === 0">🔄</button>
+      <button class="btn-header" (click)="requestChange()" title="Edit scenario">✏️</button>
+      <button class="btn-header" (click)="requestNew()" title="New scenario">🆕</button>
     </div>
   </header>
 
@@ -30,6 +31,32 @@
     </div>
   }
 
+  @if (pendingAction()) {
+    <div class="confirm-bar">
+      <span class="confirm-msg">
+        @switch (pendingAction()) {
+          @case ('reset') { Reset story? Keeps scenario, clears all messages. }
+          @case ('new') { Start a completely new scenario? This clears everything. }
+          @case ('change') { Editing the scenario resets the current story. Continue? }
+          @case ('trim') { Keep only the last 10 messages? Earlier messages will be lost. }
+        }
+      </span>
+      <button class="btn-confirm" (click)="confirmAction()">Confirm</button>
+      <button class="btn-cancel-action" (click)="cancelAction()">Cancel</button>
+    </div>
+  }
+
+  @if (!pendingAction() && (chatService.contextWarning() || chatService.contextCritical())) {
+    <div class="context-banner" [class.critical]="chatService.contextCritical()">
+      <span class="context-msg">
+        {{ chatService.contextCritical() ? '🔴' : '🟡' }}
+        ~{{ chatService.estimatedTokens() }} tokens —
+        {{ chatService.contextCritical() ? 'context nearly full' : 'context getting long' }}
+      </span>
+      <button class="btn-trim" (click)="requestTrim()">Trim to last 10</button>
+    </div>
+  }
+
   <div class="message-list" #messageList>
     @if (chatService.messages().length === 0 && !chatService.loading()) {
       <div class="empty-state">
@@ -42,14 +69,22 @@
         <p class="scene-loading">🎭 Setting the scene…</p>
       </div>
     }
-    @for (msg of chatService.messages(); track $index) {
+    @for (msg of chatService.messages(); track $index; let last = $last) {
       <div class="message" [class.user]="msg.role === 'user'" [class.assistant]="msg.role === 'assistant'">
-        @if (msg.role === 'user' && msg.inputType) {
-          <span class="input-tag" [class.tag-dialogue]="msg.inputType === 'dialogue'" [class.tag-action]="msg.inputType === 'action'" [class.tag-direct]="msg.inputType === 'direct'">
-            {{ msg.inputType === 'dialogue' ? '🗣' : msg.inputType === 'action' ? '⚔️' : '🎬' }}
-          </span>
+        @if (msg.role === 'user') {
+          @if (msg.inputType) {
+            <span class="input-tag" [class.tag-dialogue]="msg.inputType === 'dialogue'" [class.tag-action]="msg.inputType === 'action'" [class.tag-direct]="msg.inputType === 'direct'">
+              {{ msg.inputType === 'dialogue' ? '🗣' : msg.inputType === 'action' ? '⚔️' : '🎬' }}
+            </span>
+          }
+          <span class="bubble">{{ msg.content }}</span>
+        } @else {
+          @if (chatService.loading() && last) {
+            <span class="bubble markdown-body">{{ msg.content }}</span>
+          } @else {
+            <span class="bubble markdown-body" [innerHTML]="renderMarkdown(msg.content)"></span>
+          }
         }
-        <span class="bubble">{{ msg.content }}</span>
       </div>
     }
     @if (chatService.loading() && chatService.messages().length > 0 && chatService.messages()[chatService.messages().length - 1].content === '') {
@@ -69,12 +104,14 @@
     <textarea
       #chatInput
       [value]="input()"
-      (input)="input.set($any($event.target).value)"
+      (input)="onInput($event)"
       (keydown)="onKeydown($event)"
       [placeholder]="inputType() === 'dialogue' ? 'Speak as your character… (Enter to send)' : inputType() === 'action' ? 'Describe an action… (Enter to send)' : 'Direct what happens next… (Enter to send)'"
       rows="4"
     ></textarea>
+    @if (chatService.loading()) {
+      <button class="btn-stop" (click)="chatService.cancelStream()" title="Stop generation">⏹</button>
+    }
     <button (click)="send()" [disabled]="chatService.loading()">Send</button>
   </div>
 </div>
-

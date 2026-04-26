@@ -71,3 +71,21 @@ export interface DmCollection {
   npcs: DmNpc[];
   quests: Quest[];
 }
+
+export interface GeneratedNpcRaw {
+  name: string;
+  race: string;
+  description: string;
+  personality: string;
+  alignment: string;
+  cr: string;
+  classes: Array<{ name: string; level: number }>;
+  stats: { str?: number; dex?: number; con?: number; int?: number; wis?: number; cha?: number };
+  saving_throws: string[];
+  skills: string[];
+  equipment: string[];
+  actions: Array<{ name: string; description: string }>;
+  foes: string[];
+  friends: string[];
+  plot_twists: string[];
+}

@@ -74,6 +74,26 @@
     }
   </section>
 
+  <!-- Model options -->
+  <section class="section">
+    <h2>🧠 Model Options</h2>
+    <p class="section-desc">Advanced generation options applied to every request. Only enable thinking mode if the loaded model supports chain-of-thought reasoning (e.g. Qwen3 thinking variants).</p>
+
+    <div class="toggle-row">
+      <div class="toggle-label">
+        <span class="toggle-title">Thinking mode</span>
+        <span class="toggle-desc">Sends <code>thinking: enabled</code> in the LLM payload. Model's reasoning is shown in collapsible blocks.</span>
+      </div>
+      <button
+        class="toggle-btn"
+        [class.on]="settings.enableThinking()"
+        (click)="settings.setEnableThinking(!settings.enableThinking())"
+      >
+        {{ settings.enableThinking() ? 'ON' : 'OFF' }}
+      </button>
+    </div>
+  </section>
+
   <!-- How to start the LLM section -->
   <section class="section">
     <h2>🚀 Starting the LLM Server</h2>

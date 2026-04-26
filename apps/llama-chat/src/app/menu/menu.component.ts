@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   styleUrl: './menu.component.scss',
 })
 export class MenuComponent {
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   selectMode(mode: string): void {
     if (mode === 'dm') {

@@ -1,8 +1,9 @@
 import { inject, Injectable } from '@angular/core';
+import { environment } from '../../environments/environment';
 import { InputType, Npc, Scenario, ScenarioType } from '../scenario/scenario.model';
 import { ScenarioService } from '../scenario/scenario.service';
 import { ChatMessage } from '../chat/chat.service';
-import type { Quest, QuestEncounter, QuestMonster } from '../dm/dm.model';
+import type { GeneratedNpcRaw, Quest, QuestEncounter, QuestMonster } from '../dm/dm.model';
 
 @Injectable({ providedIn: 'root' })
 export class AiAssistService {
@@ -30,6 +31,7 @@ export class AiAssistService {
     const response = await fetch('/generate-scenario', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(environment.timeoutMs),
       body: JSON.stringify({
         description,
         scenario_type: scenarioType,
@@ -75,17 +77,17 @@ export class AiAssistService {
     };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async generateNpc(
     npcName: string,
     npcDescription: string,
     setting: string,
     tone: string,
     title: string,
-  ): Promise<any> {
+  ): Promise<GeneratedNpcRaw> {
     const response = await fetch('/generate-npc', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(environment.timeoutMs),
       body: JSON.stringify({
         npc_name: npcName,
         npc_description: npcDescription,
@@ -111,6 +113,7 @@ export class AiAssistService {
     const response = await fetch('/generate-quest', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(environment.timeoutMs),
       body: JSON.stringify({
         prompt,
         setting: setting ?? '',
@@ -201,6 +204,7 @@ export class AiAssistService {
     const response = await fetch('/assist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: AbortSignal.timeout(environment.timeoutMs),
       body: JSON.stringify(payload),
     });
 

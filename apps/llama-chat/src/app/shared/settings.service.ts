@@ -9,6 +9,8 @@ export interface LlmBackend {
   top_p: number;
   top_k: number;
   repeat_penalty: number;
+  min_p?: number;
+  system_prompt_style?: string;
 }
 
 export interface BackendsConfig {
@@ -17,6 +19,7 @@ export interface BackendsConfig {
 }
 
 const STORAGE_KEY = 'llm_active_backend_id';
+const THINKING_KEY = 'llm_enable_thinking';
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
@@ -24,6 +27,8 @@ export class SettingsService {
   activeId = signal<string>('');
   proxyReachable = signal<boolean | null>(null);
   loading = signal(false);
+  readonly enableThinking = signal<boolean>(localStorage.getItem(THINKING_KEY) === 'true');
+  patchError = signal<string | null>(null);
 
   async loadConfig(): Promise<void> {
     this.loading.set(true);
@@ -42,7 +47,9 @@ export class SettingsService {
 
       // Sync proxy if localStorage differs
       if (targetId !== data.active_id) {
-        await this._patchBackend(targetId);
+        try {
+          await this._patchBackend(targetId);
+        } catch { /* sync failure is non-fatal */ }
       }
     } catch {
       this.proxyReachable.set(false);
@@ -52,9 +59,14 @@ export class SettingsService {
   }
 
   async setActiveBackend(id: string): Promise<void> {
-    await this._patchBackend(id);
-    this.activeId.set(id);
-    localStorage.setItem(STORAGE_KEY, id);
+    this.patchError.set(null);
+    try {
+      await this._patchBackend(id);
+      this.activeId.set(id);
+      localStorage.setItem(STORAGE_KEY, id);
+    } catch (err) {
+      this.patchError.set(err instanceof Error ? err.message : 'Switch failed');
+    }
   }
 
   async checkHealth(): Promise<void> {
@@ -70,12 +82,18 @@ export class SettingsService {
     return this.backends().find(b => b.id === this.activeId());
   }
 
+  setEnableThinking(val: boolean): void {
+    this.enableThinking.set(val);
+    localStorage.setItem(THINKING_KEY, String(val));
+  }
+
   private async _patchBackend(id: string): Promise<void> {
-    await fetch('/config/backend', {
+    const res = await fetch('/config/backend', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
     });
+    if (!res.ok) throw new Error(`Backend switch failed: HTTP ${res.status}`);
   }
 }
 
