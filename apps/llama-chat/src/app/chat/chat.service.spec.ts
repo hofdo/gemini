@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { ChatService } from './chat.service';
 import { ScenarioService } from '../scenario/scenario.service';
 import { SettingsService } from '../shared/settings.service';
@@ -7,14 +8,17 @@ describe('ChatService', () => {
   let service: ChatService;
 
   beforeEach(() => {
-    const scenarioSpy = jasmine.createSpyObj('ScenarioService', ['activeScenario']);
-    const settingsSpy = jasmine.createSpyObj('SettingsService', ['enableThinking']);
-
     TestBed.configureTestingModule({
       providers: [
         ChatService,
-        { provide: ScenarioService, useValue: scenarioSpy },
-        { provide: SettingsService, useValue: settingsSpy },
+        {
+          provide: ScenarioService,
+          useValue: { activeScenario: signal(null) },
+        },
+        {
+          provide: SettingsService,
+          useValue: { enableThinking: signal(false) },
+        },
       ],
     });
 
@@ -71,14 +75,14 @@ describe('ChatService', () => {
   });
 
   it('should show context warning when tokens exceed threshold', () => {
-    const longContent = 'x'.repeat(12001);
+    const longContent = 'x'.repeat(13000); // 3250 tokens > 3000 threshold
     service['messages'].set([{ role: 'user', content: longContent }]);
 
     expect(service.contextWarning()).toBe(true);
   });
 
   it('should show context critical when tokens exceed critical threshold', () => {
-    const longContent = 'x'.repeat(24001);
+    const longContent = 'x'.repeat(25000); // 6250 tokens > 6000 threshold
     service['messages'].set([{ role: 'user', content: longContent }]);
 
     expect(service.contextCritical()).toBe(true);
