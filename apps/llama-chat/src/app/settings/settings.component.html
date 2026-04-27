@@ -94,6 +94,37 @@
     </div>
   </section>
 
+  <!-- Narrative Tone section (Phase 3c) -->
+  <section class="tone-section">
+    <h3>Narrative Tone</h3>
+
+    <div class="tone-group">
+      <span class="tone-label">Pacing</span>
+      <div class="segmented">
+        <button [class.active]="settingsService.toneSettings().pacing === 'cinematic'" (click)="settingsService.updateTone({pacing: 'cinematic'})">Cinematic</button>
+        <button [class.active]="settingsService.toneSettings().pacing === 'deliberate'" (click)="settingsService.updateTone({pacing: 'deliberate'})">Deliberate</button>
+      </div>
+    </div>
+
+    <div class="tone-group">
+      <span class="tone-label">Register</span>
+      <div class="segmented">
+        <button [class.active]="settingsService.toneSettings().register === 'gritty'" (click)="settingsService.updateTone({register: 'gritty'})">Gritty</button>
+        <button [class.active]="settingsService.toneSettings().register === 'balanced'" (click)="settingsService.updateTone({register: 'balanced'})">Balanced</button>
+        <button [class.active]="settingsService.toneSettings().register === 'mythic'" (click)="settingsService.updateTone({register: 'mythic'})">Mythic</button>
+      </div>
+    </div>
+
+    <div class="tone-group">
+      <span class="tone-label">Content Boundary</span>
+      <div class="segmented">
+        <button [class.active]="settingsService.toneSettings().boundary === 'fade'" (click)="settingsService.updateTone({boundary: 'fade'})">Fade</button>
+        <button [class.active]="settingsService.toneSettings().boundary === 'standard'" (click)="settingsService.updateTone({boundary: 'standard'})">Standard</button>
+        <button [class.active]="settingsService.toneSettings().boundary === 'unfiltered'" (click)="settingsService.updateTone({boundary: 'unfiltered'})">Unfiltered</button>
+      </div>
+    </div>
+  </section>
+
   <!-- How to start the LLM section -->
   <section class="section">
     <h2>🚀 Starting the LLM Server</h2>

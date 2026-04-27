@@ -14,6 +14,12 @@ from models import (
     WorldStateUpdateRequest,
 )
 
+
+# Phase 3a: World tick request model
+class WorldTickRequest(BaseModel):
+    scenario: Scenario
+    world_state: WorldStateModel
+
 router = APIRouter(tags=["world-state"])
 
 
@@ -123,3 +129,86 @@ Recent exchanges:
             "world-state/summary parse error: %s | raw: %s", exc, raw[:300] or "N/A"
         )
         return {"summary": "", "keyFacts": []}
+
+
+@router.post("/world-state/tick")
+async def world_tick(request: WorldTickRequest) -> WorldStateDelta:
+    """Phase 3a: Heartbeat tick — generate ambient inject, NPC rumors, faction drift between turns."""
+    config.logger.info(
+        "=== /world-state/tick (npcs=%d, factions=%d, turn=%d)",
+        len(request.world_state.npc_states),
+        len(request.world_state.factions),
+        request.world_state.turn_count,
+    )
+
+    npc_summary = "\n".join(
+        f"- {n.name} (disposition {n.disposition}, status {n.status})"
+        for n in request.world_state.npc_states[:8]
+    )
+    faction_summary = "\n".join(
+        f"- {f.name} (standing {f.standing})"
+        for f in request.world_state.factions[:4]
+    )
+
+    location = "Unknown"
+    if request.world_state.current_scene and request.world_state.current_scene.location_id:
+        loc = next(
+            (loc_ for loc_ in request.world_state.locations if loc_.id == request.world_state.current_scene.location_id),
+            None,
+        )
+        if loc:
+            location = loc.name
+
+    season = request.world_state.world_clock.season
+    time_of_day = request.world_state.world_clock.time_of_day
+    tension = request.world_state.current_scene.tension if request.world_state.current_scene else "calm"
+
+    prompt = f"""Update this living RPG world between player turns. Return a JSON WorldStateDelta.
+
+Scenario: {request.world_state.scenario_title}
+Location: {location} | Time: {time_of_day} ({season}) | Tension: {tension}
+
+NPCs:
+{npc_summary if npc_summary else "None"}
+
+Factions:
+{faction_summary if faction_summary else "None"}
+
+Rules:
+- ambient_inject: one atmospheric sentence specific to location/time/season/tension. Make it evocative.
+- npc_rumors: 0 or 1 rumored StoryEvent. Only if an NPC with |disposition| >= 40 would plausibly have acted off-screen. certainty must be "rumored".
+- faction_drift: for each faction where |standing| > 0, drift 2 points toward 0 (passive neutralization). standing_delta = -2 if positive, +2 if negative.
+- All other delta fields: empty/null.
+
+Return only valid JSON matching this schema:
+{{
+  "faction_changes": [],
+  "npc_changes": [],
+  "new_events": [],
+  "scene_update": null,
+  "clock_advance": null,
+  "key_facts_append": [],
+  "quest_updates": [],
+  "player_update": null,
+  "story_beat_update": null,
+  "ambient_inject": "...",
+  "npc_rumors": [],
+  "faction_drift": [{{"faction_id": "str", "standing_delta": 0, "notes_append": ""}}],
+  "bond_update": null
+}}"""
+
+    api_messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": "Generate the world tick JSON now."},
+    ]
+
+    raw = ""
+    try:
+        raw = await call_llm(api_messages, timeout=30.0, json_mode=True, temperature=0.3)
+        delta_raw = json.loads(_extract_json_object(raw))
+        return WorldStateDelta(**delta_raw)
+    except Exception as exc:
+        config.logger.error(
+            "world-state/tick parse error: %s | raw: %s", exc, raw[:300] or "N/A"
+        )
+        return WorldStateDelta()

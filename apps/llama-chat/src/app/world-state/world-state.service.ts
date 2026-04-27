@@ -1,9 +1,11 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import {
+  AmbientEvent,
   CurrentScene,
   Faction,
   NpcState,
   QuestEntry,
+  RelationshipTier,
   SceneTension,
   SessionSummary,
   StoryBeat,
@@ -85,6 +87,10 @@ export class WorldStateService {
       playerCharacter: null,
       choiceChronicle: [],
       storyBeat: null,
+      ambientQueue: [],
+      bondState: scenario.scenarioType === 'interpersonal'
+        ? { tier: 0, temperature: 'warm', memoryAnchors: [], milestones: [], companionMood: '' }
+        : null,
     };
 
     this.state.set(newState);
@@ -129,7 +135,10 @@ export class WorldStateService {
     const knownNpcIds = new Set(s.npcStates.map(n => n.npcId));
     const knownFactionIds = new Set(s.factions.map(f => f.id));
 
-    const validFactionChanges = delta.factionChanges.filter(c => {
+    // Merge factionDrift into factionChanges (Phase 3a heartbeat)
+    const allFactionChanges = [...delta.factionChanges, ...(delta.factionDrift ?? [])];
+
+    const validFactionChanges = allFactionChanges.filter(c => {
       const valid = knownFactionIds.has(c.factionId);
       if (!valid) console.warn(`WorldStateDelta: unknown factionId "${c.factionId}" discarded`);
       return valid;
@@ -140,6 +149,9 @@ export class WorldStateService {
       if (!valid) console.warn(`WorldStateDelta: unknown npcId "${c.npcId}" discarded`);
       return valid;
     });
+
+    // Merge npcRumors into newEvents (Phase 3a heartbeat)
+    const allNewEvents = [...delta.newEvents, ...(delta.npcRumors ?? [])];
 
     this.state.update(current => {
       if (!current) return current;
@@ -208,9 +220,9 @@ export class WorldStateService {
       // Append key facts (capped)
       const keyFacts = [...current.keyFacts, ...delta.keyFactsAppend].slice(0, MAX_KEY_FACTS);
 
-      // Add new events with IDs and cap at MAX_HOT_EVENTS
+      // Add new events with IDs and cap at MAX_HOT_EVENTS (includes npcRumors merged above)
       let turn = current.turnCount;
-      const newEvents: StoryEvent[] = delta.newEvents.map(e => ({
+      const newEvents: StoryEvent[] = allNewEvents.map(e => ({
         ...e,
         id: crypto.randomUUID(),
         turn: turn++,
@@ -261,6 +273,35 @@ export class WorldStateService {
       // Apply story beat
       const storyBeat: StoryBeat = delta.storyBeatUpdate !== undefined ? delta.storyBeatUpdate : current.storyBeat;
 
+      // Phase 3a: ambient queue
+      let ambientQueue = current.ambientQueue ?? [];
+      if (delta.ambientInject) {
+        ambientQueue = [...ambientQueue, { text: delta.ambientInject, generatedAt: new Date().toISOString() }].slice(-3);
+      }
+
+      // Phase 3d: bond update
+      let bondState = current.bondState;
+      if (delta.bondUpdate && bondState) {
+        const bu = delta.bondUpdate;
+        const newTier = Math.max(0, Math.min(5, bondState.tier + (bu.tierDelta ?? 0))) as RelationshipTier;
+        const anchors = bu.newAnchor
+          ? [...bondState.memoryAnchors, {
+              id: crypto.randomUUID(),
+              description: bu.newAnchor,
+              createdAtTurn: current.turnCount,
+              playerInvokedCount: 0,
+            }]
+          : bondState.memoryAnchors;
+        bondState = {
+          ...bondState,
+          tier: newTier,
+          temperature: bu.temperatureChange ?? bondState.temperature,
+          memoryAnchors: anchors,
+          milestones: bu.newMilestone ? [...bondState.milestones, bu.newMilestone] : bondState.milestones,
+          companionMood: bu.companionMoodUpdate ?? bondState.companionMood,
+        };
+      }
+
       return {
         ...current,
         factions,
@@ -274,6 +315,8 @@ export class WorldStateService {
         questLog,
         playerCharacter,
         storyBeat,
+        ambientQueue,
+        bondState,
         lastUpdated: new Date().toISOString(),
       };
     });
@@ -471,9 +514,48 @@ export class WorldStateService {
   detectContradictions(narrativeText: string): string[] {
     const s = this.state();
     if (!s) return [];
-    return s.npcStates
-      .filter(n => n.status === 'dead' && narrativeText.includes(n.name))
-      .map(n => `${n.name} is dead but appeared in the narrative`);
+    const issues: string[] = [];
+
+    // Dead NPC check
+    for (const n of s.npcStates.filter(n => n.status === 'dead' && narrativeText.includes(n.name))) {
+      issues.push(`${n.name} is dead but appeared in the narrative`);
+    }
+
+    // Phase 3e: Location contradiction heuristic
+    for (const n of s.npcStates.filter(n => n.locationId && n.status !== 'dead')) {
+      const assignedLoc = s.locations.find(l => l.id === n.locationId);
+      if (!assignedLoc) continue;
+      for (const other of s.locations.filter(l => l.id !== n.locationId)) {
+        const pattern = new RegExp(
+          `${n.name}[^.]{0,30}${other.name}|${other.name}[^.]{0,30}${n.name}`,
+          'i',
+        );
+        if (pattern.test(narrativeText)) {
+          issues.push(`${n.name} may be at wrong location (expected: ${assignedLoc.name})`);
+          break;
+        }
+      }
+    }
+
+    return issues;
+  }
+
+  // Phase 3a: Consume first ambient event from queue
+  consumeAmbient(): AmbientEvent | null {
+    const s = this.state();
+    if (!s || s.ambientQueue.length === 0) return null;
+    const first = s.ambientQueue[0];
+    this.state.update(current => current ? {
+      ...current,
+      ambientQueue: current.ambientQueue.slice(1),
+      lastUpdated: new Date().toISOString(),
+    } : current);
+    return first;
+  }
+
+  // Phase 3b: Set story beat
+  setStoryBeat(beat: WorldState['storyBeat']): void {
+    this.state.update(s => s ? { ...s, storyBeat: beat, lastUpdated: new Date().toISOString() } : s);
   }
 
   clearState(): void {
@@ -518,12 +600,14 @@ export class WorldStateService {
     // v1→v2: clockAdvance changed from boolean to ClockAdvance|null in the delta type (not stored state)
     // No stored data changes needed.
 
-    // v2→v3: add questLog, playerCharacter, choiceChronicle, storyBeat
+    // v2→v3: add questLog, playerCharacter, choiceChronicle, storyBeat, ambientQueue, bondState
     if (version < 3) {
       raw.questLog = raw.questLog ?? [];
       raw.playerCharacter = raw.playerCharacter ?? null;
       raw.choiceChronicle = raw.choiceChronicle ?? [];
       raw.storyBeat = raw.storyBeat ?? null;
+      raw.ambientQueue = raw.ambientQueue ?? [];
+      raw.bondState = raw.bondState ?? null;
     }
 
     return {

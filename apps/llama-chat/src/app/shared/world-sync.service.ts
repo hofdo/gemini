@@ -30,6 +30,17 @@ export class WorldSyncService {
     return response.json() as Promise<WorldStateDelta>;
   }
 
+  // Phase 3a: World tick / heartbeat
+  async worldTick(worldState: WorldState, scenario: unknown): Promise<WorldStateDelta> {
+    const response = await fetch('/world-state/tick', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario, world_state: worldState }),
+    });
+    if (!response.ok) throw new Error(`World tick failed: ${response.status}`);
+    return response.json() as Promise<WorldStateDelta>;
+  }
+
   async generateSummary(
     worldState: WorldState,
     scenario: unknown,

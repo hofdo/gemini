@@ -66,6 +66,10 @@
       </div>
     }
 
+    @if (ambientLine()) {
+      <div class="ambient-line">{{ ambientLine() }}</div>
+    }
+
     <div class="message-list" #messageList>
       @if (chatService.messages().length === 0 && !chatService.loading()) {
         <div class="empty-state">

@@ -13,6 +13,8 @@ import { SettingsService } from '../shared/settings.service';
 export class SettingsComponent implements OnInit {
   private router = inject(Router);
   settings = inject(SettingsService);
+  // Alias for template consistency with Phase 3c HTML spec
+  protected settingsService = this.settings;
 
   async ngOnInit(): Promise<void> {
     await this.settings.checkHealth();
@@ -25,6 +27,11 @@ export class SettingsComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/']);
+  }
+
+  // Phase 3c: Tone proxy for template
+  updateTone(patch: Parameters<SettingsService['updateTone']>[0]): void {
+    this.settings.updateTone(patch);
   }
 }
 

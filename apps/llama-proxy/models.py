@@ -51,10 +51,39 @@ class Scenario(BaseModel):
     partner_turn_ons: str = ""
 
 
+# Phase 3a: Ambient event
+class AmbientEvent(BaseModel):
+    text: str
+    generated_at: str = ""
+
+
+# Phase 3c: Tone settings
+class ToneSettings(BaseModel):
+    pacing: Literal["cinematic", "deliberate"] = "deliberate"
+    register: Literal["gritty", "balanced", "mythic"] = "balanced"
+    boundary: Literal["fade", "standard", "unfiltered"] = "standard"
+
+
+# Phase 3d: Bond mode
+class BondUpdate(BaseModel):
+    tier_delta: int = 0
+    temperature_change: Literal["cold", "warm", "charged", "tender", "raw"] | None = None
+    new_milestone: str | None = None
+    new_anchor: str | None = None
+    companion_mood_update: str | None = None
+
+
+class BondStateModel(BaseModel):
+    tier: int = 0
+    temperature: Literal["cold", "warm", "charged", "tender", "raw"] = "warm"
+    milestones: list[str] = []
+    companion_mood: str = ""
+
+
 class StoryMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str
-    input_type: Literal["dialogue", "action", "direct"] = "dialogue"
+    input_type: Literal["dialogue", "action", "direct", "remember"] = "dialogue"
 
 
 class ChatRequest(BaseModel):
@@ -63,6 +92,7 @@ class ChatRequest(BaseModel):
     world_state: "WorldStateModel | None" = None
     stream: bool = False
     enable_thinking: bool = False
+    tone_settings: ToneSettings = Field(default_factory=ToneSettings)
 
 
 class ChatResponse(BaseModel):
@@ -72,7 +102,7 @@ class ChatResponse(BaseModel):
 class AssistRequest(BaseModel):
     mode: Literal["suggest", "rewrite"]
     current_text: str = ""
-    input_type: Literal["dialogue", "action", "direct"] = "dialogue"
+    input_type: Literal["dialogue", "action", "direct", "remember"] = "dialogue"
     scenario: Scenario | None = None
     messages: list[StoryMessage] = []
 
@@ -238,6 +268,10 @@ class WorldStateModel(_CamelModel):
     player_character: PlayerCharacterModel | None = None
     choice_chronicle: list[str] = []
     story_beat: str | None = None
+    # Phase 3a: Heartbeat
+    ambient_queue: list[AmbientEvent] = []
+    # Phase 3d: Bond mode
+    bond_state: BondStateModel | None = None
 
 
 class FactionChange(BaseModel):
@@ -276,6 +310,12 @@ class WorldStateDelta(BaseModel):
     quest_updates: list[QuestUpdate] = []
     player_update: PlayerUpdate | None = None
     story_beat_update: str | None = None
+    # Phase 3a: Heartbeat additions
+    ambient_inject: str | None = None
+    npc_rumors: list[StoryEventModel] = []
+    faction_drift: list[FactionChange] = []
+    # Phase 3d: Bond mode
+    bond_update: BondUpdate | None = None
 
 
 class WorldStateUpdateRequest(BaseModel):

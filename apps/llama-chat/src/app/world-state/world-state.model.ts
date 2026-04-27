@@ -1,5 +1,38 @@
 export type NpcStatus = 'alive' | 'dead' | 'missing' | 'unknown';
 
+// Phase 3a: Heartbeat / ambient queue
+export interface AmbientEvent {
+  text: string;
+  generatedAt: string;
+}
+
+// Phase 3d: Bond Mode Engine
+export type RelationshipTier = 0 | 1 | 2 | 3 | 4 | 5;
+export type EmotionalTemperature = 'cold' | 'warm' | 'charged' | 'tender' | 'raw';
+
+export interface MemoryAnchor {
+  id: string;
+  description: string;
+  createdAtTurn: number;
+  playerInvokedCount: number;
+}
+
+export interface BondState {
+  tier: RelationshipTier;
+  temperature: EmotionalTemperature;
+  memoryAnchors: MemoryAnchor[];
+  milestones: string[];
+  companionMood: string;
+}
+
+export interface BondUpdate {
+  tierDelta?: number;
+  temperatureChange?: EmotionalTemperature;
+  newMilestone?: string;
+  newAnchor?: string;
+  companionMoodUpdate?: string;
+}
+
 export interface QuestEntry {
   id: string;
   title: string;
@@ -149,6 +182,8 @@ export interface WorldState {
   playerCharacter: PlayerCharacter | null;
   choiceChronicle: string[];
   storyBeat: StoryBeat;
+  ambientQueue: AmbientEvent[];
+  bondState: BondState | null;
 }
 
 // WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
@@ -166,6 +201,12 @@ export interface WorldStateDelta {
   questUpdates: QuestUpdate[];
   playerUpdate: PlayerUpdate | null;
   storyBeatUpdate: StoryBeat;
+  // Phase 3a: Heartbeat additions
+  ambientInject: string | null;
+  npcRumors: Omit<StoryEvent, 'id' | 'turn'>[];
+  factionDrift: FactionChange[];
+  // Phase 3d: Bond mode
+  bondUpdate: BondUpdate | null;
 }
 
 export interface FactionChange {

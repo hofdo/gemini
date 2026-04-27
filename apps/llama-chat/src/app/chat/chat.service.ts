@@ -94,6 +94,7 @@ export class ChatService {
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
+      tone_settings: this.settingsService.toneSettings(),
     });
   }
 

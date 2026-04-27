@@ -1,5 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 
+// Phase 3c: Tone Controls
+export interface ToneSettings {
+  pacing: 'cinematic' | 'deliberate';
+  register: 'gritty' | 'balanced' | 'mythic';
+  boundary: 'fade' | 'standard' | 'unfiltered';
+}
+
 export interface LlmBackend {
   id: string;
   name: string;
@@ -21,6 +28,7 @@ export interface BackendsConfig {
 
 const STORAGE_KEY = 'llm_active_backend_id';
 const THINKING_KEY = 'llm_enable_thinking';
+const TONE_KEY = 'llama-tone-settings';
 
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
@@ -31,6 +39,25 @@ export class SettingsService {
   readonly enableThinking = signal<boolean>(localStorage.getItem(THINKING_KEY) === 'true');
   patchError = signal<string | null>(null);
   contextWindow = signal<number>(8192);
+
+  // Phase 3c: Tone Controls
+  readonly toneSettings = signal<ToneSettings>({
+    pacing: 'deliberate',
+    register: 'balanced',
+    boundary: 'standard',
+  });
+
+  constructor() {
+    try {
+      const stored = localStorage.getItem(TONE_KEY);
+      if (stored) this.toneSettings.set(JSON.parse(stored));
+    } catch { /* ignore */ }
+  }
+
+  updateTone(patch: Partial<ToneSettings>): void {
+    this.toneSettings.update(t => ({ ...t, ...patch }));
+    localStorage.setItem(TONE_KEY, JSON.stringify(this.toneSettings()));
+  }
 
   async loadConfig(): Promise<void> {
     this.loading.set(true);

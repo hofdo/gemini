@@ -35,6 +35,7 @@ export class ChatComponent implements OnInit {
   protected showWorldPanel = signal(false);
   protected worldTab = signal<'scene' | 'factions' | 'npcs' | 'events'>('scene');
   protected contradictions = signal<string[]>([]);
+  protected ambientLine = signal<string | null>(null);
 
   protected readonly loadingStates = computed(() => ({
     chat: this.chatService.loading(),
@@ -62,7 +63,13 @@ export class ChatComponent implements OnInit {
       const messages = this.chatService.messages();
       const lastMsg = messages[messages.length - 1];
       if (lastMsg?.role === 'assistant') {
-        this.sessionService.onTurnComplete(lastMsg.content).then(() => {
+        const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+        this.sessionService.onTurnComplete(lastMsg.content, lastUserMsg?.inputType).then(() => {
+          const ambient = this.worldStateService.consumeAmbient();
+          if (ambient) {
+            this.ambientLine.set(ambient.text);
+            setTimeout(() => this.ambientLine.set(null), 8000);
+          }
           const found = this.worldStateService.detectContradictions(lastMsg.content);
           if (found.length) this.contradictions.set(found);
         });
