@@ -1,121 +1,145 @@
-# Session Handover — World State Feature
+# Session Handover — Living Story Engine
 
 ## What this project is
 
 Interactive RPG/storytelling platform. Three-tier:
 ```
 llama-chat (Angular 21, :4200)
-    ↓ /chat /assist /generate-* /config /health
+    ↓ dev-proxy: /chat /assist /generate-* /config /health /world-state/*
 llama-proxy (FastAPI, :8000)
     ↓ httpx streaming
 llm (llama.cpp, :8080)
 ```
 
-Two LLM backends: `gemma4-obliterated` (default) and `gemma4-uncensored`.
+Two LLM backends: `gemma4-obliterated` and `gemma4-uncensored`.
 `npm run dev` starts everything.
 
 ---
 
 ## What was built this session
 
-### Phase 1 — World State data model (commit `77f6f62`)
+Full 3-phase "Living Story Engine" roadmap designed and implemented.
+Plan: `.claude/plans/living-world-roadmap.md`
 
-**New files:**
-- `apps/llama-chat/src/app/world-state/world-state.model.ts` — full TypeScript type hierarchy
-- `apps/llama-chat/src/app/world-state/world-state.service.ts` — Angular service with persistence
+### Phase 1 — Foundation Hardening (commit `03e133c`)
 
-**Modified:**
-- `apps/llama-proxy/models.py` — 12 new Pydantic models appended at end
+- `ClockAdvance { turns: number }` replaces `boolean` in `WorldStateDelta.clockAdvance` → enables time-of-day progression within a day
+- `WorldState._schemaVersion` bumped to 2; `migrate()` handles v1→v2
+- `loadForScenario()` replaced localStorage scan loop with indexed lookup via `llama-world-index` key
+- `SessionService` extracted — owns turn-complete lifecycle; `ChatComponent` no longer calls world-state update directly
+- `WorldSyncService` extracted from `AiAssistService` — owns `/world-state/update` calls + proper-noun pre-filter (skips ~30% unnecessary LLM calls when message contains no known NPC/faction/location names)
+- `WorldPanelComponent` extracted from `chat.component.html` — reusable standalone component
+- `/world-state/update` moved from `generate.py` → `routes/world_state.py`
+- `context_window: 8192` added to backend config; `ChatService.contextWarning` now uses `settingsService.contextWindow()` signal at 50% threshold
 
-Key design decisions baked in:
-- `effect()` as single localStorage write path (async); `applyDelta()` also writes synchronously
-- Storage key: `llama-world-state-{WorldState.id}` (UUID, not title)
-- `storyEvents` capped at 50 hot events; overflow → `archivedEventCount` counter
-- `_schemaVersion: 1` + `migrate()` runner for future field additions
-- `toCompactPrompt(maxBudget=600)` — token-budgeted string, always use this for LLM injection, never raw state
-- `detectContradictions(text)` — scans narrative for dead NPC names
+### Phase 2 — Persistence + DM Integration (commit `c055aa5`)
 
-### Phase 2 — World state in system prompt (commit `f11689a`)
+- `StorageService` — IndexedDB via `idb` package; `WorldStateService` fully migrated off localStorage
+- `WorldState` schema v3: added `QuestEntry`, `PlayerCharacter`, `StoryBeat`, `choiceChronicle[]`, `questLog[]`, `playerCharacter`
+- `WorldStateDelta`: added `questUpdates[]`, `playerUpdate`, `storyBeatUpdate` — all applied in `applyDelta()`
+- `WorldStateService`: `addQuest()`, `updateQuestObjective()`, `addSessionSummary()`, `exportToFile()`, `importFromFile()`
+- `dm-npc-adapter.ts` — bridges `DmNpc → NpcState` and `Quest → QuestEntry`
+- `DmComponent`: "Add to World" / "Add to Quest Log" buttons (visible only when active scenario exists)
+- `JournalComponent` at `/journal` — 4 tabs: Quests, Events, Session Summaries, Character
+- `SessionService.maybeSummarize()` — auto-generates session summary every 20 turns via `POST /world-state/summary`
+- Python: `QuestEntry`, `PlayerCharacterModel`, `QuestUpdate`, `PlayerUpdate` in `models.py`; `WorldStateDelta` mirrored
 
-**Modified:**
-- `apps/llama-proxy/prompts.py` — full rewrite: added `standing_label()`, `_build_world_state_block()`, both `build_system_prompt()` and `build_interpersonal_system_prompt()` now accept optional `world_state`
-- `apps/llama-proxy/models.py` — `ChatRequest` gains `world_state: WorldStateModel | None = None`
-- `apps/llama-proxy/routes/chat.py` — both build_* calls now pass `request.world_state`
-- `apps/llama-chat/src/app/chat/chat.service.ts` — `WorldStateService` injected, `world_state` added to all 3 request payloads
+### Phase 3 — Living World + Narrative Mechanics (commit `a968861`)
 
-What the world state block renders (when non-null):
-1. Ground-truth anchor: "AUTHORITATIVE — DO NOT CONTRADICT"
-2. Current scene (location, tension, present NPCs, world clock)
-3. Active NPCs with `standing_label()` disposition, NPC-NPC relationships
-4. Factions with standing label + number (non-zero only)
-5. Recent events (last 3, certainty-qualified: witnessed/rumored/deduced; `false` omitted)
-6. Canon facts (max 10)
-7. Deceased block (dead NPCs separated, explicit "do not include in scenes")
-
----
-
-## Current gap: WorldState is never initialized
-
-`WorldStateService.state()` is always `null` until someone calls `initForScenario(scenario)`.
-The `ChatComponent` does NOT call this yet. So world_state sends as `null` in every request.
-**Nothing is broken** — `null` world_state = no block added to prompt = backward compatible.
+- **Heartbeat (World Tick)**: `POST /world-state/tick` fires when player uses `direct` input type
+  - NPC rumors: NPCs with `|disposition| >= 40` may act off-screen → stored as `certainty: 'rumored'` events
+  - Faction drift: passive ±2 drift toward neutral each tick
+  - Ambient injection: one atmosphere sentence queued; displayed in chat UI for 8s
+  - `WorldStateDelta`: `ambientInject`, `npcRumors[]`, `factionDrift[]` added
+  - `WorldStateService`: `consumeAmbient()`, `setStoryBeat()`
+- **Story Beat Detection**: client-side; detects `inciting_incident / rising_tension / dark_moment / climax_pending / resolution` from WorldState; injected as `STORY_BEAT_HINTS` in LLM system prompt via `chat.py`
+- **Tone Controls**: 3 sliders in SettingsComponent (Pacing: cinematic/deliberate, Register: gritty/balanced/mythic, Boundary: fade/standard/unfiltered); persisted to localStorage; sent in `ChatRequest.tone_settings`; `TONE_FRAGMENTS` injected in system prompt
+- **Bond Mode Engine**: `BondState` (tier 0–5, emotional temperature, memoryAnchors, milestones, companionMood) initialized for `interpersonal` scenarios; `BondUpdate` applied in `applyDelta()`; tier + temperature injected in interpersonal system prompt
+- `InputType` extended: `'dialogue' | 'action' | 'direct' | 'remember'`
+- Enhanced contradiction detection: location heuristic (NPC appears near wrong location in narrative)
 
 ---
 
-## What comes next (from the plan)
+## Current state
 
-Plans live in `.claude/plans/`:
-- `adventure-world-state-roadmap.md` — full 6-phase roadmap
-- `storage-analysis.md` — storage decisions (localStorage, keys, schema versioning)
+### Commits ahead of origin/main
+```
+a968861  feat(phase-3): living world — heartbeat, story beats, tone controls, bond mode engine
+c055aa5  feat(phase-2): persistence, quest log, DM integration, journal, session summaries
+03e133c  feat(phase-1): foundation hardening — SessionService, WorldSync, WorldPanel, ClockAdvance
+```
 
-### Next priority: Phase 4 — World State UI
-
-Build before Phase 3 (LLM delta updates) so you can see/verify what the LLM would track.
-
-Collapsible side panel in `ChatComponent`. Tabs: Scene, Factions, NPCs, Events.
-Also needs: `ChatComponent.ngOnInit()` to call `worldStateService.loadForScenario(scenario.title)` or `initForScenario(scenario)`.
-
-### After that: Phase 3 — LLM delta updates
-
-New endpoint `POST /world-state/update` in `apps/llama-proxy/routes/generate.py`.
-Request: `{ scenario, world_state, last_exchanges: last 6 messages }`.
-Response: `WorldStateDelta` with faction/NPC/scene/event changes.
-Frontend: fire-and-forget after stream completes in `ChatService.sendMessage()`.
-
-Critical prompt engineering for this endpoint (from expert review):
-- Inject compact ID-to-name table so LLM uses real IDs, not invented ones
-- Explicit rules: only mark dead if explicitly stated, delta cap ±25, max 2 key facts/turn
-- Temperature 0.1–0.2 (deterministic extraction)
-
-### Remaining: Phase 5 (DM integration), Phase 6 (session compression) — lower priority
+### Tests
+`npx nx test llama-chat` → 9/9 pass
+`npx nx run-many -t lint` → all 3 projects clean
 
 ---
 
-## Key files to know
+## What comes next
+
+Phases 4–6 are designed in `.claude/plans/living-world-roadmap.md`.
+
+### Phase 4 — Error Handling + Context Management (2–3 days)
+
+- `AppError` union type: `llm_unreachable | parse_failure | quota_exceeded | abort`
+- Wire existing `ErrorBoundaryComponent` into all lazy-loaded routes
+- `LoadingBusService`: replace scattered `loading` signals with keyed bus (`chatLoading`, `worldUpdateLoading`, `assistLoading`, `anyLoading`)
+- Tiered context management:
+  - Auto-archive at 50% context limit (fold oldest 25% of messages into latest session summary)
+  - Warning banner at 75% with 3 actions: Trim / Export & Reset / Continue anyway
+  - `systemPromptTokenEstimate` signal in `ChatService` from first response `usage.prompt_tokens`
+- Improve `trimContext()`: show preview count, adjustable `keepLast` slider
+
+### Phase 5 — Combat Mode (5–7 days)
+
+- `CombatState` in `WorldState`: initiative order, HP tracking, round log
+- `CombatDelta` in `WorldStateDelta`: start/next_turn/end actions, HP changes
+- `CombatService`: `startCombat()`, `resolveTurn()`, `endCombat()`
+- `POST /combat/resolve-turn` in `routes/combat.py` — temperature 0.1, JSON mode; `CombatPromptBuilder`
+- `CombatComponent` at `/combat`: `InitiativeTrackerComponent`, `CombatLogComponent`, `ActionPanelComponent`
+- Auto-transition: when `scene.tension === 'combat'`, prompt user to switch mode
+- Client-side dice (Math.random + stat modifiers); LLM only for narrative description
+
+### Phase 6 — DM Campaign Forge (3–5 days)
+
+- Session Zero wizard at `/dm/session-zero`: generate premise → factions → NPCs → opening scene → export JSON
+- In-session Oracle overlay in ChatComponent: quick NPC name, location, quest hook generation
+- Preset scenario library expansion (pre-populated NPCs + factions + opening quest)
+
+---
+
+## Key files
 
 | Path | What it is |
 |---|---|
-| `apps/llama-chat/src/app/world-state/world-state.model.ts` | All TS types |
-| `apps/llama-chat/src/app/world-state/world-state.service.ts` | State service |
-| `apps/llama-chat/src/app/chat/chat.service.ts` | Chat streaming, now injects WorldStateService |
-| `apps/llama-proxy/prompts.py` | System prompt builders (now world-state aware) |
-| `apps/llama-proxy/models.py` | All Pydantic models (WorldStateModel at line ~165) |
-| `apps/llama-proxy/routes/chat.py` | /chat endpoint (passes world_state to prompts) |
-| `.claude/plans/adventure-world-state-roadmap.md` | Full 6-phase plan with all specs |
-| `.claude/plans/storage-analysis.md` | Storage decisions and guardrails |
+| `apps/llama-chat/src/app/world-state/world-state.model.ts` | All TS types (v3 schema) |
+| `apps/llama-chat/src/app/world-state/world-state.service.ts` | State service + IndexedDB persistence |
+| `apps/llama-chat/src/app/shared/storage.service.ts` | IndexedDB wrapper via `idb` |
+| `apps/llama-chat/src/app/session/session.service.ts` | Turn lifecycle, tick, summarize, beat detection |
+| `apps/llama-chat/src/app/shared/world-sync.service.ts` | LLM world-state calls, proper-noun filter |
+| `apps/llama-chat/src/app/shared/settings.service.ts` | Backends, contextWindow, toneSettings signals |
+| `apps/llama-chat/src/app/world-state/world-panel/world-panel.component.ts` | Extracted world panel |
+| `apps/llama-chat/src/app/journal/journal.component.ts` | Journal (/journal route) |
+| `apps/llama-chat/src/app/dm/dm-npc-adapter.ts` | DmNpc→NpcState bridge |
+| `apps/llama-proxy/models.py` | All Pydantic models (keep in sync with TS model) |
+| `apps/llama-proxy/routes/world_state.py` | /world-state/update, /summary, /tick |
+| `apps/llama-proxy/routes/chat.py` | /chat, story beat hints, tone fragments, bond context |
+| `apps/llama-proxy/routes/generate.py` | /generate-scenario, /generate-npc, /generate-quest |
+| `.claude/plans/living-world-roadmap.md` | Full 6-phase roadmap with specs |
 
-## Tests
+---
 
-Run: `npx nx test llama-chat`
-9 tests, all pass. Located in:
-- `apps/llama-chat/src/app/app.spec.ts`
-- `apps/llama-chat/src/app/chat/chat.service.spec.ts`
+## Gotchas / invariants
 
-No tests yet for `WorldStateService` — that's a gap to fill in Phase 4 or alongside.
-
-## Gotchas
-
-- `llama-proxy` uses `.venv` at `apps/llama-proxy/.venv` — run `npx nx run llama-proxy:setup` first time
-- `WorldStateModel` in `prompts.py` imported under `TYPE_CHECKING` guard to avoid circular import at runtime
-- `standing_label()` is defined in `prompts.py` (backend) AND mirrored as a module-scope function in `world-state.service.ts` (frontend) — keep them in sync if thresholds change
-- `ChatRequest.world_state` uses forward-reference string `"WorldStateModel | None"` in models.py because `WorldStateModel` is defined after `ChatRequest` in that file
+- **TS + Python models must stay in sync** — `world-state.model.ts` ↔ `models.py`. Schema v3. If you add a field to `WorldState` or `WorldStateDelta`, add it to both.
+- **Never use localStorage directly** — go through `WorldStateService` (which uses `StorageService` → IndexedDB). Exception: `ToneSettings` and small config items in `SettingsService` still use localStorage directly (acceptable for small config).
+- **All Angular components are standalone** — no NgModules. Signals via `signal()`, `computed()`, `effect()`. Injection via `inject()` (not constructor params).
+- **World-state update call is fire-and-forget** — `SessionService.onTurnComplete()` does not block the UI. If it fails, `console.warn` only.
+- **Proper-noun pre-filter in WorldSyncService** — if the last assistant message contains no known NPC/faction/location names, `/world-state/update` is NOT called. Empty world states (no NPCs/factions/locations yet) will never trigger an update.
+- **`fireTick()` only fires on `inputType === 'direct'`** — not on every message.
+- **`maybeSummarize()` fires every 20 turns** — requires at least 10 messages to have content.
+- **`_schemaVersion` in service** — `CURRENT_SCHEMA_VERSION = 3`. `migrate()` must handle v0→v1→v2→v3 upgrade path.
+- **`llama-proxy` virtualenv** — `apps/llama-proxy/.venv`. Run `npx nx run llama-proxy:setup` first time or after new dependencies.
+- **`idb` package** — installed at v8.0.3. Used only in `StorageService`.
+- **Bond mode** — `BondState` only initialized when `scenario.scenarioType === 'interpersonal'`. For adventure scenarios it is `null`.
+- **`'remember'` input type** — added to model and backend but no UI toggle yet in `ChatComponent.toggleInputType()`. Wire it when Bond mode UI is built.
