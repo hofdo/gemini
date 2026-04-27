@@ -2,7 +2,8 @@ import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScenarioService } from '../scenario/scenario.service';
 import { WorldStateService } from '../world-state/world-state.service';
-import { CombatParticipant, CombatState } from '../world-state/world-state.model';
+import { CombatParticipant, CombatState, PlayerCharacter } from '../world-state/world-state.model';
+import { Scenario } from '../scenario/scenario.model';
 
 export interface CombatResolution {
   narrative: string;
@@ -33,12 +34,14 @@ export class CombatService {
 
     const participants: CombatParticipant[] = [];
 
-    // Add player
+    // Add player — derive from scenario if no PlayerCharacter has been set (e.g. adventure mode without Session Zero)
+    const pc = worldState.playerCharacter
+      ?? this.derivePlayerCharacterFromScenario(this.scenarioService.activeScenario());
     participants.push({
       entityId: 'player',
-      name: worldState.playerCharacter?.name ?? 'Player',
+      name: pc?.name ?? 'Player',
       initiative: this.rollInitiative(10),
-      hp: worldState.playerCharacter?.hp ?? { current: 20, max: 20 },
+      hp: pc?.hp ?? { current: 20, max: 20 },
       isPlayer: true,
     });
 
@@ -53,7 +56,10 @@ export class CombatService {
         entityId: npcId,
         name: npc.name,
         initiative: this.rollInitiative(8),
-        hp: { current: 15, max: 15 },
+        hp: {
+          current: (npc as unknown as { stats?: { maxHp?: number } }).stats?.maxHp ?? 15,
+          max: (npc as unknown as { stats?: { maxHp?: number } }).stats?.maxHp ?? 15,
+        },
         isPlayer: false,
       });
     }
@@ -114,6 +120,18 @@ export class CombatService {
           .map(s => s.entityId),
       });
 
+      // Fix 1C: guard against out-of-bounds activeEntityIndex after entity removal
+      const updatedCs = this.worldStateService.state()?.combatState;
+      if (updatedCs) {
+        const order = updatedCs.initiativeOrder;
+        if (order.length > 0 && updatedCs.activeEntityIndex >= order.length) {
+          this.worldStateService.setCombatState({
+            ...updatedCs,
+            activeEntityIndex: Math.max(0, order.length - 1),
+          });
+        }
+      }
+
       return res;
     } catch (err) {
       console.warn('CombatService.resolveTurn: fetch error', err);
@@ -130,7 +148,38 @@ export class CombatService {
       roundLogAppend: `Combat ended: ${outcome}`,
     });
 
+    // Reset all combat state so re-entering combat starts fresh (Fix 1D)
+    const currentState = this.worldStateService.state()?.combatState;
+    if (currentState) {
+      this.worldStateService.setCombatState({
+        ...currentState,
+        active: false,
+        initiativeOrder: [],
+        activeEntityIndex: 0,
+        round: 0,
+      });
+    }
+
     await this.router.navigate(['/chat']);
+  }
+
+  private derivePlayerCharacterFromScenario(scenario: Scenario | null): PlayerCharacter {
+    return {
+      name: scenario?.characterName ?? 'Adventurer',
+      epithets: [],
+      aptitudes: {
+        bold: 0,
+        subtle: 0,
+        learned: 0,
+        connected: 0,
+        fierce: 0,
+        resilient: 0,
+      },
+      scarsAndGlories: [],
+      inventory: [],
+      conditions: [],
+      hp: { current: 20, max: 20 },
+    };
   }
 
   private rollInitiative(bonus: number): number {
