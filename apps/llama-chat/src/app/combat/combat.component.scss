@@ -203,6 +203,17 @@
   }
 }
 
+// Fix 3C: combat turn resolution error banner
+.combat-error {
+  margin: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
+  background: #2a0a0a;
+  border: 1px solid #7f1d1d;
+  border-radius: 6px;
+  color: #f87171;
+  font-size: 0.88rem;
+}
+
 // ─── Initiative Tracker ───────────────────────────────────────────────────────
 
 llama-initiative-tracker {

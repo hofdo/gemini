@@ -71,6 +71,9 @@
           </button>
         }
       </div>
+      @if (settings.patchError()) {
+        <p class="settings-error">{{ settings.patchError() }}</p>
+      }
     }
   </section>
 

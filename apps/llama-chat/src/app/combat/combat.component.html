@@ -49,6 +49,10 @@
         <llama-combat-log [log]="combatService.combatLog()" />
       </div>
 
+      @if (combatError()) {
+        <div class="combat-error">&#9888; {{ combatError() }}</div>
+      }
+
       @if (!outcome()) {
         <div class="action-panel-wrapper">
           <llama-action-panel

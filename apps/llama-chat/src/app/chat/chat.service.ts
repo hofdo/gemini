@@ -8,9 +8,12 @@ import { AppErrorService } from '../shared/app-error.service';
 import { environment } from '../../environments/environment';
 
 export interface ChatMessage {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   inputType?: InputType;
+  // Fix 3B: marks a message whose stream was interrupted mid-way
+  failed?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -22,6 +25,8 @@ export class ChatService {
   private appErrorService = inject(AppErrorService);
   private _abortController: AbortController | null = null;
   private readonly STORAGE_KEY = 'llama_chat_messages';
+  // Fix 3A: remember the last payload so retry can replay it
+  private _lastStreamPayload: Record<string, unknown> | null = null;
 
   readonly messages = signal<ChatMessage[]>([]);
 
@@ -55,7 +60,11 @@ export class ChatService {
       if (!raw) return;
       const { title, messages } = JSON.parse(raw);
       if (title === scenario.title) {
-        this.messages.set(messages);
+        // Fix 3B: back-fill id for messages persisted before this field was added
+        const hydrated = (messages as ChatMessage[]).map(m =>
+          m.id ? m : { ...m, id: crypto.randomUUID() }
+        );
+        this.messages.set(hydrated);
       }
     } catch {
       // ignore corrupt storage
@@ -101,7 +110,7 @@ export class ChatService {
   sendMessage(content: string, inputType: InputType = 'dialogue'): void {
     if (this.loading()) return;
     this.appErrorService.clear();
-    this.messages.update((msgs) => [...msgs, { role: 'user' as const, content, inputType }]);
+    this.messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user' as const, content, inputType }]);
 
     const scenario = this.scenarioService.activeScenario();
     this.streamWithRetry({
@@ -178,7 +187,9 @@ export class ChatService {
     this._abortController?.abort();
     this._abortController = new AbortController();
     this.loadingBus.set('chat', true);
-    this.messages.update((msgs) => [...msgs, { role: 'assistant' as const, content: '' }]);
+    // Fix 3B: assign a stable ID so we can locate the message on error
+    const pendingId = crypto.randomUUID();
+    this.messages.update((msgs) => [...msgs, { id: pendingId, role: 'assistant' as const, content: '' }]);
 
     try {
       const response = await fetch(`${environment.apiBaseUrl}/chat`, {
@@ -239,7 +250,11 @@ export class ChatService {
       }
       console.error('Stream error', err);
       this.appErrorService.set({ type: 'llm_unreachable', message: String(err) });
-      this.messages.update((msgs) => msgs.slice(0, -1));
+      // Fix 3B: mark the pending message as failed rather than silently removing it,
+      // so the user can see partial content with a clear failure indicator.
+      this.messages.update((msgs) =>
+        msgs.map(m => m.id === pendingId ? { ...m, failed: true } : m)
+      );
     } finally {
       this._abortController = null;
       this.loadingBus.set('chat', false);
@@ -247,7 +262,23 @@ export class ChatService {
     }
   }
 
+  // Fix 3A: re-send the last failed stream (called by App on error-boundary retry)
+  retryLastStream(): void {
+    if (!this._lastStreamPayload || this.loading()) return;
+    this.appErrorService.clear();
+    // Remove any failed/empty trailing assistant message before retrying
+    this.messages.update(msgs => {
+      const last = msgs[msgs.length - 1];
+      if (last?.role === 'assistant' && (last.failed || last.content === '')) {
+        return msgs.slice(0, -1);
+      }
+      return msgs;
+    });
+    void this.streamWithRetry(this._lastStreamPayload);
+  }
+
   private async streamWithRetry(payload: Record<string, unknown>, retries = environment.retryAttempts): Promise<void> {
+    this._lastStreamPayload = payload;
     for (let i = 0; i <= retries; i++) {
       try {
         return await this.streamRequest(payload);

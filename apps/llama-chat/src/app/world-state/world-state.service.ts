@@ -13,6 +13,7 @@ import {
   StoryBeat,
   StoryEvent,
   TimeOfDay,
+
   WorldState,
   WorldStateDelta,
 } from './world-state.model';
@@ -54,6 +55,19 @@ export class WorldStateService {
         );
       }
     });
+
+    // Fix 3E: synchronous localStorage fallback on page unload so we don't
+    // lose the latest state if the async effect() hasn't flushed yet.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', () => {
+        const current = this.state();
+        if (current) {
+          try {
+            localStorage.setItem('worldState_fallback', JSON.stringify(current));
+          } catch { /* storage full — ignore */ }
+        }
+      });
+    }
   }
 
   initForScenario(scenario: Scenario): void {
@@ -599,7 +613,7 @@ export class WorldStateService {
         // Apply HP changes
         if (delta.hpChanges?.length) {
           order = order.map(p => {
-            const change = delta.hpChanges!.find(c => c.entityId === p.entityId);
+            const change = delta.hpChanges?.find(c => c.entityId === p.entityId);
             if (!change) return p;
             return {
               ...p,

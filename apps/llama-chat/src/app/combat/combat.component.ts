@@ -21,6 +21,8 @@ export class CombatComponent implements OnInit {
   protected loading = signal(false);
   protected lastNarrative = signal<string | null>(null);
   protected outcome = signal<'victory' | 'flee' | 'tpk' | null>(null);
+  // Fix 3C: surface resolve-turn failures to the user
+  protected combatError = signal<string | null>(null);
 
   ngOnInit(): void {
     if (!this.combatService.combatActive()) {
@@ -31,6 +33,7 @@ export class CombatComponent implements OnInit {
   protected async onAction(actionText: string): Promise<void> {
     if (this.loading()) return;
     this.loading.set(true);
+    this.combatError.set(null);
     try {
       const result = await this.combatService.resolveTurn(actionText);
       if (result) {
@@ -44,6 +47,9 @@ export class CombatComponent implements OnInit {
             this.outcome.set('victory');
           }
         }
+      } else {
+        // Fix 3C: null return means the HTTP call failed — inform the user
+        this.combatError.set('Turn resolution failed. Check the proxy connection and try again.');
       }
     } finally {
       this.loading.set(false);

@@ -801,3 +801,12 @@
   from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+// Fix 3B: visual indicator for mid-stream failures
+.msg-error {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.78rem;
+  color: #f87171;
+  opacity: 0.9;
+}

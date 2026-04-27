@@ -120,6 +120,9 @@
             } @else {
               <span class="bubble markdown-body" [innerHTML]="renderMarkdown(msg.content)"></span>
             }
+            @if (msg.failed) {
+              <span class="msg-error">&#9888; Generation failed</span>
+            }
           }
         </div>
       }

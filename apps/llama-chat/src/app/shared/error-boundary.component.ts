@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, output } from '@angular/core';
 import { AppErrorService } from './app-error.service';
 
 @Component({
@@ -13,26 +13,26 @@ import { AppErrorService } from './app-error.service';
           @case ('llm_unreachable') {
             <h3>LLM unreachable</h3>
             <p>Could not connect to the language model. Make sure <code>npm run dev</code> is running.</p>
-            <button (click)="retry()">Retry</button>
+            <button (click)="onRetry()">Retry</button>
           }
           @case ('parse_failure') {
             <h3>Response parse error</h3>
             <p>{{ errorService.currentError()!.message }}</p>
-            <button (click)="retry()">Retry</button>
+            <button (click)="onRetry()">Retry</button>
           }
           @case ('quota_exceeded') {
             <h3>Context limit exceeded</h3>
             <p>The conversation is too long. Trim the context or start a new session.</p>
-            <button (click)="retry()">Dismiss</button>
+            <button (click)="onRetry()">Dismiss</button>
           }
           @case ('abort') {
             <h3>Generation aborted</h3>
-            <button (click)="retry()">Dismiss</button>
+            <button (click)="onRetry()">Dismiss</button>
           }
           @default {
             <h3>Something went wrong</h3>
             <p>{{ errorService.currentError()!.message }}</p>
-            <button (click)="retry()">Retry</button>
+            <button (click)="onRetry()">Retry</button>
           }
         }
       </div>
@@ -64,7 +64,11 @@ import { AppErrorService } from './app-error.service';
 export class ErrorBoundaryComponent {
   protected errorService = inject(AppErrorService);
 
-  retry(): void {
+  // Fix 3A: emit retry so the parent can re-trigger the failed operation
+  readonly retry = output<void>();
+
+  onRetry(): void {
     this.errorService.clear();
+    this.retry.emit();
   }
 }
