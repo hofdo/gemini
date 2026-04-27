@@ -89,6 +89,14 @@ export class ChatComponent implements OnInit, OnDestroy {
       e.preventDefault();
       this.toggleOracle();
     }
+    if (e.key === 'Escape') {
+      if (this.oracleVisible()) {
+        this.oracleVisible.set(false);
+      }
+      if (this.combatPromptVisible()) {
+        this.combatPromptVisible.set(false);
+      }
+    }
   };
 
   private _deltaEffect = effect(() => {
@@ -329,10 +337,12 @@ export class ChatComponent implements OnInit, OnDestroy {
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      this.oracleResults.update(results => [
-        { type, result: data.result, detail: data.detail },
-        ...results.slice(0, 9),
-      ]);
+      if (data?.result?.trim()) {
+        this.oracleResults.update(results => [
+          { type, result: data.result, detail: data.detail },
+          ...results.slice(0, 9),
+        ]);
+      }
     } catch (err) {
       console.warn('Oracle generation failed', err);
     } finally {

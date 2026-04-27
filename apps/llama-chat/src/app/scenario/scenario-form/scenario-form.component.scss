@@ -3,6 +3,13 @@
   height: 100%;
 }
 
+.field-error {
+  color: #f44;
+  font-size: 0.8em;
+  margin-top: 2px;
+  display: block;
+}
+
 .scenario-container {
   max-width: 700px;
   margin: 0 auto;

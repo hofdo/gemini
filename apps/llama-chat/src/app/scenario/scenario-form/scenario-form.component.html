@@ -46,14 +46,23 @@
         Title
         <input formControlName="title" placeholder="e.g. The Lost Kingdom" />
       </label>
+      @if (form.get('title')?.invalid && form.get('title')?.touched) {
+        <span class="field-error">Title is required</span>
+      }
       <label>
         Setting
         <textarea formControlName="setting" rows="3" placeholder="Describe the world, time period, location…"></textarea>
       </label>
+      @if (form.get('setting')?.invalid && form.get('setting')?.touched) {
+        <span class="field-error">Setting is required</span>
+      }
       <label>
         Tone / Genre
         <input formControlName="tone" placeholder="e.g. Dark fantasy, Comedic sci-fi, Romance…" />
       </label>
+      @if (form.get('tone')?.invalid && form.get('tone')?.touched) {
+        <span class="field-error">Tone / Genre is required</span>
+      }
     </section>
 
     <section>
@@ -62,10 +71,16 @@
         Name
         <input formControlName="characterName" placeholder="Character name" />
       </label>
+      @if (form.get('characterName')?.invalid && form.get('characterName')?.touched) {
+        <span class="field-error">Character name is required</span>
+      }
       <label>
         Description
         <textarea formControlName="characterDescription" rows="2" placeholder="Backstory, skills, appearance…"></textarea>
       </label>
+      @if (form.get('characterDescription')?.invalid && form.get('characterDescription')?.touched) {
+        <span class="field-error">Character description is required</span>
+      }
     </section>
 
     @if (scenarioType() === 'interpersonal') {

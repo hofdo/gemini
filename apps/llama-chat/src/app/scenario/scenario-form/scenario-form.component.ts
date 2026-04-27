@@ -106,6 +106,10 @@ export class ScenarioFormComponent {
   }
 
   goBack(): void {
+    if (this.form.dirty) {
+      const confirmed = confirm('Discard unsaved changes?');
+      if (!confirmed) return;
+    }
     this.router.navigate(['/']);
   }
 

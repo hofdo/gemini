@@ -11,11 +11,11 @@
   </div>
 
   <!-- Tab Bar -->
-  <div class="tab-bar">
-    <button class="tab-btn" [class.active]="activeTab() === 'quests'" (click)="setTab('quests')">
+  <div class="tab-bar" role="tablist">
+    <button class="tab-btn" [class.active]="activeTab() === 'quests'" (click)="setTab('quests')" role="tab" [attr.aria-selected]="activeTab() === 'quests'">
       📜 Quests
     </button>
-    <button class="tab-btn" [class.active]="activeTab() === 'npcs'" (click)="setTab('npcs')">
+    <button class="tab-btn" [class.active]="activeTab() === 'npcs'" (click)="setTab('npcs')" role="tab" [attr.aria-selected]="activeTab() === 'npcs'">
       🧙 NPCs
     </button>
   </div>

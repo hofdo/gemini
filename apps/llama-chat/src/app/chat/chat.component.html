@@ -93,7 +93,7 @@
       <div class="bond-toast">{{ bondToast() }}</div>
     }
 
-    <div class="message-list" #messageList>
+    <div class="message-list" #messageList role="log" aria-live="polite">
       @if (chatService.messages().length === 0 && !chatService.loading()) {
         <div class="empty-state">
           <p>✨ Your story awaits!</p>
@@ -134,7 +134,7 @@
     </div>
 
     <div class="input-row">
-      <button class="btn-toggle" [class.mode-dialogue]="inputType() === 'dialogue'" [class.mode-action]="inputType() === 'action'" [class.mode-direct]="inputType() === 'direct'" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue — click for Action' : inputType() === 'action' ? 'Action — click for Direct' : 'Direct — click for Dialogue'">
+      <button class="btn-toggle" [class.mode-dialogue]="inputType() === 'dialogue'" [class.mode-action]="inputType() === 'action'" [class.mode-direct]="inputType() === 'direct'" (click)="toggleInputType()" [title]="inputType() === 'dialogue' ? 'Dialogue — click for Action' : inputType() === 'action' ? 'Action — click for Direct' : 'Direct — click for Dialogue'" [attr.aria-label]="inputType() === 'dialogue' ? 'Dialogue' : inputType() === 'action' ? 'Action' : 'Direct'">
         {{ inputType() === 'dialogue' ? '🗣' : inputType() === 'action' ? '⚔️' : '🎬' }}
       </button>
       <button class="btn-ai" (click)="aiSuggestOrRewrite()" [disabled]="aiAssisting() || chatService.loading()" [title]="input().trim() ? '✨ Enhance text' : '✨ Suggest text'">
@@ -166,9 +166,9 @@
 </div>
 
 @if (combatPromptVisible()) {
-  <div class="combat-prompt-overlay">
+  <div class="combat-prompt-overlay" role="dialog" aria-modal="true" aria-labelledby="combat-prompt-title">
     <div class="combat-prompt">
-      <p>⚔️ A fight is breaking out! Enter combat mode?</p>
+      <p id="combat-prompt-title">⚔️ A fight is breaking out! Enter combat mode?</p>
       <button (click)="enterCombat()">Enter Combat</button>
       <button (click)="combatPromptVisible.set(false)">Stay Here</button>
     </div>
@@ -176,10 +176,10 @@
 }
 
 @if (oracleVisible()) {
-  <div class="oracle-overlay">
+  <div class="oracle-overlay" role="dialog" aria-modal="true" aria-labelledby="oracle-panel-title">
     <div class="oracle-panel">
       <div class="oracle-header">
-        <span class="oracle-title">Oracle</span>
+        <span class="oracle-title" id="oracle-panel-title">Oracle</span>
         <span class="oracle-hint">Ctrl+Shift+O</span>
         <button class="oracle-close" (click)="toggleOracle()">✕</button>
       </div>
