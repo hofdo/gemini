@@ -47,7 +47,11 @@
             @case ('reset') { Reset story? Keeps scenario, clears all messages. }
             @case ('new') { Start a completely new scenario? This clears everything. }
             @case ('change') { Editing the scenario resets the current story. Continue? }
-            @case ('trim') { Keep only the last 10 messages? Earlier messages will be lost. }
+            @case ('trim') {
+            Keep last
+            <input type="range" min="4" max="40" step="2" [value]="keepLast()" (input)="keepLast.set(+$any($event.target).value)" style="vertical-align:middle;width:80px;">
+            {{ keepLast() }} messages. Earlier messages will be lost.
+          }
           }
         </span>
         <button class="btn-confirm" (click)="confirmAction()">Confirm</button>
@@ -55,14 +59,18 @@
       </div>
     }
 
-    @if (!pendingAction() && (chatService.contextWarning() || chatService.contextCritical())) {
+    @if (!pendingAction() && !contextBannerDismissed() && (chatService.contextWarning() || chatService.contextCritical())) {
       <div class="context-banner" [class.critical]="chatService.contextCritical()">
         <span class="context-msg">
           {{ chatService.contextCritical() ? '🔴' : '🟡' }}
           ~{{ chatService.estimatedTokens() }} tokens —
           {{ chatService.contextCritical() ? 'context nearly full' : 'context getting long' }}
         </span>
-        <button class="btn-trim" (click)="requestTrim()">Trim to last 10</button>
+        <div class="context-actions">
+          <button class="btn-trim" (click)="requestTrim()">Trim</button>
+          <button class="btn-trim" (click)="exportAndReset()">Export &amp; Reset</button>
+          <button class="btn-dismiss" (click)="dismissContextBanner()">Continue</button>
+        </div>
       </div>
     }
 

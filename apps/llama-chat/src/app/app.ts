@@ -1,8 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { ErrorBoundaryComponent } from './shared/error-boundary.component';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, ErrorBoundaryComponent],
   selector: 'llama-root',
   templateUrl: './app.html',
   styleUrl: './app.scss',

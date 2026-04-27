@@ -10,6 +10,7 @@ import { InputType } from '../scenario/scenario.model';
 import { WorldStateService } from '../world-state/world-state.service';
 import { SessionService } from '../session/session.service';
 import { WorldPanelComponent } from '../world-state/world-panel/world-panel.component';
+import { LoadingBusService } from '../shared/loading-bus.service';
 
 @Component({
   selector: 'llama-chat',
@@ -26,21 +27,20 @@ export class ChatComponent implements OnInit {
   private aiAssist = inject(AiAssistService);
   private router = inject(Router);
   private readonly _sanitizer = inject(DomSanitizer);
+  private loadingBus = inject(LoadingBusService);
 
   protected input = signal('');
   protected inputType = signal<InputType>('dialogue');
   protected showScenarioInfo = signal(false);
-  protected aiAssisting = signal(false);
   protected pendingAction = signal<'reset' | 'new' | 'change' | 'trim' | null>(null);
   protected showWorldPanel = signal(false);
   protected worldTab = signal<'scene' | 'factions' | 'npcs' | 'events'>('scene');
   protected contradictions = signal<string[]>([]);
   protected ambientLine = signal<string | null>(null);
+  protected keepLast = signal(10);
+  protected contextBannerDismissed = signal(false);
 
-  protected readonly loadingStates = computed(() => ({
-    chat: this.chatService.loading(),
-    aiAssist: this.aiAssisting(),
-  }));
+  protected readonly aiAssisting = computed(() => this.loadingBus.assistLoading());
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLElement>;
   @ViewChild('chatInput') private chatInput!: ElementRef<HTMLTextAreaElement>;
@@ -142,6 +142,17 @@ export class ChatComponent implements OnInit {
     this.pendingAction.set('trim');
   }
 
+  exportAndReset(): void {
+    this.worldStateService.exportToFile();
+    this.chatService.resetMessages();
+    this.chatService.initializeStory();
+    this.contextBannerDismissed.set(true);
+  }
+
+  dismissContextBanner(): void {
+    this.contextBannerDismissed.set(true);
+  }
+
   confirmAction(): void {
     const action = this.pendingAction();
     this.pendingAction.set(null);
@@ -159,7 +170,8 @@ export class ChatComponent implements OnInit {
         this.executeChange();
         break;
       case 'trim':
-        this.chatService.trimContext();
+        this.chatService.trimContext(this.keepLast());
+        this.contextBannerDismissed.set(true);
         break;
     }
   }
@@ -178,6 +190,7 @@ export class ChatComponent implements OnInit {
     const text = this.input().trim();
     if (!text || this.chatService.loading()) return;
     this.input.set('');
+    this.contextBannerDismissed.set(false);
     this.chatService.sendMessage(text, this.inputType());
     this.focusInput();
   }
@@ -207,7 +220,7 @@ export class ChatComponent implements OnInit {
 
   async aiSuggestOrRewrite(): Promise<void> {
     if (this.aiAssisting() || this.chatService.loading()) return;
-    this.aiAssisting.set(true);
+    this.loadingBus.set('assist', true);
     try {
       const currentText = this.input().trim();
       const messages = this.chatService.messages();
@@ -220,7 +233,7 @@ export class ChatComponent implements OnInit {
     } catch (err) {
       console.error('AI assist error', err);
     } finally {
-      this.aiAssisting.set(false);
+      this.loadingBus.set('assist', false);
     }
   }
 }

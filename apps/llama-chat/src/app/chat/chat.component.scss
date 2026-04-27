@@ -224,6 +224,8 @@
 
   .context-msg { flex: 1; color: #d4aa40; }
 
+  .context-actions { display: flex; gap: 0.5rem; }
+
   .btn-trim {
     background: transparent;
     border: 1px solid #a07820;
@@ -235,11 +237,23 @@
     &:hover { background: #a07820; color: #fff; }
   }
 
+  .btn-dismiss {
+    background: transparent;
+    border: 1px solid #605040;
+    color: #a09070;
+    padding: 0.2rem 0.65rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 0.8rem;
+    &:hover { background: #605040; color: #fff; }
+  }
+
   &.critical {
     background: #2a1010;
     border-bottom-color: #c04020;
     .context-msg { color: #f08060; }
     .btn-trim { border-color: #c04020; color: #f08060; &:hover { background: #c04020; color: #fff; } }
+    .btn-dismiss { border-color: #7f3020; color: #c08070; &:hover { background: #7f3020; color: #fff; } }
   }
 }
 

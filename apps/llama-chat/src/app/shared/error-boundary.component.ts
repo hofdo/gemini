@@ -1,52 +1,70 @@
-import { Component, signal } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AppErrorService } from './app-error.service';
 
 @Component({
   selector: 'llama-error-boundary',
   standalone: true,
   template: `
-  @if (!error()) {
-    <ng-content />
-  } @else {
-    <div class="error-boundary">
-      <h3>Something went wrong</h3>
-      <p>{{ error()?.message }}</p>
-      <button (click)="reset()">Try again</button>
-    </div>
-  }
-`,
-  styles: [
-    `
-      .error-boundary {
-        padding: 2rem;
-        background: #fee;
-        border: 1px solid #fcc;
-        border-radius: 8px;
-        margin: 1rem 0;
-      }
-      .error-boundary h3 {
-        color: #c33;
-        margin: 0 0 0.5rem 0;
-      }
-      .error-boundary button {
-        margin-top: 1rem;
-        padding: 0.5rem 1rem;
-        background: #c33;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-    `,
-  ],
+    @if (!errorService.currentError()) {
+      <ng-content />
+    } @else {
+      <div class="error-boundary">
+        @switch (errorService.currentError()!.type) {
+          @case ('llm_unreachable') {
+            <h3>LLM unreachable</h3>
+            <p>Could not connect to the language model. Make sure <code>npm run dev</code> is running.</p>
+            <button (click)="retry()">Retry</button>
+          }
+          @case ('parse_failure') {
+            <h3>Response parse error</h3>
+            <p>{{ errorService.currentError()!.message }}</p>
+            <button (click)="retry()">Retry</button>
+          }
+          @case ('quota_exceeded') {
+            <h3>Context limit exceeded</h3>
+            <p>The conversation is too long. Trim the context or start a new session.</p>
+            <button (click)="retry()">Dismiss</button>
+          }
+          @case ('abort') {
+            <h3>Generation aborted</h3>
+            <button (click)="retry()">Dismiss</button>
+          }
+          @default {
+            <h3>Something went wrong</h3>
+            <p>{{ errorService.currentError()!.message }}</p>
+            <button (click)="retry()">Retry</button>
+          }
+        }
+      </div>
+    }
+  `,
+  styles: [`
+    .error-boundary {
+      padding: 2rem;
+      background: #1a0a0a;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      margin: 1rem;
+      color: #fca5a5;
+    }
+    .error-boundary h3 { margin: 0 0 0.5rem 0; color: #f87171; }
+    .error-boundary p { margin: 0 0 1rem 0; font-size: 0.9rem; opacity: 0.85; }
+    .error-boundary code { background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; border-radius: 3px; }
+    .error-boundary button {
+      padding: 0.4rem 1rem;
+      background: #7f1d1d;
+      color: #fef2f2;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .error-boundary button:hover { background: #991b1b; }
+  `],
 })
 export class ErrorBoundaryComponent {
-  error = signal<Error | null>(null);
+  protected errorService = inject(AppErrorService);
 
-  handleError(err: Error): void {
-    this.error.set(err);
-  }
-
-  reset(): void {
-    this.error.set(null);
+  retry(): void {
+    this.errorService.clear();
   }
 }

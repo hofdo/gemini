@@ -3,6 +3,8 @@ import { InputType } from '../scenario/scenario.model';
 import { ScenarioService } from '../scenario/scenario.service';
 import { WorldStateService } from '../world-state/world-state.service';
 import { SettingsService } from '../shared/settings.service';
+import { LoadingBusService } from '../shared/loading-bus.service';
+import { AppErrorService } from '../shared/app-error.service';
 import { environment } from '../../environments/environment';
 
 export interface ChatMessage {
@@ -16,15 +18,21 @@ export class ChatService {
   private scenarioService = inject(ScenarioService);
   private settingsService = inject(SettingsService);
   private worldStateService = inject(WorldStateService);
+  private loadingBus = inject(LoadingBusService);
+  private appErrorService = inject(AppErrorService);
   private _abortController: AbortController | null = null;
   private readonly STORAGE_KEY = 'llama_chat_messages';
 
   readonly messages = signal<ChatMessage[]>([]);
-  readonly loading = signal(false);
+
+  readonly loading = computed(() => this.loadingBus.chatLoading());
 
   readonly estimatedTokens = computed(() =>
     Math.round(this.messages().reduce((sum, m) => sum + m.content.length, 0) / 4),
   );
+
+  readonly systemPromptTokenEstimate = signal<number>(0);
+
   readonly contextWarning = computed(() => {
     const contextLimit = this.settingsService.contextWindow();
     return this.estimatedTokens() > contextLimit * 0.5;
@@ -65,6 +73,16 @@ export class ChatService {
     this.persistMessages();
   }
 
+  autoArchiveIfNeeded(): void {
+    const contextLimit = this.settingsService.contextWindow();
+    if (this.estimatedTokens() <= contextLimit * 0.5) return;
+    const msgs = this.messages();
+    const keepCount = Math.ceil(msgs.length * 0.75);
+    if (msgs.length <= keepCount) return;
+    this.messages.set(msgs.slice(msgs.length - keepCount));
+    this.persistMessages();
+  }
+
   initializeStory(): void {
     if (this.loading()) return;
     const scenario = this.scenarioService.activeScenario();
@@ -73,6 +91,7 @@ export class ChatService {
     this.streamWithRetry({
       messages: [] as never[],
       stream: true,
+      stream_options: { include_usage: true },
       scenario: this.buildScenarioPayload(scenario),
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
@@ -81,6 +100,7 @@ export class ChatService {
 
   sendMessage(content: string, inputType: InputType = 'dialogue'): void {
     if (this.loading()) return;
+    this.appErrorService.clear();
     this.messages.update((msgs) => [...msgs, { role: 'user' as const, content, inputType }]);
 
     const scenario = this.scenarioService.activeScenario();
@@ -91,6 +111,7 @@ export class ChatService {
         input_type: m.inputType ?? 'dialogue',
       })),
       stream: true,
+      stream_options: { include_usage: true },
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
@@ -113,6 +134,7 @@ export class ChatService {
         input_type: m.inputType ?? 'dialogue',
       })),
       stream: true,
+      stream_options: { include_usage: true },
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
@@ -155,7 +177,7 @@ export class ChatService {
   private async streamRequest(payload: Record<string, unknown>): Promise<void> {
     this._abortController?.abort();
     this._abortController = new AbortController();
-    this.loading.set(true);
+    this.loadingBus.set('chat', true);
     this.messages.update((msgs) => [...msgs, { role: 'assistant' as const, content: '' }]);
 
     try {
@@ -166,12 +188,22 @@ export class ChatService {
         signal: this._abortController.signal,
       });
 
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        const status = response.status;
+        if (status === 503 || status === 0) {
+          this.appErrorService.set({ type: 'llm_unreachable', message: `HTTP ${status}` });
+        } else {
+          this.appErrorService.set({ type: 'parse_failure', message: `HTTP ${status}` });
+        }
+        this.messages.update((msgs) => msgs.slice(0, -1));
+        return;
+      }
       if (!response.body) throw new Error('Response body is null');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let usageSet = false;
 
       while (true) {
         const { done, value } = await reader.read();
@@ -188,22 +220,29 @@ export class ChatService {
               const json = JSON.parse(line.slice(6));
               const token: string = json.choices?.[0]?.delta?.content ?? '';
               if (token) this.appendToLastMessage(token);
+              if (!usageSet && json.usage?.prompt_tokens) {
+                this.systemPromptTokenEstimate.set(json.usage.prompt_tokens);
+                usageSet = true;
+              }
             } catch {
               // skip malformed SSE lines
             }
           }
         }
       }
+
+      this.autoArchiveIfNeeded();
     } catch (err) {
       if (err instanceof DOMException && err.name === 'AbortError') {
         this.messages.update((msgs) => msgs.slice(0, -1));
         return;
       }
       console.error('Stream error', err);
-      this.appendToLastMessage('\n\n⚠️ Error during streaming.');
+      this.appErrorService.set({ type: 'llm_unreachable', message: String(err) });
+      this.messages.update((msgs) => msgs.slice(0, -1));
     } finally {
       this._abortController = null;
-      this.loading.set(false);
+      this.loadingBus.set('chat', false);
       this.persistMessages();
     }
   }
