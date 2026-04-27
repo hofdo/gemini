@@ -80,6 +80,29 @@ class BondStateModel(BaseModel):
     companion_mood: str = ""
 
 
+class CombatParticipant(BaseModel):
+    entity_id: str
+    name: str
+    initiative: int = 0
+    hp: dict = {"current": 10, "max": 10}
+    is_player: bool = False
+
+
+class CombatStateModel(BaseModel):
+    active: bool = False
+    round: int = 1
+    initiative_order: list[CombatParticipant] = []
+    active_entity_index: int = 0
+    log: list[str] = []
+
+
+class CombatDelta(BaseModel):
+    action: Literal["start", "next_turn", "end"] = "start"
+    hp_changes: list[dict] = []
+    round_log_append: str | None = None
+    removed_entity_ids: list[str] = []
+
+
 class StoryMessage(BaseModel):
     role: Literal["user", "assistant"]
     content: str
@@ -272,6 +295,7 @@ class WorldStateModel(_CamelModel):
     ambient_queue: list[AmbientEvent] = []
     # Phase 3d: Bond mode
     bond_state: BondStateModel | None = None
+    combat_state: CombatStateModel | None = None
 
 
 class FactionChange(BaseModel):
@@ -316,6 +340,7 @@ class WorldStateDelta(BaseModel):
     faction_drift: list[FactionChange] = []
     # Phase 3d: Bond mode
     bond_update: BondUpdate | None = None
+    combat_delta: CombatDelta | None = None
 
 
 class WorldStateUpdateRequest(BaseModel):

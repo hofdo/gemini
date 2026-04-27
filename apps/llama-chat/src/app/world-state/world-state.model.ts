@@ -162,6 +162,29 @@ export interface SessionSummary {
   createdAt: string;
 }
 
+export interface CombatParticipant {
+  entityId: string;
+  name: string;
+  initiative: number;
+  hp: { current: number; max: number };
+  isPlayer: boolean;
+}
+
+export interface CombatState {
+  active: boolean;
+  round: number;
+  initiativeOrder: CombatParticipant[];
+  activeEntityIndex: number;
+  log: string[];
+}
+
+export interface CombatDelta {
+  action: 'start' | 'next_turn' | 'end';
+  hpChanges?: { entityId: string; hpDelta: number }[];
+  roundLogAppend?: string;
+  removedEntityIds?: string[];
+}
+
 export interface WorldState {
   _schemaVersion: number;
   id: string;
@@ -184,6 +207,7 @@ export interface WorldState {
   storyBeat: StoryBeat;
   ambientQueue: AmbientEvent[];
   bondState: BondState | null;
+  combatState: CombatState | null;
 }
 
 // WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
@@ -207,6 +231,7 @@ export interface WorldStateDelta {
   factionDrift: FactionChange[];
   // Phase 3d: Bond mode
   bondUpdate: BondUpdate | null;
+  combatDelta: CombatDelta | null;
 }
 
 export interface FactionChange {

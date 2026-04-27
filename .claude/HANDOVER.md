@@ -60,10 +60,27 @@ Plan: `.claude/plans/living-world-roadmap.md`
 
 ---
 
+## What was built this session (continued)
+
+### Phase 4 — Error Handling + Context Management (commit `0378b2b`)
+
+- `AppError` union type: `llm_unreachable | parse_failure | quota_exceeded | abort` — `app-error.service.ts`
+- `ErrorBoundaryComponent` upgraded: injects `AppErrorService`; type-specific recovery UI; wired into `app.html` wrapping `<router-outlet>`
+- `LoadingBusService`: keyed signal bus (`chat`, `worldUpdate`, `assist`, `anyLoading`); `ChatService.loading` is now `computed(() => loadingBus.chatLoading())` — no scattered `signal(false)` leaves
+- `ChatService` improvements:
+  - Stream failures set typed `AppError` (no more inline ⚠️ appended to message)
+  - `stream_options: { include_usage: true }` → `systemPromptTokenEstimate` signal fed from `usage.prompt_tokens`
+  - `autoArchiveIfNeeded()` — silently folds oldest 25% of messages when `estimatedTokens > contextLimit * 0.5`
+- Context banner: 3 actions (Trim / Export & Reset / Continue); `keepLast` slider (range 4–40) in trim confirm dialog; `contextBannerDismissed` resets on next `send()` so banner resurfaces
+- `4d (contradiction detection)` — already complete from Phase 3 (location heuristic)
+
+---
+
 ## Current state
 
 ### Commits ahead of origin/main
 ```
+0378b2b  feat(phase-4): error handling, loading bus, tiered context management
 a968861  feat(phase-3): living world — heartbeat, story beats, tone controls, bond mode engine
 c055aa5  feat(phase-2): persistence, quest log, DM integration, journal, session summaries
 03e133c  feat(phase-1): foundation hardening — SessionService, WorldSync, WorldPanel, ClockAdvance
@@ -77,18 +94,7 @@ c055aa5  feat(phase-2): persistence, quest log, DM integration, journal, session
 
 ## What comes next
 
-Phases 4–6 are designed in `.claude/plans/living-world-roadmap.md`.
-
-### Phase 4 — Error Handling + Context Management (2–3 days)
-
-- `AppError` union type: `llm_unreachable | parse_failure | quota_exceeded | abort`
-- Wire existing `ErrorBoundaryComponent` into all lazy-loaded routes
-- `LoadingBusService`: replace scattered `loading` signals with keyed bus (`chatLoading`, `worldUpdateLoading`, `assistLoading`, `anyLoading`)
-- Tiered context management:
-  - Auto-archive at 50% context limit (fold oldest 25% of messages into latest session summary)
-  - Warning banner at 75% with 3 actions: Trim / Export & Reset / Continue anyway
-  - `systemPromptTokenEstimate` signal in `ChatService` from first response `usage.prompt_tokens`
-- Improve `trimContext()`: show preview count, adjustable `keepLast` slider
+Phases 5–6 are designed in `.claude/plans/living-world-roadmap.md`.
 
 ### Phase 5 — Combat Mode (5–7 days)
 
@@ -117,6 +123,8 @@ Phases 4–6 are designed in `.claude/plans/living-world-roadmap.md`.
 | `apps/llama-chat/src/app/shared/storage.service.ts` | IndexedDB wrapper via `idb` |
 | `apps/llama-chat/src/app/session/session.service.ts` | Turn lifecycle, tick, summarize, beat detection |
 | `apps/llama-chat/src/app/shared/world-sync.service.ts` | LLM world-state calls, proper-noun filter |
+| `apps/llama-chat/src/app/shared/loading-bus.service.ts` | Keyed loading signal bus (Phase 4) |
+| `apps/llama-chat/src/app/shared/app-error.service.ts` | AppError union type + global error signal (Phase 4) |
 | `apps/llama-chat/src/app/shared/settings.service.ts` | Backends, contextWindow, toneSettings signals |
 | `apps/llama-chat/src/app/world-state/world-panel/world-panel.component.ts` | Extracted world panel |
 | `apps/llama-chat/src/app/journal/journal.component.ts` | Journal (/journal route) |

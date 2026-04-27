@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 import config
 from routes.backends import router as backends_router
 from routes.chat import router as chat_router
+from routes.combat import router as combat_router
 from routes.generate import router as generate_router
 from routes.world_state import router as world_state_router
 
@@ -23,6 +24,7 @@ app.include_router(chat_router)
 app.include_router(generate_router)
 app.include_router(backends_router)
 app.include_router(world_state_router)
+app.include_router(combat_router)
 
 
 @app.middleware("http")

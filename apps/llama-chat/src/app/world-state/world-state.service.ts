@@ -1,6 +1,8 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import {
   AmbientEvent,
+  CombatDelta,
+  CombatState,
   CurrentScene,
   Faction,
   NpcState,
@@ -91,6 +93,7 @@ export class WorldStateService {
       bondState: scenario.scenarioType === 'interpersonal'
         ? { tier: 0, temperature: 'warm', memoryAnchors: [], milestones: [], companionMood: '' }
         : null,
+      combatState: null,
     };
 
     this.state.set(newState);
@@ -320,6 +323,11 @@ export class WorldStateService {
         lastUpdated: new Date().toISOString(),
       };
     });
+
+    // Phase 5a: combat delta (applied after state.update so state() is fresh)
+    if (delta.combatDelta) {
+      this.applyCombatDelta(delta.combatDelta);
+    }
 
     // Synchronous write — bypasses the async effect() write path
     const updated = this.state();
@@ -558,6 +566,11 @@ export class WorldStateService {
     this.state.update(s => s ? { ...s, storyBeat: beat, lastUpdated: new Date().toISOString() } : s);
   }
 
+  // Phase 5a: Set combat state directly (used by CombatService)
+  setCombatState(cs: CombatState | null): void {
+    this.state.update(s => s ? { ...s, combatState: cs, lastUpdated: new Date().toISOString() } : s);
+  }
+
   clearState(): void {
     const s = this.state();
     if (s) {
@@ -565,6 +578,70 @@ export class WorldStateService {
       void this.storageService.delete(`${STORAGE_KEY_PREFIX}${s.id}`);
     }
     this.state.set(null);
+  }
+
+  // Phase 5b: exposed for CombatService direct calls
+  applyCombatDelta(delta: CombatDelta): void {
+    if (delta.action === 'start') {
+      // CombatService sets state directly via setCombatState — nothing to do here
+      return;
+    }
+
+    this.state.update(current => {
+      if (!current || !current.combatState) return current;
+      const cs = current.combatState;
+
+      if (delta.action === 'next_turn') {
+        // Remove entities
+        const removedIds = new Set(delta.removedEntityIds ?? []);
+        let order = cs.initiativeOrder.filter(p => !removedIds.has(p.entityId));
+
+        // Apply HP changes
+        if (delta.hpChanges?.length) {
+          order = order.map(p => {
+            const change = delta.hpChanges!.find(c => c.entityId === p.entityId);
+            if (!change) return p;
+            return {
+              ...p,
+              hp: {
+                ...p.hp,
+                current: Math.max(0, Math.min(p.hp.max, p.hp.current + change.hpDelta)),
+              },
+            };
+          });
+        }
+
+        // Advance initiative index cyclically
+        const nextIndex = order.length > 0
+          ? (cs.activeEntityIndex + 1) % order.length
+          : 0;
+
+        // Append round log
+        const log = delta.roundLogAppend
+          ? [...cs.log, delta.roundLogAppend]
+          : cs.log;
+
+        return {
+          ...current,
+          combatState: { ...cs, initiativeOrder: order, activeEntityIndex: nextIndex, log },
+          lastUpdated: new Date().toISOString(),
+        };
+      }
+
+      if (delta.action === 'end') {
+        const log = delta.roundLogAppend
+          ? [...cs.log, delta.roundLogAppend]
+          : cs.log;
+
+        return {
+          ...current,
+          combatState: { ...cs, active: false, log },
+          lastUpdated: new Date().toISOString(),
+        };
+      }
+
+      return current;
+    });
   }
 
   private async persistNow(state: WorldState): Promise<void> {
@@ -609,6 +686,9 @@ export class WorldStateService {
       raw.ambientQueue = raw.ambientQueue ?? [];
       raw.bondState = raw.bondState ?? null;
     }
+
+    // v3→current: add combatState (Phase 5a)
+    raw.combatState = raw.combatState ?? null;
 
     return {
       ...raw,

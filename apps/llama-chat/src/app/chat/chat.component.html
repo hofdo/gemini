@@ -146,3 +146,13 @@
     />
   }
 </div>
+
+@if (combatPromptVisible()) {
+  <div class="combat-prompt-overlay">
+    <div class="combat-prompt">
+      <p>⚔️ A fight is breaking out! Enter combat mode?</p>
+      <button (click)="enterCombat()">Enter Combat</button>
+      <button (click)="combatPromptVisible.set(false)">Stay Here</button>
+    </div>
+  </div>
+}

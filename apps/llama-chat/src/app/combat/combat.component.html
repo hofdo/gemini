@@ -1,0 +1,63 @@
+<div class="combat-shell">
+
+  @if (outcome()) {
+    <div class="combat-outcome-overlay">
+      <div class="combat-outcome-card">
+        @if (outcome() === 'victory') {
+          <h2 class="outcome-title victory">Victory!</h2>
+          <p class="outcome-sub">You have defeated your enemies.</p>
+        } @else if (outcome() === 'flee') {
+          <h2 class="outcome-title flee">Fled!</h2>
+          <p class="outcome-sub">You escaped from combat.</p>
+        } @else {
+          <h2 class="outcome-title tpk">Defeat!</h2>
+          <p class="outcome-sub">The party has fallen.</p>
+        }
+        @if (lastNarrative()) {
+          <p class="outcome-narrative">{{ lastNarrative() }}</p>
+        }
+        <button class="btn-outcome-back" (click)="endCombat(outcome()!)">Return to Story</button>
+      </div>
+    </div>
+  }
+
+  <header class="combat-header">
+    <h1 class="combat-title">⚔️ Combat</h1>
+    <div class="combat-header-actions">
+      <button class="btn-flee" (click)="endCombat('flee')" [disabled]="loading()">Flee</button>
+      <button class="btn-tpk" (click)="endCombat('tpk')" [disabled]="loading()">End (TPK)</button>
+    </div>
+  </header>
+
+  <div class="combat-layout">
+    <aside class="combat-sidebar">
+      <llama-initiative-tracker
+        [participants]="combatService.initiative()"
+        [activeEntityIndex]="worldStateService.state()?.combatState?.activeEntityIndex ?? 0"
+        [round]="combatService.currentRound()"
+      />
+    </aside>
+
+    <main class="combat-main">
+      @if (lastNarrative()) {
+        <div class="narrative-feedback">
+          <p>{{ lastNarrative() }}</p>
+        </div>
+      }
+
+      <div class="combat-log-wrapper">
+        <llama-combat-log [log]="combatService.combatLog()" />
+      </div>
+
+      @if (!outcome()) {
+        <div class="action-panel-wrapper">
+          <llama-action-panel
+            [loading]="loading()"
+            (action)="onAction($event)"
+          />
+        </div>
+      }
+    </main>
+  </div>
+
+</div>

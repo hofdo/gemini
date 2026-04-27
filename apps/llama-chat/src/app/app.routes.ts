@@ -31,6 +31,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./journal/journal.component').then((m) => m.JournalComponent),
   },
+  {
+    path: 'combat',
+    loadComponent: () =>
+      import('./combat/combat.component').then((m) => m.CombatComponent),
+  },
   { path: '**', redirectTo: '' },
 ];
 

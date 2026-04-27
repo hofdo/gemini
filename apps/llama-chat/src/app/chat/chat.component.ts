@@ -11,6 +11,7 @@ import { WorldStateService } from '../world-state/world-state.service';
 import { SessionService } from '../session/session.service';
 import { WorldPanelComponent } from '../world-state/world-panel/world-panel.component';
 import { LoadingBusService } from '../shared/loading-bus.service';
+import { CombatService } from '../combat/combat.service';
 
 @Component({
   selector: 'llama-chat',
@@ -28,6 +29,7 @@ export class ChatComponent implements OnInit {
   private router = inject(Router);
   private readonly _sanitizer = inject(DomSanitizer);
   private loadingBus = inject(LoadingBusService);
+  private combatService = inject(CombatService);
 
   protected input = signal('');
   protected inputType = signal<InputType>('dialogue');
@@ -39,6 +41,7 @@ export class ChatComponent implements OnInit {
   protected ambientLine = signal<string | null>(null);
   protected keepLast = signal(10);
   protected contextBannerDismissed = signal(false);
+  protected combatPromptVisible = signal(false);
 
   protected readonly aiAssisting = computed(() => this.loadingBus.assistLoading());
 
@@ -72,6 +75,10 @@ export class ChatComponent implements OnInit {
           }
           const found = this.worldStateService.detectContradictions(lastMsg.content);
           if (found.length) this.contradictions.set(found);
+          const ws = this.worldStateService.state();
+          if (ws?.currentScene?.tension === 'combat' && !ws?.combatState?.active) {
+            this.combatPromptVisible.set(true);
+          }
         });
       }
     }
@@ -216,6 +223,14 @@ export class ChatComponent implements OnInit {
 
   dismissContradictions(): void {
     this.contradictions.set([]);
+  }
+
+  async enterCombat(): Promise<void> {
+    this.combatPromptVisible.set(false);
+    const ws = this.worldStateService.state();
+    if (!ws) return;
+    const npcIds = ws.currentScene?.presentNpcIds ?? [];
+    await this.combatService.startCombat(npcIds);
   }
 
   async aiSuggestOrRewrite(): Promise<void> {

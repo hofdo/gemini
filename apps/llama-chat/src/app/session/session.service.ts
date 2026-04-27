@@ -36,6 +36,11 @@ export class SessionService {
         })),
       });
       this.worldStateService.applyDelta(delta);
+      // Phase 5: auto-transition to combat when scene tension hits 'combat'
+      const wsAfter = this.worldStateService.state();
+      if (wsAfter?.currentScene?.tension === 'combat' && !wsAfter?.combatState?.active) {
+        console.info('[SessionService] Scene tension reached combat — combatState not yet active');
+      }
     } catch (err) {
       console.warn('World state update failed (non-blocking)', err);
     }
