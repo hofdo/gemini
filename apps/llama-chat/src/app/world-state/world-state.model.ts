@@ -1,4 +1,56 @@
 export type NpcStatus = 'alive' | 'dead' | 'missing' | 'unknown';
+
+export interface QuestEntry {
+  id: string;
+  title: string;
+  description: string;
+  status: 'active' | 'completed' | 'failed' | 'abandoned';
+  objectives: { text: string; done: boolean }[];
+  addedAtTurn: number;
+  resolvedAtTurn?: number;
+  linkedNpcIds: string[];
+  rewards?: { gold?: number; items?: string[] };
+}
+
+export interface PlayerCharacter {
+  name: string;
+  epithets: string[];
+  aptitudes: {
+    bold: number;
+    subtle: number;
+    learned: number;
+    connected: number;
+    fierce: number;
+    resilient: number;
+  };
+  scarsAndGlories: string[];
+  inventory: string[];
+  conditions: string[];
+  hp: { current: number; max: number };
+}
+
+export type StoryBeat =
+  | 'inciting_incident'
+  | 'rising_tension'
+  | 'dark_moment'
+  | 'climax_pending'
+  | 'resolution'
+  | null;
+
+export interface QuestUpdate {
+  questId: string;
+  newStatus?: QuestEntry['status'];
+  objectivesDone?: number[];
+  notesAppend?: string;
+}
+
+export interface PlayerUpdate {
+  hpDelta?: number;
+  conditionsAdd?: string[];
+  conditionsRemove?: string[];
+  inventoryAdd?: string[];
+  inventoryRemove?: string[];
+}
 export type EventType = 'combat' | 'dialogue' | 'discovery' | 'faction' | 'world';
 export type EventCertainty = 'witnessed' | 'rumored' | 'deduced' | 'false';
 export type SceneTension = 'calm' | 'tense' | 'hostile' | 'combat';
@@ -93,6 +145,10 @@ export interface WorldState {
   sessionSummaries: SessionSummary[];
   turnCount: number;
   lastUpdated: string;
+  questLog: QuestEntry[];
+  playerCharacter: PlayerCharacter | null;
+  choiceChronicle: string[];
+  storyBeat: StoryBeat;
 }
 
 // WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
@@ -107,6 +163,9 @@ export interface WorldStateDelta {
   sceneUpdate: SceneUpdate | null;
   clockAdvance: ClockAdvance | null;
   keyFactsAppend: string[];
+  questUpdates: QuestUpdate[];
+  playerUpdate: PlayerUpdate | null;
+  storyBeatUpdate: StoryBeat;
 }
 
 export interface FactionChange {

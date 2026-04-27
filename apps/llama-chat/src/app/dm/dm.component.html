@@ -94,6 +94,11 @@
             <h2>📜 Quest Details</h2>
             <div class="result-actions">
               <button class="btn-save" (click)="saveQuest()">💾 Save to Collection</button>
+              @if (hasActiveScenario()) {
+                <button type="button" class="btn-promote" (click)="addQuestToWorld(currentQuest()!)">
+                  + Add to Quest Log
+                </button>
+              }
               <button class="btn-secondary" (click)="newQuest()">🔄 New Quest</button>
             </div>
           </div>
@@ -391,6 +396,11 @@
             <h2>🧙 NPC Details</h2>
             <div class="result-actions">
               <button class="btn-save" (click)="saveNpc()">💾 Save to Collection</button>
+              @if (hasActiveScenario()) {
+                <button type="button" class="btn-promote" (click)="promoteNpcToWorld(currentNpc()!)">
+                  + Add to World
+                </button>
+              }
               <button class="btn-secondary" (click)="newNpc()">🔄 New NPC</button>
             </div>
           </div>

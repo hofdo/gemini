@@ -1,17 +1,21 @@
-import { Injectable, effect, signal } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import {
   CurrentScene,
   Faction,
   NpcState,
+  QuestEntry,
   SceneTension,
+  SessionSummary,
+  StoryBeat,
   StoryEvent,
   TimeOfDay,
   WorldState,
   WorldStateDelta,
 } from './world-state.model';
 import { Scenario } from '../scenario/scenario.model';
+import { StorageService } from '../shared/storage.service';
 
-const CURRENT_SCHEMA_VERSION = 2;
+const CURRENT_SCHEMA_VERSION = 3;
 const MAX_HOT_EVENTS = 50;
 const MAX_KEY_FACTS = 10;
 const STORAGE_KEY_PREFIX = 'llama-world-state-';
@@ -32,6 +36,7 @@ function standingLabel(v: number): string {
 
 @Injectable({ providedIn: 'root' })
 export class WorldStateService {
+  private storageService = inject(StorageService);
   readonly state = signal<WorldState | null>(null);
 
   constructor() {
@@ -40,7 +45,9 @@ export class WorldStateService {
     effect(() => {
       const current = this.state();
       if (current) {
-        this.persistNow(current);
+        this.persistNow(current).catch(err =>
+          console.warn('WorldStateService: async persist failed', err)
+        );
       }
     });
   }
@@ -74,43 +81,44 @@ export class WorldStateService {
       sessionSummaries: [],
       turnCount: 0,
       lastUpdated: new Date().toISOString(),
+      questLog: [],
+      playerCharacter: null,
+      choiceChronicle: [],
+      storyBeat: null,
     };
 
     this.state.set(newState);
   }
 
-  loadForScenario(scenarioTitle: string): boolean {
+  async loadForScenario(scenarioTitle: string): Promise<boolean> {
     try {
-      const raw = localStorage.getItem(WORLD_INDEX_KEY);
-      if (raw) {
-        const index = JSON.parse(raw) as WorldIndex;
+      const index = await this.storageService.load<WorldIndex>(WORLD_INDEX_KEY);
+      if (index) {
         const entry = index.find(e => e.title === scenarioTitle);
         if (entry) {
-          const stateRaw = localStorage.getItem(`${STORAGE_KEY_PREFIX}${entry.id}`);
-          if (stateRaw) {
-            const parsed = JSON.parse(stateRaw) as Partial<WorldState>;
+          const parsed = await this.storageService.load<Partial<WorldState>>(
+            `${STORAGE_KEY_PREFIX}${entry.id}`
+          );
+          if (parsed) {
             this.state.set(this.migrate(parsed));
             return true;
           }
         }
       }
-    } catch { /* fall through to scan */ }
-    // Fallback: linear scan for legacy entries not yet indexed
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(STORAGE_KEY_PREFIX)) {
-        try {
-          const stateRaw = localStorage.getItem(key);
-          if (stateRaw) {
-            const parsed = JSON.parse(stateRaw) as Partial<WorldState>;
-            if (parsed.scenarioTitle === scenarioTitle) {
-              this.state.set(this.migrate(parsed));
-              return true;
-            }
-          }
-        } catch { /* skip malformed entries */ }
+    } catch { /* fall through */ }
+
+    // Fallback: linear scan via prefix
+    try {
+      const keys = await this.storageService.listByPrefix(STORAGE_KEY_PREFIX);
+      for (const key of keys) {
+        const parsed = await this.storageService.load<Partial<WorldState>>(key);
+        if (parsed?.scenarioTitle === scenarioTitle) {
+          this.state.set(this.migrate(parsed));
+          return true;
+        }
       }
-    }
+    } catch { /* give up */ }
+
     return false;
   }
 
@@ -216,6 +224,43 @@ export class WorldStateService {
         storyEvents = storyEvents.slice(overflow);
       }
 
+      // Apply quest updates
+      const questLog = current.questLog.map(q => {
+        const update = delta.questUpdates.find(u => u.questId === q.id);
+        if (!update) return q;
+        const objectivesDone = update.objectivesDone;
+        const objectives = objectivesDone
+          ? q.objectives.map((o, i) => objectivesDone.includes(i) ? { ...o, done: true } : o)
+          : q.objectives;
+        return {
+          ...q,
+          status: update.newStatus ?? q.status,
+          objectives,
+          resolvedAtTurn: update.newStatus && update.newStatus !== 'active' ? current.turnCount : q.resolvedAtTurn,
+        };
+      });
+
+      // Apply player update
+      let playerCharacter = current.playerCharacter;
+      if (delta.playerUpdate && playerCharacter) {
+        const pu = delta.playerUpdate;
+        const newHp = pu.hpDelta
+          ? { ...playerCharacter.hp, current: Math.max(0, Math.min(playerCharacter.hp.max, playerCharacter.hp.current + pu.hpDelta)) }
+          : playerCharacter.hp;
+        const conditions = [
+          ...playerCharacter.conditions.filter(c => !pu.conditionsRemove?.includes(c)),
+          ...(pu.conditionsAdd ?? []),
+        ];
+        const inventory = [
+          ...playerCharacter.inventory.filter(i => !pu.inventoryRemove?.includes(i)),
+          ...(pu.inventoryAdd ?? []),
+        ];
+        playerCharacter = { ...playerCharacter, hp: newHp, conditions, inventory };
+      }
+
+      // Apply story beat
+      const storyBeat: StoryBeat = delta.storyBeatUpdate !== undefined ? delta.storyBeatUpdate : current.storyBeat;
+
       return {
         ...current,
         factions,
@@ -226,13 +271,20 @@ export class WorldStateService {
         storyEvents,
         archivedEventCount,
         turnCount: turn,
+        questLog,
+        playerCharacter,
+        storyBeat,
         lastUpdated: new Date().toISOString(),
       };
     });
 
     // Synchronous write — bypasses the async effect() write path
     const updated = this.state();
-    if (updated) this.persistNow(updated);
+    if (updated) {
+      this.persistNow(updated).catch(err =>
+        console.warn('WorldStateService: applyDelta persist failed', err)
+      );
+    }
   }
 
   updateFaction(id: string, patch: Partial<Faction>): void {
@@ -288,6 +340,59 @@ export class WorldStateService {
       }
       return { ...s, storyEvents, archivedEventCount, turnCount: s.turnCount + 1, lastUpdated: new Date().toISOString() };
     });
+  }
+
+  addQuest(quest: Omit<QuestEntry, 'id' | 'addedAtTurn'>): void {
+    this.state.update(s => s ? {
+      ...s,
+      questLog: [...s.questLog, { ...quest, id: crypto.randomUUID(), addedAtTurn: s.turnCount }],
+      lastUpdated: new Date().toISOString(),
+    } : s);
+  }
+
+  updateQuestObjective(questId: string, objectiveIndex: number, done: boolean): void {
+    this.state.update(s => s ? {
+      ...s,
+      questLog: s.questLog.map(q => q.id === questId
+        ? { ...q, objectives: q.objectives.map((o, i) => i === objectiveIndex ? { ...o, done } : o) }
+        : q),
+      lastUpdated: new Date().toISOString(),
+    } : s);
+  }
+
+  addSessionSummary(summary: SessionSummary): void {
+    this.state.update(s => {
+      if (!s) return s;
+      const summaries = [...s.sessionSummaries, summary];
+      // Cap at 10, merge oldest two if exceeding
+      const capped = summaries.length > 10 ? summaries.slice(summaries.length - 10) : summaries;
+      return { ...s, sessionSummaries: capped, lastUpdated: new Date().toISOString() };
+    });
+  }
+
+  exportToFile(): void {
+    const state = this.state();
+    if (!state) return;
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `world-state-${state.scenarioTitle.replace(/\s+/g, '-')}-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async importFromFile(file: File): Promise<boolean> {
+    try {
+      const text = await file.text();
+      const parsed = JSON.parse(text) as Partial<WorldState>;
+      if (!parsed.id || !parsed.scenarioTitle) return false;
+      const migrated = this.migrate(parsed);
+      this.state.set(migrated);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   toCompactPrompt(maxBudget = 600): string {
@@ -372,29 +477,26 @@ export class WorldStateService {
   }
 
   clearState(): void {
+    const s = this.state();
+    if (s) {
+      // Deletion is best-effort; errors are intentionally ignored
+      void this.storageService.delete(`${STORAGE_KEY_PREFIX}${s.id}`);
+    }
     this.state.set(null);
   }
 
-  private persistNow(state: WorldState): void {
-    try {
-      localStorage.setItem(`${STORAGE_KEY_PREFIX}${state.id}`, JSON.stringify(state));
-      // Update world index
-      let index: WorldIndex = [];
-      try {
-        const raw = localStorage.getItem(WORLD_INDEX_KEY);
-        if (raw) index = JSON.parse(raw) as WorldIndex;
-      } catch { /* start with empty index */ }
-      const entry = { id: state.id, title: state.scenarioTitle, lastUpdated: state.lastUpdated };
-      const existingIdx = index.findIndex(e => e.id === state.id);
-      if (existingIdx >= 0) {
-        index[existingIdx] = entry;
-      } else {
-        index.push(entry);
-      }
-      localStorage.setItem(WORLD_INDEX_KEY, JSON.stringify(index));
-    } catch {
-      // QuotaExceededError or private browsing — in-memory state still valid
+  private async persistNow(state: WorldState): Promise<void> {
+    await this.storageService.save(`${STORAGE_KEY_PREFIX}${state.id}`, state);
+    // Update world index
+    const index: WorldIndex = (await this.storageService.load<WorldIndex>(WORLD_INDEX_KEY)) ?? [];
+    const entry = { id: state.id, title: state.scenarioTitle, lastUpdated: state.lastUpdated };
+    const existingIdx = index.findIndex(e => e.id === state.id);
+    if (existingIdx >= 0) {
+      index[existingIdx] = entry;
+    } else {
+      index.push(entry);
     }
+    await this.storageService.save(WORLD_INDEX_KEY, index);
   }
 
   private migrate(raw: Partial<WorldState>): WorldState {
@@ -414,8 +516,15 @@ export class WorldStateService {
     }
 
     // v1→v2: clockAdvance changed from boolean to ClockAdvance|null in the delta type (not stored state)
-    // No stored data changes needed — just bump the schema version.
-    // (version < 2 is intentionally a no-op on data)
+    // No stored data changes needed.
+
+    // v2→v3: add questLog, playerCharacter, choiceChronicle, storyBeat
+    if (version < 3) {
+      raw.questLog = raw.questLog ?? [];
+      raw.playerCharacter = raw.playerCharacter ?? null;
+      raw.choiceChronicle = raw.choiceChronicle ?? [];
+      raw.storyBeat = raw.storyBeat ?? null;
+    }
 
     return {
       ...raw,

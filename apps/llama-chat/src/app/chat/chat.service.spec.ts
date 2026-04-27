@@ -3,6 +3,14 @@ import { signal } from '@angular/core';
 import { ChatService } from './chat.service';
 import { ScenarioService } from '../scenario/scenario.service';
 import { SettingsService } from '../shared/settings.service';
+import { StorageService } from '../shared/storage.service';
+
+const storageServiceMock: Partial<StorageService> = {
+  save: () => Promise.resolve(),
+  load: () => Promise.resolve(null),
+  listByPrefix: () => Promise.resolve([]),
+  delete: () => Promise.resolve(),
+};
 
 describe('ChatService', () => {
   let service: ChatService;
@@ -18,6 +26,10 @@ describe('ChatService', () => {
         {
           provide: SettingsService,
           useValue: { enableThinking: signal(false), contextWindow: signal(8192) },
+        },
+        {
+          provide: StorageService,
+          useValue: storageServiceMock,
         },
       ],
     });

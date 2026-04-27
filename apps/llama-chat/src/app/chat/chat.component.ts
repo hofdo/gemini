@@ -77,13 +77,15 @@ export class ChatComponent implements OnInit {
       this.router.navigate(['/']);
       return;
     }
-    if (!this.worldStateService.loadForScenario(scenario.title)) {
-      this.worldStateService.initForScenario(scenario);
-    }
-    this.chatService.loadPersistedMessages();
-    if (this.chatService.messages().length === 0) {
-      this.chatService.initializeStory();
-    }
+    this.worldStateService.loadForScenario(scenario.title).then(loaded => {
+      if (!loaded) {
+        this.worldStateService.initForScenario(scenario);
+      }
+      this.chatService.loadPersistedMessages();
+      if (this.chatService.messages().length === 0) {
+        this.chatService.initializeStory();
+      }
+    });
   }
 
   renderMarkdown(content: string): string {

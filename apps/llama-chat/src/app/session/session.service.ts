@@ -3,6 +3,7 @@ import { WorldStateService } from '../world-state/world-state.service';
 import { ScenarioService } from '../scenario/scenario.service';
 import { WorldSyncService } from '../shared/world-sync.service';
 import { ChatService } from '../chat/chat.service';
+import { SessionSummary } from '../world-state/world-state.model';
 
 @Injectable({ providedIn: 'root' })
 export class SessionService {
@@ -38,10 +39,36 @@ export class SessionService {
     } catch (err) {
       console.warn('World state update failed (non-blocking)', err);
     }
+
+    await this.maybeSummarize(ws.turnCount);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async maybeSummarize(_turnCount: number): Promise<void> {
-    // Phase 2 — session summary wiring
+  async maybeSummarize(turnCount: number): Promise<void> {
+    if (turnCount % 20 !== 0) return;
+    const ws = this.worldStateService.state();
+    const scenario = this.scenarioService.activeScenario();
+    if (!ws || !scenario) return;
+    const messages = this.chatService.messages();
+    const last20 = messages.slice(-20);
+    if (last20.length < 10) return; // not enough content yet
+    try {
+      const result = await this.worldSyncService.generateSummary(
+        ws,
+        this.chatService.buildScenarioPayload(scenario),
+        last20,
+      );
+      if (result) {
+        const summary: SessionSummary = {
+          id: crypto.randomUUID(),
+          turnRange: [Math.max(0, ws.turnCount - 20), ws.turnCount],
+          summary: result.summary,
+          keyFacts: result.keyFacts,
+          createdAt: new Date().toISOString(),
+        };
+        this.worldStateService.addSessionSummary(summary);
+      }
+    } catch (err) {
+      console.warn('Session summary failed (non-blocking)', err);
+    }
   }
 }

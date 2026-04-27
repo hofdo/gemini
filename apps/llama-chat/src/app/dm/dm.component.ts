@@ -1,9 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
 import { AiAssistService } from '../shared/ai-assist.service';
 import { DmNpc, DmNpcAction, DmNpcClass, Quest, QuestEncounter, QuestMonster, QuestReward } from './dm.model';
+import { WorldStateService } from '../world-state/world-state.service';
+import { ScenarioService } from '../scenario/scenario.service';
+import { dmNpcToNpcState, dmQuestToQuestEntry } from './dm-npc-adapter';
 
 const STORAGE_KEY_QUESTS = 'dm_saved_quests';
 const STORAGE_KEY_NPCS = 'dm_saved_npcs';
@@ -18,6 +21,10 @@ const STORAGE_KEY_NPCS = 'dm_saved_npcs';
 export class DmComponent {
   private router = inject(Router);
   private aiAssist = inject(AiAssistService);
+  private worldStateService = inject(WorldStateService);
+  private scenarioService = inject(ScenarioService);
+
+  readonly hasActiveScenario = computed(() => !!this.scenarioService.activeScenario());
 
   // --- Tab ---
   activeTab = signal<'quests' | 'npcs'>('quests');
@@ -364,6 +371,14 @@ export class DmComponent {
     this.npcName.set('');
     this.npcDescription.set('');
     this.npcError.set(null);
+  }
+
+  promoteNpcToWorld(npc: DmNpc): void {
+    this.worldStateService.addNpcState(dmNpcToNpcState(npc));
+  }
+
+  addQuestToWorld(quest: Quest): void {
+    this.worldStateService.addQuest(dmQuestToQuestEntry(quest));
   }
 
   difficultyClass(difficulty: string): string {

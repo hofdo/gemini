@@ -1,5 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { WorldStateService } from '../world-state/world-state.service';
 
 @Component({
   selector: 'llama-menu',
@@ -9,6 +10,7 @@ import { Router } from '@angular/router';
 })
 export class MenuComponent {
   private router = inject(Router);
+  readonly worldStateService = inject(WorldStateService);
 
   selectMode(mode: string): void {
     if (mode === 'dm') {
@@ -20,6 +22,10 @@ export class MenuComponent {
 
   goToSettings(): void {
     this.router.navigate(['/settings']);
+  }
+
+  goToJournal(): void {
+    this.router.navigate(['/journal']);
   }
 }
 

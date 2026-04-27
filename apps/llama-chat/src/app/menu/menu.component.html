@@ -1,5 +1,8 @@
 <div class="menu-container">
   <div class="menu-top-bar">
+    @if (worldStateService.state()) {
+      <button class="btn-journal" (click)="goToJournal()" title="Journal">📖 Journal</button>
+    }
     <button class="btn-settings" (click)="goToSettings()" title="Settings">⚙️</button>
   </div>
 

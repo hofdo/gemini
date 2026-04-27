@@ -1,12 +1,16 @@
 import json
 
 from fastapi import APIRouter
+from pydantic import BaseModel
 
 import config
 from json_utils import _extract_json_object
 from llm import call_llm
 from models import (
+    Scenario,
+    StoryMessage,
     WorldStateDelta,
+    WorldStateModel,
     WorldStateUpdateRequest,
 )
 
@@ -76,3 +80,46 @@ Output ONLY valid JSON matching this schema:
         )
         # Return empty delta on parse failure — non-blocking for the user
         return WorldStateDelta()
+
+
+class SessionSummaryRequest(BaseModel):
+    scenario: Scenario
+    world_state: WorldStateModel
+    last_messages: list[StoryMessage]
+
+
+@router.post("/world-state/summary")
+async def generate_session_summary(request: SessionSummaryRequest) -> dict:
+    config.logger.info(
+        "=== /world-state/summary (turn=%d, messages=%d)",
+        request.world_state.turn_count,
+        len(request.last_messages),
+    )
+    messages_text = "\n".join(
+        f"[{m.role.upper()}]: {m.content[:200]}" for m in request.last_messages[-20:]
+    )
+    turn_start = max(0, request.world_state.turn_count - 20)
+    prompt = f"""Summarize this RPG session in 3-5 sentences and extract 3-5 key facts.
+Return JSON: {{"summary": "...", "keyFacts": ["...", "..."]}}
+
+Scenario: {request.world_state.scenario_title}
+Turn range: {turn_start} to {request.world_state.turn_count}
+
+Recent exchanges:
+{messages_text}
+"""
+    api_messages = [
+        {"role": "system", "content": prompt},
+        {"role": "user", "content": "Generate the session summary JSON now."},
+    ]
+
+    raw = ""
+    try:
+        raw = await call_llm(api_messages, timeout=30.0, json_mode=True, temperature=0.15)
+        result = json.loads(_extract_json_object(raw))
+        return result
+    except Exception as exc:
+        config.logger.error(
+            "world-state/summary parse error: %s | raw: %s", exc, raw[:300] or "N/A"
+        )
+        return {"summary": "", "keyFacts": []}

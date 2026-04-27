@@ -29,4 +29,26 @@ export class WorldSyncService {
     if (!response.ok) throw new Error(`World state update failed: ${response.status}`);
     return response.json() as Promise<WorldStateDelta>;
   }
+
+  async generateSummary(
+    worldState: WorldState,
+    scenario: unknown,
+    messages: { role: string; content: string; inputType?: string }[]
+  ): Promise<{ summary: string; keyFacts: string[] } | null> {
+    const response = await fetch(`${this.baseUrl}/summary`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        scenario,
+        world_state: worldState,
+        last_messages: messages.map(m => ({
+          role: m.role,
+          content: m.content,
+          input_type: m.inputType ?? 'dialogue',
+        })),
+      }),
+    });
+    if (!response.ok) return null;
+    return response.json();
+  }
 }

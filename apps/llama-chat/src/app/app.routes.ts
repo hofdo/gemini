@@ -26,6 +26,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./settings/settings.component').then((m) => m.SettingsComponent),
   },
+  {
+    path: 'journal',
+    loadComponent: () =>
+      import('./journal/journal.component').then((m) => m.JournalComponent),
+  },
   { path: '**', redirectTo: '' },
 ];
 

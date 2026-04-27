@@ -169,6 +169,57 @@ class WorldClockModel(_CamelModel):
     turns_per_day: int = 8
 
 
+class QuestObjective(BaseModel):
+    text: str
+    done: bool = False
+
+
+class QuestEntry(BaseModel):
+    id: str
+    title: str
+    description: str
+    status: Literal["active", "completed", "failed", "abandoned"] = "active"
+    objectives: list[QuestObjective] = []
+    added_at_turn: int = 0
+    resolved_at_turn: int | None = None
+    linked_npc_ids: list[str] = []
+    rewards: dict | None = None
+
+
+class AptitudeSet(BaseModel):
+    bold: int = 0
+    subtle: int = 0
+    learned: int = 0
+    connected: int = 0
+    fierce: int = 0
+    resilient: int = 0
+
+
+class PlayerCharacterModel(BaseModel):
+    name: str
+    epithets: list[str] = []
+    aptitudes: AptitudeSet = AptitudeSet()
+    scars_and_glories: list[str] = []
+    inventory: list[str] = []
+    conditions: list[str] = []
+    hp: dict = {"current": 20, "max": 20}
+
+
+class QuestUpdate(BaseModel):
+    quest_id: str
+    new_status: Literal["active", "completed", "failed", "abandoned"] | None = None
+    objectives_done: list[int] = []
+    notes_append: str = ""
+
+
+class PlayerUpdate(BaseModel):
+    hp_delta: int | None = None
+    conditions_add: list[str] = []
+    conditions_remove: list[str] = []
+    inventory_add: list[str] = []
+    inventory_remove: list[str] = []
+
+
 class WorldStateModel(_CamelModel):
     schema_version: int = 1
     id: str
@@ -183,6 +234,10 @@ class WorldStateModel(_CamelModel):
     archived_event_summary: str = ""
     key_facts: list[str] = []
     turn_count: int = 0
+    quest_log: list[QuestEntry] = []
+    player_character: PlayerCharacterModel | None = None
+    choice_chronicle: list[str] = []
+    story_beat: str | None = None
 
 
 class FactionChange(BaseModel):
@@ -218,6 +273,9 @@ class WorldStateDelta(BaseModel):
     scene_update: SceneUpdate | None = None
     clock_advance: ClockAdvance | None = None
     key_facts_append: list[str] = []
+    quest_updates: list[QuestUpdate] = []
+    player_update: PlayerUpdate | None = None
+    story_beat_update: str | None = None
 
 
 class WorldStateUpdateRequest(BaseModel):
