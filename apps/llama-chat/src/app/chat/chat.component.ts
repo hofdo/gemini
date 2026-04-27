@@ -53,6 +53,21 @@ export class ChatComponent implements OnInit, OnDestroy {
   protected oracleLoading = signal(false);
   protected oracleResults = signal<OracleResult[]>([]);
 
+  // Fix 2A — Bond state computed signals
+  readonly bondState = computed(() => this.worldStateService.state()?.bondState ?? null);
+  readonly isBondMode = computed(() => this.scenarioService.activeScenario()?.scenarioType === 'interpersonal');
+  readonly bondTemperaturePercent = computed(() => {
+    const temp = this.bondState()?.temperature;
+    // EmotionalTemperature: 'cold' | 'warm' | 'charged' | 'tender' | 'raw'
+    const map: Record<string, number> = { cold: 0, warm: 25, charged: 50, tender: 75, raw: 100 };
+    return temp != null ? (map[temp] ?? 0) : 0;
+  });
+
+  // Fix 2B — Bond change toast
+  protected bondToast = signal<string | null>(null);
+  private _bondToastTimer: ReturnType<typeof setTimeout> | null = null;
+  private _lastBondSnapshot: { tier: number; temperature: string } | null = null;
+
   protected readonly aiAssisting = computed(() => this.loadingBus.assistLoading());
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLElement>;
@@ -100,6 +115,21 @@ export class ChatComponent implements OnInit, OnDestroy {
       }
     }
     if (loading) this._wasLoading = true;
+  });
+
+  // Fix 2B — watch bondState changes and flash a toast
+  private _bondEffect = effect(() => {
+    const bs = this.bondState();
+    if (!bs) return;
+    // effect() runs on every change; track transitions by comparing snapshot
+    const prev = this._lastBondSnapshot;
+    this._lastBondSnapshot = { tier: bs.tier, temperature: bs.temperature };
+    if (prev === null) return; // first run — no toast
+    if (prev.tier === bs.tier && prev.temperature === bs.temperature) return;
+    const msg = `Bond changed: Tier ${bs.tier} — ${bs.temperature}`;
+    this.bondToast.set(msg);
+    if (this._bondToastTimer !== null) clearTimeout(this._bondToastTimer);
+    this._bondToastTimer = setTimeout(() => this.bondToast.set(null), 3000);
   });
 
   ngOnInit(): void {

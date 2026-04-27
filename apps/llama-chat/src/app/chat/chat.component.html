@@ -41,6 +41,16 @@
       </div>
     }
 
+    @if (isBondMode() && bondState()) {
+      <div class="bond-indicator">
+        <span class="bond-tier">❤ Tier {{ bondState()!.tier }}</span>
+        <span class="bond-temperature">{{ bondState()!.temperature }}</span>
+        <div class="bond-bar-track">
+          <div class="bond-bar-fill" [style.width.%]="bondTemperaturePercent()"></div>
+        </div>
+      </div>
+    }
+
     @if (pendingAction()) {
       <div class="confirm-bar">
         <span class="confirm-msg">
@@ -77,6 +87,10 @@
 
     @if (ambientLine()) {
       <div class="ambient-line">{{ ambientLine() }}</div>
+    }
+
+    @if (bondToast()) {
+      <div class="bond-toast">{{ bondToast() }}</div>
     }
 
     <div class="message-list" #messageList>

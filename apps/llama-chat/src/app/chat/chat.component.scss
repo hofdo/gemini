@@ -742,3 +742,62 @@
 .oracle-result strong { color: #f0f0f0; display: block; }
 
 .oracle-detail { color: #aaa; font-size: 12px; margin: 4px 0 0 0; }
+
+// ─── Bond Indicator (Fix 2A) ──────────────────────────────────────────────────
+
+.bond-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 1.5rem;
+  background: #0d1a2e;
+  border-bottom: 1px solid #533483;
+  font-size: 0.8rem;
+
+  .bond-tier {
+    color: #e94560;
+    font-weight: 600;
+    white-space: nowrap;
+    min-width: 3.5rem;
+  }
+
+  .bond-temperature {
+    color: #b39ddb;
+    text-transform: capitalize;
+    min-width: 4rem;
+  }
+
+  .bond-bar-track {
+    flex: 1;
+    height: 5px;
+    background: #1e1e3a;
+    border-radius: 3px;
+    overflow: hidden;
+    min-width: 60px;
+
+    .bond-bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #533483 0%, #e94560 100%);
+      transition: width 0.4s ease;
+    }
+  }
+}
+
+// ─── Bond Toast (Fix 2B) ──────────────────────────────────────────────────────
+
+.bond-toast {
+  position: relative;
+  padding: 0.4rem 1.5rem;
+  background: rgba(83, 52, 131, 0.85);
+  border-bottom: 1px solid #7c4dff;
+  font-size: 0.8rem;
+  color: #d4c0ff;
+  text-align: center;
+  animation: bondFadeIn 0.25s ease;
+}
+
+@keyframes bondFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
