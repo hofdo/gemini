@@ -1,0 +1,75 @@
+{
+  "scenarioType": "adventure",
+  "title": "The Last Stockade",
+  "setting": "A crumbling fortress town called Dustwall at the edge of a dying empire, three weeks before the winter that will either save or kill the settlement. Orc raiding parties have been cutting the supply roads for six weeks; the imperial garrison quietly halved its strength last month without explanation or warning. The granary holds enough food for two months, and there are three months of winter ahead.",
+  "tone": "Grimdark survival — every decision carries weight that does not reset. There is no cavalry coming, no divine intervention waiting in the wings. Resources are scarce, trust is rarer, and heroism is measured not by glory but by who is still breathing come spring. Moral clarity is a luxury Dustwall cannot afford.",
+  "characterName": "",
+  "characterDescription": "A veteran soldier who arrived in Dustwall three days ago, carrying discharge papers and a reputation that precedes them by about half a mile. You have seen enough wars to know what a settlement looks like when it has been written off. Dustwall looks like that. You stayed anyway.",
+  "npcs": [
+    {
+      "name": "Commander Vael Orris",
+      "description": "The garrison commander — a lean man in his late forties whose uniform is still impeccable despite everything. He runs the daily briefings with crisp efficiency and has not slept more than four hours in two weeks. His authority is absolute within the walls, and he guards it with something that looks like certainty but feels, up close, like desperate performance.",
+      "mode": "detailed",
+      "personality": "Measured and controlled in public; precise in orders; privately consumed by a decision he cannot undo and cannot share. He respects competence and despises wasted effort. When cornered on difficult questions — supply projections, troop counts, reinforcement timelines — his answers are technically true and deliberately incomplete.",
+      "foes": [
+        "Imperial High Command, who issued the garrison reduction orders and will not respond to his dispatches",
+        "the settlement merchants who are already talking about negotiated surrender"
+      ],
+      "friends": [
+        "Captain Senna, his second, who is beginning to suspect the truth",
+        "the player, cautiously — their experience fills a gap he cannot acknowledge"
+      ],
+      "plotTwists": [
+        "The imperial support order was not a reduction — it was a quiet abandonment. Dustwall was deemed indefensible three months ago. Orris received the classified assessment and chose not to tell anyone.",
+        "He was the officer who ordered the evacuation of Fort Carren two years ago — an order that saved most lives but left a rear guard to die. The player may have been connected to that rear guard."
+      ],
+      "stats": { "str": 14, "dex": 11, "con": 15, "int": 16, "wis": 17, "cha": 13 }
+    },
+    {
+      "name": "Marta Fen",
+      "description": "The settlement's herbalist, bone-setter, and de-facto mayor — she holds the civilian authority by sheer weight of competence and the fact that no one else wants the job. Her workroom smells of dried sage and pine resin. She is practical to the point of bluntness, and she has already started calculating who will die if the winter goes badly.",
+      "mode": "detailed",
+      "personality": "Direct, tired, and entirely without patience for solutions that only work in theory. She is not unkind, but she has watched too many people die of pride and optimism to indulge either. Her negotiations with the orc chieftain are a secret she holds with the calm of someone who has already accepted the consequences if she is discovered.",
+      "foes": [
+        "Commander Orris, whose military authority overrides her civilian judgment on defense matters",
+        "the settlement's loudest voices for armed retaliation against the orcs"
+      ],
+      "friends": [
+        "Rekk, unknowingly — she suspects someone is sheltering in the old granary but has not investigated",
+        "the three settlement midwives who carry her messages to the outlying farms"
+      ],
+      "plotTwists": [
+        "The orc chieftain she has been negotiating with has offered a cease-trade in exchange for Dustwall providing medical aid to his clan through winter. She has already agreed in principle — without anyone's knowledge or authority.",
+        "She has a supply of a specific herb — krevva root — that slows infection and could save lives in a siege, but she has been quietly rationing it because she expects this winter to be worse than anyone believes."
+      ],
+      "stats": { "str": 9, "dex": 12, "con": 12, "int": 15, "wis": 18, "cha": 14 }
+    },
+    {
+      "name": "Rekk",
+      "description": "A young orc scout, nineteen years old, who got separated from his raiding party during a river crossing four days ago and made a panicked decision to hide inside Dustwall rather than freeze in the open. He has been living in the collapsed section of the old eastern granary, surviving on rats and stolen bread crusts, wearing a dead farmer's coat and keeping his face down.",
+      "mode": "detailed",
+      "personality": "Frightened, stubborn, and deeply aware that discovery means death. He is not cruel — the raid was about food, his clan is starving too — but he knows that explanation will not save him. He is more intelligent than people expect and more scared than he shows. He grew up hearing that humans cannot be trusted. He is beginning to suspect that assessment was symmetrical.",
+      "foes": [
+        "The garrison soldiers who killed two of his clanmates during the last raid",
+        "his own raiding party, if they return — they may not know he survived"
+      ],
+      "friends": [
+        "a settlement dog that found him and has not betrayed him",
+        "the player, potentially — if approached with something other than a sword"
+      ],
+      "plotTwists": [
+        "He is the chieftain's youngest son. His presence in Dustwall is, from the chieftain's perspective, both a catastrophic loss and an extraordinary intelligence opportunity — and the chieftain does not yet know which.",
+        "He overheard a conversation between two garrison soldiers about a secondary supply cache four miles north that the commander has not disclosed to the settlement. He does not know what to do with this information."
+      ],
+      "stats": { "str": 17, "dex": 14, "con": 16, "int": 10, "wis": 11, "cha": 8 }
+    }
+  ],
+  "rules": [
+    "Resources are finite and tracked — food, firewood, medicinal supplies, and garrison morale are all in decline. Decisions that spend resources must accept the downstream consequence.",
+    "Faction trust operates on a slow clock: the garrison, the civilians, and the orc clan each have their own read of you, built from actions not words. Shifting one faction's trust can cost you another's.",
+    "There is no authority above Dustwall. Dispatches to the empire go unanswered. Decisions made here are the only decisions being made.",
+    "Violence resolves the immediate problem and creates the next one. An orc killed in the settlement is an orc with kin who will be looking for an answer.",
+    "Secrets have weight — NPCs who know things and have not told them did not do so by accident. Surface a secret through action or inference, not through persuasion alone.",
+    "Winter does not negotiate. Regardless of story events, the temperature drops, the days shorten, and the settlement's margins narrow. Time is a resource too."
+  ]
+}

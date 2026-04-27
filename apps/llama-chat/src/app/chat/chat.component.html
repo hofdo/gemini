@@ -16,6 +16,7 @@
             ⚠ {{ contradictions().length }}
           </button>
         }
+        <button class="oracle-btn" (click)="toggleOracle()" title="Oracle (Ctrl+Shift+O)">⚡</button>
         @if (worldStateService.state()) {
           <button class="btn-header" (click)="toggleWorldPanel()" [class.active]="showWorldPanel()" title="World state">🌍</button>
         }
@@ -153,6 +154,37 @@
       <p>⚔️ A fight is breaking out! Enter combat mode?</p>
       <button (click)="enterCombat()">Enter Combat</button>
       <button (click)="combatPromptVisible.set(false)">Stay Here</button>
+    </div>
+  </div>
+}
+
+@if (oracleVisible()) {
+  <div class="oracle-overlay">
+    <div class="oracle-panel">
+      <div class="oracle-header">
+        <span class="oracle-title">Oracle</span>
+        <span class="oracle-hint">Ctrl+Shift+O</span>
+        <button class="oracle-close" (click)="toggleOracle()">✕</button>
+      </div>
+      <div class="oracle-actions">
+        <button (click)="generateOracle('npc_name')" [disabled]="oracleLoading()">NPC Name</button>
+        <button (click)="generateOracle('location_name')" [disabled]="oracleLoading()">Location</button>
+        <button (click)="generateOracle('quest_hook')" [disabled]="oracleLoading()">Quest Hook</button>
+      </div>
+      @if (oracleLoading()) {
+        <p class="oracle-loading">Consulting the oracle...</p>
+      }
+      <div class="oracle-results">
+        @for (r of oracleResults(); track r.result) {
+          <div class="oracle-result">
+            <span class="oracle-type">{{ r.type.replace('_', ' ') }}</span>
+            <strong>{{ r.result }}</strong>
+            @if (r.detail) {
+              <p class="oracle-detail">{{ r.detail }}</p>
+            }
+          </div>
+        }
+      </div>
     </div>
   </div>
 }

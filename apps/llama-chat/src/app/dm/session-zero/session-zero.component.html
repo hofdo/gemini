@@ -1,0 +1,384 @@
+<div class="sz-container">
+
+  <!-- Header -->
+  <div class="sz-header">
+    <button class="btn-back" (click)="goBack()">&#8592; Back to DM</button>
+    <div class="sz-title-row">
+      <span class="sz-icon">&#9733;</span>
+      <h1>Session Zero Wizard</h1>
+    </div>
+    <p class="sz-subtitle">Build your campaign world step by step</p>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="step-indicator">
+    @for (n of [1,2,3,4,5]; track n) {
+      <div class="step-dot-wrap">
+        <div class="step-dot"
+             [class.completed]="step() > n"
+             [class.current]="step() === n">
+          @if (step() > n) {
+            <span class="checkmark">&#10003;</span>
+          } @else {
+            <span>{{ n }}</span>
+          }
+        </div>
+        <span class="step-label">{{ stepLabel(n) }}</span>
+      </div>
+      @if (n < 5) {
+        <div class="step-connector" [class.filled]="step() > n"></div>
+      }
+    }
+  </div>
+
+  <!-- Error banner -->
+  @if (error()) {
+    <div class="error-banner">
+      <span>&#9888; {{ error() }}</span>
+      <button class="btn-dismiss" (click)="error.set(null)">&#10005;</button>
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- STEP 1 — Premise                                                  -->
+  <!-- ================================================================ -->
+  @if (step() === 1) {
+    <div class="step-card">
+      <h2><span class="step-num">1</span> Campaign Premise</h2>
+      <p class="step-desc">Describe your campaign concept in a few sentences. The wizard will generate a structured scenario from your idea.</p>
+
+      <textarea
+        class="premise-area"
+        rows="5"
+        placeholder="e.g. A crumbling empire on the edge of civil war. The old king is dying, three noble houses vie for the throne, and something ancient stirs beneath the capital's foundations..."
+        [ngModel]="premiseText()"
+        (ngModelChange)="premiseText.set($event)"
+      ></textarea>
+
+      <button
+        class="btn-generate"
+        [disabled]="loading() || !premiseText().trim()"
+        (click)="generatePremise()">
+        @if (loading()) {
+          <span class="spinner"></span> Generating...
+        } @else {
+          &#10024; Generate Premise
+        }
+      </button>
+
+      @if (scenario()) {
+        <div class="result-card">
+          <h3>Generated Scenario</h3>
+
+          <label class="field-label">Title
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="scenarioTitle()"
+              (ngModelChange)="scenarioTitle.set($event); syncScenarioFromFields()">
+          </label>
+
+          <label class="field-label">Setting
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="scenarioSetting()"
+              (ngModelChange)="scenarioSetting.set($event); syncScenarioFromFields()">
+          </label>
+
+          <label class="field-label">Tone
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="scenarioTone()"
+              (ngModelChange)="scenarioTone.set($event); syncScenarioFromFields()">
+          </label>
+
+          <label class="field-label">Character Name
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="scenarioCharacterName()"
+              (ngModelChange)="scenarioCharacterName.set($event); syncScenarioFromFields()">
+          </label>
+
+          <label class="field-label">Character Description
+            <textarea
+              class="field-textarea"
+              rows="3"
+              [ngModel]="scenarioCharacterDescription()"
+              (ngModelChange)="scenarioCharacterDescription.set($event); syncScenarioFromFields()"></textarea>
+          </label>
+        </div>
+
+        <div class="nav-row">
+          <span></span>
+          <button class="btn-next" (click)="nextStep()">Factions &#8594;</button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- STEP 2 — Factions                                                 -->
+  <!-- ================================================================ -->
+  @if (step() === 2) {
+    <div class="step-card">
+      <h2><span class="step-num">2</span> Factions</h2>
+      <p class="step-desc">Generate three factions that will shape the political landscape of your world. Edit names and goals to fit your vision.</p>
+
+      <button
+        class="btn-generate"
+        [disabled]="loading()"
+        (click)="generateFactions()">
+        @if (loading()) {
+          <span class="spinner"></span> Generating...
+        } @else {
+          &#9876; Generate Factions
+        }
+      </button>
+
+      @if (factions().length > 0) {
+        <div class="faction-grid">
+          @for (faction of factions(); track faction.id) {
+            <div class="faction-card">
+              <div class="faction-archetype">{{ faction.archetype }}</div>
+
+              <label class="field-label">Name
+                <input
+                  class="field-input"
+                  type="text"
+                  [ngModel]="faction.name"
+                  (ngModelChange)="updateFactionField(faction.id, 'name', $event)">
+              </label>
+
+              <p class="faction-desc">{{ faction.description }}</p>
+
+              <label class="field-label">Goal
+                <input
+                  class="field-input"
+                  type="text"
+                  [ngModel]="faction.goal"
+                  (ngModelChange)="updateFactionField(faction.id, 'goal', $event)">
+              </label>
+
+              @if (faction.territories.length > 0) {
+                <div class="territories">
+                  <span class="territories-label">Territories:</span>
+                  @for (t of faction.territories; track t) {
+                    <span class="territory-chip">{{ t }}</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-prev" (click)="prevStep()">&#8592; Premise</button>
+          <button class="btn-next" (click)="nextStep()">NPCs &#8594;</button>
+        </div>
+      } @else {
+        <div class="nav-row">
+          <button class="btn-prev" (click)="prevStep()">&#8592; Premise</button>
+          <span></span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- STEP 3 — NPCs                                                     -->
+  <!-- ================================================================ -->
+  @if (step() === 3) {
+    <div class="step-card">
+      <h2><span class="step-num">3</span> Key NPCs</h2>
+      <p class="step-desc">Generate up to 2 NPCs per faction. Each NPC will have a name, background, and personality. You can skip this step.</p>
+
+      @if (factions().length === 0) {
+        <div class="empty-notice">No factions generated — go back to Step 2 first.</div>
+      } @else {
+        <div class="npc-factions">
+          @for (faction of factionsForStep3(); track faction.id) {
+            <div class="npc-faction-block">
+              <div class="npc-faction-header">
+                <span class="npc-faction-name">{{ faction.name }}</span>
+                <button
+                  class="btn-generate-sm"
+                  [disabled]="npcCountForFaction(faction.id) >= 2 || generatingNpcFor() !== null"
+                  (click)="generateNpcForFaction(faction.id, faction.name)">
+                  @if (generatingNpcFor() === faction.id) {
+                    <span class="spinner-sm"></span> Generating...
+                  } @else if (npcCountForFaction(faction.id) >= 2) {
+                    &#10003; Full (2/2)
+                  } @else {
+                    + Generate NPC ({{ npcCountForFaction(faction.id) }}/2)
+                  }
+                </button>
+              </div>
+
+              <div class="npc-cards-row">
+                @for (npc of npcsForFaction(faction.id); track npc.name) {
+                  <div class="npc-card">
+                    <div class="npc-card-name">{{ npc.name }}</div>
+                    <div class="npc-card-desc">{{ npc.description }}</div>
+                    <div class="npc-card-personality">
+                      <span class="npc-label">Personality:</span> {{ npc.personality }}
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <div class="nav-row">
+        <button class="btn-prev" (click)="prevStep()">&#8592; Factions</button>
+        <div class="nav-right">
+          <button class="btn-skip" (click)="nextStep()">Skip</button>
+          <button class="btn-next" (click)="nextStep()">Opening Scene &#8594;</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- STEP 4 — Opening Scene                                            -->
+  <!-- ================================================================ -->
+  @if (step() === 4) {
+    <div class="step-card">
+      <h2><span class="step-num">4</span> Opening Scene</h2>
+      <p class="step-desc">Generate the opening scene that will set the tone for your first session. You can edit the scene once generated.</p>
+
+      <button
+        class="btn-generate"
+        [disabled]="loading()"
+        (click)="generateOpeningScene()">
+        @if (loading()) {
+          <span class="spinner"></span> Generating...
+        } @else {
+          &#9776; Generate Opening Scene
+        }
+      </button>
+
+      @if (openingScene()) {
+        <div class="result-card scene-card">
+          <div class="scene-tension" [class]="'tension-' + openingScene()!.tension">
+            {{ openingScene()!.tension | uppercase }} tension
+          </div>
+
+          <label class="field-label">Scene Title
+            <input
+              class="field-input"
+              type="text"
+              [ngModel]="openingSceneTitle()"
+              (ngModelChange)="openingSceneTitle.set($event); syncOpeningSceneFromFields()">
+          </label>
+
+          <label class="field-label">Scene Description
+            <textarea
+              class="field-textarea"
+              rows="5"
+              [ngModel]="openingSceneDescription()"
+              (ngModelChange)="openingSceneDescription.set($event); syncOpeningSceneFromFields()"></textarea>
+          </label>
+
+          <label class="field-label">Opening Line (GM voice)
+            <textarea
+              class="field-textarea field-textarea--accent"
+              rows="3"
+              [ngModel]="openingSceneLine()"
+              (ngModelChange)="openingSceneLine.set($event); syncOpeningSceneFromFields()"></textarea>
+          </label>
+        </div>
+
+        <div class="nav-row">
+          <button class="btn-prev" (click)="prevStep()">&#8592; NPCs</button>
+          <button class="btn-next" (click)="nextStep()">Export &#8594;</button>
+        </div>
+      } @else {
+        <div class="nav-row">
+          <button class="btn-prev" (click)="prevStep()">&#8592; NPCs</button>
+          <span></span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ================================================================ -->
+  <!-- STEP 5 — Export                                                   -->
+  <!-- ================================================================ -->
+  @if (step() === 5) {
+    <div class="step-card">
+      <h2><span class="step-num">5</span> Ready to Play</h2>
+      <p class="step-desc">Your campaign world is set. Download the JSON for safekeeping or jump straight into the adventure.</p>
+
+      <div class="summary-table">
+        <div class="summary-row">
+          <span class="summary-label">Campaign Title</span>
+          <span class="summary-value">{{ scenario()?.title || '—' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Setting</span>
+          <span class="summary-value">{{ scenario()?.setting || '—' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Tone</span>
+          <span class="summary-value">{{ scenario()?.tone || '—' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Character</span>
+          <span class="summary-value">{{ scenario()?.characterName || '—' }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Factions</span>
+          <span class="summary-value">{{ factions().length }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">NPCs</span>
+          <span class="summary-value">{{ totalNpcCount() }}</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Opening Scene</span>
+          <span class="summary-value">{{ openingScene()?.scene_title || 'None generated' }}</span>
+        </div>
+      </div>
+
+      @if (factions().length > 0) {
+        <div class="summary-factions">
+          <h3>Factions</h3>
+          @for (f of factions(); track f.id) {
+            <div class="summary-faction-row">
+              <span class="summary-faction-name">{{ f.name }}</span>
+              <span class="summary-faction-goal">{{ f.goal }}</span>
+              @if (npcsForFaction(f.id).length > 0) {
+                <span class="summary-faction-npcs">
+                  NPCs: {{ npcNamesForFaction(f.id) }}
+                </span>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      <div class="export-actions">
+        <button class="btn-download" (click)="downloadJson()">
+          &#11015; Download JSON
+        </button>
+        <button
+          class="btn-start"
+          [disabled]="!scenario()"
+          (click)="startAdventure()">
+          &#9658; Start Adventure
+        </button>
+      </div>
+
+      <div class="nav-row nav-row--top-margin">
+        <button class="btn-prev" (click)="prevStep()">&#8592; Opening Scene</button>
+        <span></span>
+      </div>
+    </div>
+  }
+
+</div>

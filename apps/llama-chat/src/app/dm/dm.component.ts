@@ -54,6 +54,7 @@ export class DmComponent {
   savedNpcs = signal<DmNpc[]>(this.loadNpcs());
 
   goBack(): void { this.router.navigate(['/']); }
+  goToSessionZero(): void { this.router.navigate(['/dm/session-zero']); }
   setTab(tab: 'quests' | 'npcs'): void { this.activeTab.set(tab); }
 
   // -----------------------------------------------------------------------

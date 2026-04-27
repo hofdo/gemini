@@ -17,6 +17,11 @@ export const routes: Routes = [
       import('./dm/dm.component').then((m) => m.DmComponent),
   },
   {
+    path: 'dm/session-zero',
+    loadComponent: () =>
+      import('./dm/session-zero/session-zero.component').then((m) => m.SessionZeroComponent),
+  },
+  {
     path: 'chat',
     loadComponent: () =>
       import('./chat/chat.component').then((m) => m.ChatComponent),

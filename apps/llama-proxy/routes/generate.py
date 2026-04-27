@@ -1,6 +1,8 @@
 import json
+from typing import Literal
 
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 import config
 from json_utils import _extract_json_object, _fix_retry_messages, _parse_with_repair
@@ -360,3 +362,251 @@ async def generate_quest(request: GenerateQuestRequest) -> dict:
         ) from exc
 
 
+# ---------------------------------------------------------------------------
+# Faction set
+# ---------------------------------------------------------------------------
+
+
+class GenerateFactionSetRequest(BaseModel):
+    scenario_title: str
+    setting: str
+    tone: str
+
+
+@router.post("/generate-faction-set")
+async def generate_faction_set(request: GenerateFactionSetRequest) -> list[dict]:
+    config.logger.info(
+        "=== /generate-faction-set (title=%s, setting=%s)",
+        request.scenario_title[:80],
+        request.setting[:80],
+    )
+    system = (
+        "You are a world-building expert for interactive RPG stories.\n"
+        f"Scenario: {request.scenario_title}\n"
+        f"Setting: {request.setting}\n"
+        f"Tone: {request.tone}\n\n"
+        "Generate exactly 3 factions with conflicting goals.\n"
+        "Output ONLY a valid JSON array — no markdown, no explanation:\n\n"
+        '[{"id": "slug", "name": "...", "description": "...", "goal": "...", '
+        '"archetype": "...", "territories": ["..."], "standing": 0}]\n\n'
+        "Requirements:\n"
+        "- Factions must have overlapping territorial interests or resource conflicts.\n"
+        "- Each faction must have a distinct ideological motivation.\n"
+        "- At least 2 of the 3 factions must be adversarial to each other.\n"
+        "- The 'id' field must be a lowercase hyphenated slug derived from the faction name.\n"
+        "- 'standing' starts at 0 (neutral) for all factions.\n"
+        "- ALL fields must be filled with meaningful content."
+    )
+
+    api_messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": "Generate the 3 factions."},
+    ]
+
+    raw = await call_llm(api_messages, temperature=0.7, timeout=45.0, json_mode=True)
+
+    try:
+        extracted = _extract_json_object(raw)
+        result = json.loads(extracted)
+        if isinstance(result, list):
+            return result
+    except Exception:
+        pass
+
+    try:
+        result = _parse_with_repair(raw)
+        if isinstance(result, list):
+            return result
+    except Exception:
+        config.logger.warning("/generate-faction-set: direct + repair failed, retrying with LLM")
+
+    raw2 = await call_llm(_fix_retry_messages(raw), temperature=0.7, timeout=45.0, json_mode=True)
+    try:
+        extracted = _extract_json_object(raw2)
+        result = json.loads(extracted)
+        if isinstance(result, list):
+            return result
+    except Exception as exc:
+        config.logger.error(
+            "/generate-faction-set: all attempts failed. raw=%r raw2=%r err=%s",
+            raw[:200],
+            raw2[:200],
+            exc,
+        )
+        raise HTTPException(
+            status_code=422,
+            detail="The LLM did not return a valid faction set JSON array after two attempts. Try again.",
+        ) from exc
+
+
+# ---------------------------------------------------------------------------
+# Opening scene
+# ---------------------------------------------------------------------------
+
+
+class GenerateOpeningSceneRequest(BaseModel):
+    scenario_title: str
+    setting: str
+    tone: str
+    character_name: str
+    character_description: str
+    factions: list[dict] = []
+    npc_names: list[str] = []
+
+
+@router.post("/generate-opening-scene")
+async def generate_opening_scene(request: GenerateOpeningSceneRequest) -> dict:
+    config.logger.info(
+        "=== /generate-opening-scene (title=%s, character=%s)",
+        request.scenario_title[:80],
+        request.character_name[:80],
+    )
+    faction_context = ""
+    if request.factions:
+        names = ", ".join(f.get("name", "") for f in request.factions if f.get("name"))
+        if names:
+            faction_context = f"Active factions: {names}.\n"
+
+    npc_context = ""
+    if request.npc_names:
+        npc_context = f"Key NPCs: {', '.join(request.npc_names)}.\n"
+
+    system = (
+        "You are a master storyteller crafting the opening of an interactive RPG session.\n"
+        f"Scenario: {request.scenario_title}\n"
+        f"Setting: {request.setting}\n"
+        f"Tone: {request.tone}\n"
+        f"Player character: {request.character_name} — {request.character_description}\n"
+        f"{faction_context}"
+        f"{npc_context}\n"
+        "Generate an opening scene. Output ONLY valid JSON — no markdown, no explanation:\n\n"
+        '{"scene_title": "...", "description": "...", "opening_line": "...", "tension": "calm|tense|hostile"}\n\n'
+        "Requirements:\n"
+        "- scene_title: 6 words maximum.\n"
+        "- description: 3-4 evocative sentences that establish mood, place, and stakes.\n"
+        "- opening_line: the first sentence the narrator speaks to the player — a compelling hook "
+        "that draws them into the scene immediately.\n"
+        "- tension: exactly one of calm, tense, or hostile — matching the mood of the scene.\n"
+        "- Weave in 1-2 faction names or NPC names if they were provided.\n"
+        "- ALL fields must be filled."
+    )
+
+    api_messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": "Generate the opening scene."},
+    ]
+
+    _default: dict = {
+        "scene_title": "The Adventure Begins",
+        "description": (
+            f"You find yourself in {request.setting}. "
+            "The air is thick with possibility. "
+            "Something is about to change. "
+            "Your story starts here."
+        ),
+        "opening_line": f"Welcome, {request.character_name}. Your journey begins now.",
+        "tension": "calm",
+    }
+
+    try:
+        raw = await call_llm(api_messages, temperature=0.7, timeout=45.0, json_mode=True)
+    except Exception as exc:
+        config.logger.warning("/generate-opening-scene: LLM call failed: %s", exc)
+        return _default
+
+    try:
+        result = json.loads(_extract_json_object(raw))
+        if isinstance(result, dict) and "scene_title" in result:
+            return result
+    except Exception:
+        pass
+
+    try:
+        result = _parse_with_repair(raw)
+        if isinstance(result, dict) and "scene_title" in result:
+            return result
+    except Exception:
+        config.logger.warning("/generate-opening-scene: all parse attempts failed, returning default")
+
+    return _default
+
+
+# ---------------------------------------------------------------------------
+# Oracle
+# ---------------------------------------------------------------------------
+
+
+class GenerateOracleRequest(BaseModel):
+    oracle_type: Literal["npc_name", "location_name", "quest_hook"]
+    world_state_summary: str = ""
+    scenario_title: str = ""
+    setting: str = ""
+
+
+@router.post("/generate-oracle")
+async def generate_oracle(request: GenerateOracleRequest) -> dict:
+    config.logger.info(
+        "=== /generate-oracle (type=%s, setting=%s)",
+        request.oracle_type,
+        request.setting[:60] if request.setting else "(empty)",
+    )
+    _default: dict = {"result": "Unknown", "detail": ""}
+
+    context_parts = []
+    if request.scenario_title:
+        context_parts.append(f"Scenario: {request.scenario_title}")
+    if request.setting:
+        context_parts.append(f"Setting: {request.setting}")
+    if request.world_state_summary:
+        context_parts.append(f"World context: {request.world_state_summary}")
+    context_prefix = ("\n".join(context_parts) + "\n\n") if context_parts else ""
+
+    if request.oracle_type == "npc_name":
+        oracle_instruction = (
+            'Generate a single evocative NPC name with a 1-line description. '
+            'Output JSON: {"result": "Name", "detail": "1-line description"}. '
+            "Be creative and fitting to the setting."
+        )
+    elif request.oracle_type == "location_name":
+        oracle_instruction = (
+            "Generate a single location name with atmospheric 1-line description. "
+            'Output JSON: {"result": "Location Name", "detail": "1-line atmosphere"}'
+        )
+    else:  # quest_hook
+        oracle_instruction = (
+            "Based on this world context, generate an improvised quest hook in 1-2 sentences. "
+            'Output JSON: {"result": "Hook title", "detail": "Full 1-2 sentence hook"}'
+        )
+
+    system = (
+        f"{context_prefix}"
+        f"{oracle_instruction}\n\n"
+        "Output ONLY the JSON object — no markdown, no explanation."
+    )
+
+    api_messages = [
+        {"role": "system", "content": system},
+        {"role": "user", "content": f"Generate a {request.oracle_type.replace('_', ' ')}."},
+    ]
+
+    try:
+        raw = await call_llm(api_messages, temperature=0.9, timeout=15.0, json_mode=True)
+    except Exception as exc:
+        config.logger.warning("/generate-oracle: LLM call failed: %s", exc)
+        return _default
+
+    try:
+        result = json.loads(_extract_json_object(raw))
+        if isinstance(result, dict) and "result" in result:
+            return result
+    except Exception:
+        pass
+
+    try:
+        result = _parse_with_repair(raw)
+        if isinstance(result, dict) and "result" in result:
+            return result
+    except Exception:
+        config.logger.warning("/generate-oracle: all parse attempts failed, returning default")
+
+    return _default

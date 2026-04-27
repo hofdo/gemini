@@ -67,6 +67,20 @@ h2 {
   &:hover { background: #0f3460; }
 }
 
+.btn-session-zero {
+  margin-left: auto;
+  padding: 0.4rem 1rem;
+  background: linear-gradient(135deg, #533483, #7b52ab);
+  border: none;
+  border-radius: 0.5rem;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  &:hover { opacity: 0.85; }
+}
+
 .btn-generate {
   margin-top: 1rem;
   padding: 0.65rem 1.5rem;

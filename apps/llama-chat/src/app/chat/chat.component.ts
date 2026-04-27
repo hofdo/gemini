@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, signal, ViewChild, ElementRef, OnInit, SecurityContext } from '@angular/core';
+import { Component, computed, effect, inject, signal, ViewChild, ElementRef, OnInit, OnDestroy, SecurityContext } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
@@ -13,6 +13,12 @@ import { WorldPanelComponent } from '../world-state/world-panel/world-panel.comp
 import { LoadingBusService } from '../shared/loading-bus.service';
 import { CombatService } from '../combat/combat.service';
 
+interface OracleResult {
+  type: 'npc_name' | 'location_name' | 'quest_hook';
+  result: string;
+  detail: string;
+}
+
 @Component({
   selector: 'llama-chat',
   standalone: true,
@@ -20,7 +26,7 @@ import { CombatService } from '../combat/combat.service';
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
-export class ChatComponent implements OnInit {
+export class ChatComponent implements OnInit, OnDestroy {
   protected chatService = inject(ChatService);
   protected scenarioService = inject(ScenarioService);
   protected worldStateService = inject(WorldStateService);
@@ -43,6 +49,10 @@ export class ChatComponent implements OnInit {
   protected contextBannerDismissed = signal(false);
   protected combatPromptVisible = signal(false);
 
+  protected oracleVisible = signal(false);
+  protected oracleLoading = signal(false);
+  protected oracleResults = signal<OracleResult[]>([]);
+
   protected readonly aiAssisting = computed(() => this.loadingBus.assistLoading());
 
   @ViewChild('messageList') private messageList!: ElementRef<HTMLElement>;
@@ -58,6 +68,13 @@ export class ChatComponent implements OnInit {
   });
 
   private _wasLoading = false;
+
+  private _oracleKeyHandler = (e: KeyboardEvent) => {
+    if (e.ctrlKey && e.shiftKey && e.key === 'O') {
+      e.preventDefault();
+      this.toggleOracle();
+    }
+  };
 
   private _deltaEffect = effect(() => {
     const loading = this.chatService.loading();
@@ -100,6 +117,11 @@ export class ChatComponent implements OnInit {
         this.chatService.initializeStory();
       }
     });
+    document.addEventListener('keydown', this._oracleKeyHandler);
+  }
+
+  ngOnDestroy(): void {
+    document.removeEventListener('keydown', this._oracleKeyHandler);
   }
 
   renderMarkdown(content: string): string {
@@ -249,6 +271,42 @@ export class ChatComponent implements OnInit {
       console.error('AI assist error', err);
     } finally {
       this.loadingBus.set('assist', false);
+    }
+  }
+
+  protected toggleOracle(): void {
+    this.oracleVisible.update(v => !v);
+  }
+
+  protected async generateOracle(type: 'npc_name' | 'location_name' | 'quest_hook'): Promise<void> {
+    if (this.oracleLoading()) return;
+    this.oracleLoading.set(true);
+    try {
+      const ws = this.worldStateService.state();
+      const scenario = this.scenarioService.activeScenario();
+      const summary = ws
+        ? `Location: ${ws.currentScene?.locationId ?? 'unknown'}, Tension: ${ws.currentScene?.tension ?? 'calm'}, Factions: ${ws.factions.map(f => f.name).slice(0, 3).join(', ')}`
+        : '';
+      const response = await fetch('/generate-oracle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          oracle_type: type,
+          world_state_summary: summary,
+          scenario_title: scenario?.title ?? '',
+          setting: scenario?.setting ?? '',
+        }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      this.oracleResults.update(results => [
+        { type, result: data.result, detail: data.detail },
+        ...results.slice(0, 9),
+      ]);
+    } catch (err) {
+      console.warn('Oracle generation failed', err);
+    } finally {
+      this.oracleLoading.set(false);
     }
   }
 }
