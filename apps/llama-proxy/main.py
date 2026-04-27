@@ -16,7 +16,7 @@ app = FastAPI(title="llama-proxy", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:4200"],
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PATCH"],
     allow_headers=["*"],
 )
 
@@ -47,5 +47,9 @@ async def global_exception_handler(request: Request, exc: Exception):
     config.logger.error("Unhandled error on %s %s: %s", request.method, request.url.path, exc, exc_info=True)
     return JSONResponse(
         status_code=500,
-        content={"error": "Internal server error", "detail": str(exc)}
+        content={
+            "error_type": "internal_error",
+            "message": "Internal server error",
+            "detail": str(exc)
+        }
     )

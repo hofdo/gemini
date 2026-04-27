@@ -26,6 +26,13 @@
         "command": "python3.12 -m venv .venv && .venv/bin/pip install -e .",
         "cwd": "apps/llama-proxy"
       }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": ".venv/bin/pytest . -v",
+        "cwd": "apps/llama-proxy"
+      }
     }
   }
 }

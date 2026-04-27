@@ -18,10 +18,10 @@ async def get_backends() -> dict:
 
 @router.patch("/config/backend")
 async def set_backend(request: BackendPatchRequest) -> dict:
-    backend = next((b for b in config.BACKENDS if b["id"] == request.id), None)
-    if not backend:
-        raise HTTPException(status_code=404, detail=f"Backend '{request.id}' not found")
     with config._backend_lock:
+        backend = next((b for b in config.BACKENDS if b["id"] == request.id), None)
+        if not backend:
+            raise HTTPException(status_code=404, detail=f"Backend '{request.id}' not found")
         config.active_backend = backend
     config.logger.info("Switched active backend to: %s (%s)", backend["name"], backend["url"])
     return {"active_id": backend["id"]}
