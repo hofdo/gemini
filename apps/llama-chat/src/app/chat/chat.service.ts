@@ -25,8 +25,14 @@ export class ChatService {
   readonly estimatedTokens = computed(() =>
     Math.round(this.messages().reduce((sum, m) => sum + m.content.length, 0) / 4),
   );
-  readonly contextWarning = computed(() => this.estimatedTokens() > 3000);
-  readonly contextCritical = computed(() => this.estimatedTokens() > 6000);
+  readonly contextWarning = computed(() => {
+    const contextLimit = this.settingsService.contextWindow();
+    return this.estimatedTokens() > contextLimit * 0.5;
+  });
+  readonly contextCritical = computed(() => {
+    const contextLimit = this.settingsService.contextWindow();
+    return this.estimatedTokens() > contextLimit * 0.75;
+  });
 
   resetMessages(): void {
     this.messages.set([]);
@@ -112,7 +118,7 @@ export class ChatService {
     });
   }
 
-  protected buildScenarioPayload(
+  buildScenarioPayload(
     scenario: NonNullable<ReturnType<ScenarioService['activeScenario']>>,
   ) {
     return {

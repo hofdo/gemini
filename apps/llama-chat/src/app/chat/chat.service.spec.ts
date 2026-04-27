@@ -17,7 +17,7 @@ describe('ChatService', () => {
         },
         {
           provide: SettingsService,
-          useValue: { enableThinking: signal(false) },
+          useValue: { enableThinking: signal(false), contextWindow: signal(8192) },
         },
       ],
     });
@@ -75,14 +75,16 @@ describe('ChatService', () => {
   });
 
   it('should show context warning when tokens exceed threshold', () => {
-    const longContent = 'x'.repeat(13000); // 3250 tokens > 3000 threshold
+    // contextWindow=8192, warning at 50% = 4096 tokens = 16384 chars
+    const longContent = 'x'.repeat(17000); // 4250 tokens > 4096 threshold
     service['messages'].set([{ role: 'user', content: longContent }]);
 
     expect(service.contextWarning()).toBe(true);
   });
 
   it('should show context critical when tokens exceed critical threshold', () => {
-    const longContent = 'x'.repeat(25000); // 6250 tokens > 6000 threshold
+    // contextWindow=8192, critical at 75% = 6144 tokens = 24576 chars
+    const longContent = 'x'.repeat(25600); // 6400 tokens > 6144 threshold
     service['messages'].set([{ role: 'user', content: longContent }]);
 
     expect(service.contextCritical()).toBe(true);

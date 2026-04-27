@@ -1,10 +1,33 @@
 import json
 import logging
+import logging.handlers
 import os
 import threading
+from pathlib import Path
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+_LOG_FORMAT = "%(asctime)s [%(levelname)-8s] %(name)s: %(message)s"
+_LOG_DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
+
+_log_dir = Path(__file__).resolve().parents[2] / "logs"
+_log_dir.mkdir(exist_ok=True)
+_log_file = _log_dir / "llama-proxy.log"
+
 logger = logging.getLogger("llama-proxy")
+logger.setLevel(logging.DEBUG)
+
+_console = logging.StreamHandler()
+_console.setLevel(logging.INFO)
+_console.setFormatter(logging.Formatter(_LOG_FORMAT, datefmt=_LOG_DATE_FORMAT))
+
+_file = logging.handlers.RotatingFileHandler(
+    _log_file, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"
+)
+_file.setLevel(logging.DEBUG)
+_file.setFormatter(logging.Formatter(_LOG_FORMAT, datefmt=_LOG_DATE_FORMAT))
+
+logger.addHandler(_console)
+logger.addHandler(_file)
+logger.propagate = False
 
 _DEFAULT_BACKENDS: list[dict] = [
     {
@@ -17,6 +40,7 @@ _DEFAULT_BACKENDS: list[dict] = [
         "top_k": 64,
         "repeat_penalty": 1.0,
         "system_prompt_style": "narrative",
+        "context_window": 8192,
     },
     {
         "id": "qwen3-uncensored",
@@ -29,6 +53,7 @@ _DEFAULT_BACKENDS: list[dict] = [
         "min_p": 0.0,
         "repeat_penalty": 1.0,
         "system_prompt_style": "narrative",
+        "context_window": 8192,
     },
 ]
 
@@ -47,3 +72,9 @@ BACKENDS: list[dict] = _load_backends()
 _default_id = os.getenv("ACTIVE_BACKEND_ID", "gemma4-uncensored")
 active_backend: dict = next((b for b in BACKENDS if b["id"] == _default_id), BACKENDS[0])
 _backend_lock = threading.Lock()
+
+logger.info("=== llama-proxy startup ===")
+logger.info("Log file: %s", _log_file)
+logger.info("Active backend: %s (%s)", active_backend["id"], active_backend["url"])
+for b in BACKENDS:
+    logger.debug("  configured backend: %s — url=%s temp=%.2f", b["id"], b["url"], b.get("temperature", 0.8))

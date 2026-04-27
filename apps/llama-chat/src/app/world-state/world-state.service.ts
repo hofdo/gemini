@@ -5,15 +5,19 @@ import {
   NpcState,
   SceneTension,
   StoryEvent,
+  TimeOfDay,
   WorldState,
   WorldStateDelta,
 } from './world-state.model';
 import { Scenario } from '../scenario/scenario.model';
 
-const CURRENT_SCHEMA_VERSION = 1;
+const CURRENT_SCHEMA_VERSION = 2;
 const MAX_HOT_EVENTS = 50;
 const MAX_KEY_FACTS = 10;
 const STORAGE_KEY_PREFIX = 'llama-world-state-';
+const WORLD_INDEX_KEY = 'llama-world-index';
+
+type WorldIndex = { id: string; title: string; lastUpdated: string }[];
 const COMPACT_PROMPT_APPROX_CHARS_PER_TOKEN = 4;
 
 function standingLabel(v: number): string {
@@ -76,13 +80,29 @@ export class WorldStateService {
   }
 
   loadForScenario(scenarioTitle: string): boolean {
+    try {
+      const raw = localStorage.getItem(WORLD_INDEX_KEY);
+      if (raw) {
+        const index = JSON.parse(raw) as WorldIndex;
+        const entry = index.find(e => e.title === scenarioTitle);
+        if (entry) {
+          const stateRaw = localStorage.getItem(`${STORAGE_KEY_PREFIX}${entry.id}`);
+          if (stateRaw) {
+            const parsed = JSON.parse(stateRaw) as Partial<WorldState>;
+            this.state.set(this.migrate(parsed));
+            return true;
+          }
+        }
+      }
+    } catch { /* fall through to scan */ }
+    // Fallback: linear scan for legacy entries not yet indexed
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       if (key?.startsWith(STORAGE_KEY_PREFIX)) {
         try {
-          const raw = localStorage.getItem(key);
-          if (raw) {
-            const parsed = JSON.parse(raw) as Partial<WorldState>;
+          const stateRaw = localStorage.getItem(key);
+          if (stateRaw) {
+            const parsed = JSON.parse(stateRaw) as Partial<WorldState>;
             if (parsed.scenarioTitle === scenarioTitle) {
               this.state.set(this.migrate(parsed));
               return true;
@@ -162,7 +182,19 @@ export class WorldStateService {
       // Advance clock
       let worldClock = current.worldClock;
       if (delta.clockAdvance) {
-        worldClock = { ...worldClock, dayNumber: worldClock.dayNumber + 1 };
+        const timeOrder: TimeOfDay[] = ['dawn', 'morning', 'afternoon', 'evening', 'night'];
+        let totalTurns = delta.clockAdvance.turns;
+        let timeIdx = timeOrder.indexOf(worldClock.timeOfDay);
+        let dayNumber = worldClock.dayNumber;
+        while (totalTurns > 0) {
+          timeIdx++;
+          totalTurns--;
+          if (timeIdx >= timeOrder.length) {
+            timeIdx = 0;
+            dayNumber++;
+          }
+        }
+        worldClock = { ...worldClock, dayNumber, timeOfDay: timeOrder[timeIdx] };
       }
 
       // Append key facts (capped)
@@ -346,6 +378,20 @@ export class WorldStateService {
   private persistNow(state: WorldState): void {
     try {
       localStorage.setItem(`${STORAGE_KEY_PREFIX}${state.id}`, JSON.stringify(state));
+      // Update world index
+      let index: WorldIndex = [];
+      try {
+        const raw = localStorage.getItem(WORLD_INDEX_KEY);
+        if (raw) index = JSON.parse(raw) as WorldIndex;
+      } catch { /* start with empty index */ }
+      const entry = { id: state.id, title: state.scenarioTitle, lastUpdated: state.lastUpdated };
+      const existingIdx = index.findIndex(e => e.id === state.id);
+      if (existingIdx >= 0) {
+        index[existingIdx] = entry;
+      } else {
+        index.push(entry);
+      }
+      localStorage.setItem(WORLD_INDEX_KEY, JSON.stringify(index));
     } catch {
       // QuotaExceededError or private browsing — in-memory state still valid
     }
@@ -366,6 +412,10 @@ export class WorldStateService {
       raw.npcStates = raw.npcStates ?? [];
       raw.storyEvents = raw.storyEvents ?? [];
     }
+
+    // v1→v2: clockAdvance changed from boolean to ClockAdvance|null in the delta type (not stored state)
+    // No stored data changes needed — just bump the schema version.
+    // (version < 2 is intentionally a no-op on data)
 
     return {
       ...raw,

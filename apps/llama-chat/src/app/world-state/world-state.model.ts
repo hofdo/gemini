@@ -95,12 +95,17 @@ export interface WorldState {
   lastUpdated: string;
 }
 
+// WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
+export interface ClockAdvance {
+  turns: number;
+}
+
 export interface WorldStateDelta {
   factionChanges: FactionChange[];
   npcChanges: NpcChange[];
   newEvents: Omit<StoryEvent, 'id' | 'turn'>[];
   sceneUpdate: SceneUpdate | null;
-  clockAdvance: boolean;
+  clockAdvance: ClockAdvance | null;
   keyFactsAppend: string[];
 }
 

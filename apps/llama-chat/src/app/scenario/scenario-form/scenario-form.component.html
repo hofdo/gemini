@@ -7,13 +7,13 @@
     <section class="preset-section">
       <h2>📦 Load a Preset Scenario</h2>
       <div class="preset-row">
-        <select #presetSelect [disabled]="loadingPreset()">
+        <select [disabled]="loadingPreset()" (change)="selectedPresetId.set($any($event.target).value)">
           <option value="">— choose a preset —</option>
           @for (p of presets(); track p.id) {
             <option [value]="p.id">{{ p.label }}</option>
           }
         </select>
-        <button type="button" class="btn-preset-load" (click)="loadPreset(presetSelect.value)" [disabled]="!presetSelect.value || loadingPreset()">
+        <button type="button" class="btn-preset-load" (click)="loadPreset(selectedPresetId())" [disabled]="!selectedPresetId() || loadingPreset()">
           @if (loadingPreset()) { ⏳ Loading… } @else { Load }
         </button>
       </div>
@@ -193,7 +193,7 @@
       <h2>Rules <button type="button" class="btn-small" (click)="addRule()">+ Add</button></h2>
       @for (rule of rules.controls; track $index) {
         <div class="rule-row">
-          <input [formControlName]="$index" placeholder="e.g. No modern technology" />
+          <input [formControl]="$any(rule)" placeholder="e.g. No modern technology" />
           <button type="button" class="btn-danger" (click)="removeRule($index)">✕</button>
         </div>
       }

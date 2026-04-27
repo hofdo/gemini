@@ -1,6 +1,12 @@
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
+
+
+class _CamelModel(BaseModel):
+    """Accept camelCase keys from the Angular frontend."""
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
 class NPCStats(BaseModel):
@@ -99,7 +105,7 @@ class BackendPatchRequest(BaseModel):
     id: str
 
 
-class FactionState(BaseModel):
+class FactionState(_CamelModel):
     id: str
     name: str
     archetypes: list[str] = []
@@ -110,13 +116,13 @@ class FactionState(BaseModel):
     notes: str = ""
 
 
-class NpcRelationship(BaseModel):
+class NpcRelationship(_CamelModel):
     target_npc_id: str
     disposition: int = 0
     note: str = ""
 
 
-class NpcStateModel(BaseModel):
+class NpcStateModel(_CamelModel):
     npc_id: str
     name: str
     status: Literal["alive", "dead", "missing", "unknown"] = "alive"
@@ -127,7 +133,7 @@ class NpcStateModel(BaseModel):
     notes: str = ""
 
 
-class StoryEventModel(BaseModel):
+class StoryEventModel(_CamelModel):
     id: str
     turn: int
     title: str
@@ -140,7 +146,7 @@ class StoryEventModel(BaseModel):
     location_id: str | None = None
 
 
-class WorldLocationModel(BaseModel):
+class WorldLocationModel(_CamelModel):
     id: str
     name: str
     description: str
@@ -149,21 +155,21 @@ class WorldLocationModel(BaseModel):
     visit_count: int = 0
 
 
-class CurrentSceneModel(BaseModel):
+class CurrentSceneModel(_CamelModel):
     location_id: str | None = None
     present_npc_ids: list[str] = []
     tension: Literal["calm", "tense", "hostile", "combat"] = "calm"
     scene_note: str = ""
 
 
-class WorldClockModel(BaseModel):
+class WorldClockModel(_CamelModel):
     day_number: int = 1
     time_of_day: Literal["dawn", "morning", "afternoon", "evening", "night"] = "morning"
     season: Literal["spring", "summer", "autumn", "winter"] = "spring"
     turns_per_day: int = 8
 
 
-class WorldStateModel(BaseModel):
+class WorldStateModel(_CamelModel):
     schema_version: int = 1
     id: str
     scenario_title: str
@@ -201,12 +207,16 @@ class SceneUpdate(BaseModel):
     scene_note: str = ""
 
 
+class ClockAdvance(BaseModel):
+    turns: int = 1
+
+
 class WorldStateDelta(BaseModel):
     faction_changes: list[FactionChange] = []
     npc_changes: list[NpcChange] = []
     new_events: list[StoryEventModel] = []
     scene_update: SceneUpdate | None = None
-    clock_advance: bool = False
+    clock_advance: ClockAdvance | None = None
     key_facts_append: list[str] = []
 
 

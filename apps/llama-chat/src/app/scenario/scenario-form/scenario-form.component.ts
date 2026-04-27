@@ -30,6 +30,7 @@ export class ScenarioFormComponent {
   scenarioGenerationError = signal<string | null>(null);
   presets = signal<PresetMeta[]>([]);
   loadingPreset = signal(false);
+  selectedPresetId = signal('');
 
   form: FormGroup = this.fb.group({
     scenarioType: ['adventure'],
@@ -69,7 +70,7 @@ export class ScenarioFormComponent {
       existing.npcs.forEach((n) =>
         this.addNpc(n.name, n.description, n.mode ?? 'simple', n.stats, n.personality, n.foes, n.friends, n.plotTwists)
       );
-      existing.rules.forEach((r) => this.addRule(r));
+      existing.rules.filter(r => r?.trim()).forEach((r) => this.addRule(r));
     }
 
     this.presetService.loadIndex()
@@ -96,7 +97,7 @@ export class ScenarioFormComponent {
         this.addNpc(n.name, n.description, n.mode ?? 'simple', n.stats, n.personality, n.foes, n.friends, n.plotTwists)
       );
       this.rules.clear();
-      (scenario.rules ?? []).forEach((r) => this.addRule(r));
+      (scenario.rules ?? []).filter(r => r?.trim()).forEach((r) => this.addRule(r));
     } catch (err) {
       console.error('Failed to load preset', err);
     } finally {
@@ -132,9 +133,9 @@ export class ScenarioFormComponent {
     stats?: { str?: number; dex?: number; con?: number; int?: number; wis?: number; cha?: number },
     personality = '', foes: string[] = [], friends: string[] = [], plotTwists: string[] = [],
   ): void {
-    const foesArray = this.fb.array(foes.map(f => this.fb.control(f, Validators.required)));
-    const friendsArray = this.fb.array(friends.map(f => this.fb.control(f, Validators.required)));
-    const plotTwistsArray = this.fb.array(plotTwists.map(p => this.fb.control(p, Validators.required)));
+    const foesArray = this.fb.array(foes.filter(f => f?.trim()).map(f => this.fb.control(f, Validators.required)));
+    const friendsArray = this.fb.array(friends.filter(f => f?.trim()).map(f => this.fb.control(f, Validators.required)));
+    const plotTwistsArray = this.fb.array(plotTwists.filter(p => p?.trim()).map(p => this.fb.control(p, Validators.required)));
 
     this.npcs.push(this.fb.group({
       name: [name, Validators.required],
@@ -282,12 +283,17 @@ export class ScenarioFormComponent {
     });
     this.npcs.clear();
     this.rules.clear();
+    this.selectedPresetId.set('');
     this.applyTypeValidators(type);
+    this.scenarioService.clearScenario();
   }
 
   start(): void {
     if (this.form.invalid) return;
-    const scenario: Scenario = this.form.value;
+    const scenario: Scenario = {
+      ...this.form.value,
+      rules: (this.form.value.rules as string[]).filter(r => r?.trim()),
+    };
     this.scenarioService.setScenario(scenario);
     this.router.navigate(['/chat']);
   }
@@ -325,7 +331,7 @@ export class ScenarioFormComponent {
       );
       // Populate rules
       this.rules.clear();
-      (scenario.rules ?? []).forEach((r) => this.addRule(r));
+      (scenario.rules ?? []).filter(r => r?.trim()).forEach((r) => this.addRule(r));
     } catch (err) {
       console.error('AI scenario generation error', err);
       this.scenarioGenerationError.set(err instanceof Error ? err.message : 'Generation failed');

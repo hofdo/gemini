@@ -125,100 +125,12 @@
     </div>
   </div>
 
-  @if (showWorldPanel() && worldStateService.state(); as ws) {
-    <aside class="world-panel">
-      <div class="panel-header">
-        <span class="panel-title">World State</span>
-        <button class="btn-close-panel" (click)="toggleWorldPanel()">✕</button>
-      </div>
-      <div class="panel-tabs">
-        <button [class.active]="worldTab() === 'scene'" (click)="setWorldTab('scene')">Scene</button>
-        <button [class.active]="worldTab() === 'factions'" (click)="setWorldTab('factions')">Factions</button>
-        <button [class.active]="worldTab() === 'npcs'" (click)="setWorldTab('npcs')">NPCs</button>
-        <button [class.active]="worldTab() === 'events'" (click)="setWorldTab('events')">Events</button>
-      </div>
-
-      @if (worldTab() === 'scene') {
-        <div class="panel-content">
-          <div class="scene-block">
-            <div class="scene-tension" [class]="'tension-' + (ws.currentScene?.tension ?? 'calm')">
-              {{ ws.currentScene?.tension ?? 'calm' }}
-            </div>
-            @if (ws.currentScene?.sceneNote) {
-              <p class="scene-note">{{ ws.currentScene!.sceneNote }}</p>
-            }
-            <div class="clock">Day {{ ws.worldClock.dayNumber }} · {{ ws.worldClock.timeOfDay }} · {{ ws.worldClock.season }}</div>
-          </div>
-          @if (ws.currentScene?.presentNpcIds?.length) {
-            <div class="present-npcs">
-              <strong>Present:</strong>
-              @for (id of ws.currentScene!.presentNpcIds; track id) {
-                @if (findNpcById(ws, id); as npc) {
-                  <span class="npc-tag">{{ npc.name }}</span>
-                }
-              }
-            </div>
-          }
-        </div>
-      }
-
-      @if (worldTab() === 'factions') {
-        <div class="panel-content">
-          @for (f of ws.factions; track f.id) {
-            <div class="faction-row">
-              <div class="faction-name">{{ f.name }}</div>
-              <div class="standing-bar-wrap">
-                <div class="standing-bar" [style.width.%]="(f.standing + 100) / 2" [style.background]="standingColor(f.standing)"></div>
-              </div>
-              <span class="standing-label-text" [style.color]="standingColor(f.standing)">{{ standingLabel(f.standing) }} ({{ f.standing > 0 ? '+' : '' }}{{ f.standing }})</span>
-            </div>
-          }
-          @if (!ws.factions.length) {
-            <p class="empty-tab">No factions tracked yet.</p>
-          }
-        </div>
-      }
-
-      @if (worldTab() === 'npcs') {
-        <div class="panel-content">
-          @for (npc of ws.npcStates; track npc.npcId) {
-            <div class="npc-row" [class.dead]="npc.status === 'dead'">
-              <div class="npc-name">{{ npc.name }} @if (npc.status !== 'alive') { <span class="npc-status">({{ npc.status }})</span> }</div>
-              @if (npc.status !== 'dead') {
-                <div class="standing-bar-wrap">
-                  <div class="standing-bar" [style.width.%]="(npc.disposition + 100) / 2" [style.background]="standingColor(npc.disposition)"></div>
-                </div>
-                <span class="standing-label-text" [style.color]="standingColor(npc.disposition)">{{ standingLabel(npc.disposition) }}</span>
-              }
-              @if (npc.notes) {
-                <p class="npc-notes">{{ npc.notes }}</p>
-              }
-            </div>
-          }
-          @if (!ws.npcStates.length) {
-            <p class="empty-tab">No NPCs tracked yet.</p>
-          }
-        </div>
-      }
-
-      @if (worldTab() === 'events') {
-        <div class="panel-content">
-          @for (e of ws.storyEvents.slice().reverse(); track e.id) {
-            <div class="event-row">
-              <span class="event-certainty" [class]="'certainty-' + e.certainty">{{ e.certainty }}</span>
-              <span class="event-title-text">Turn {{ e.turn }} — {{ e.title }}</span>
-              <p class="event-desc">{{ e.description }}</p>
-            </div>
-          }
-          @if (!ws.storyEvents.length) {
-            <p class="empty-tab">No events recorded yet.</p>
-          }
-          @if (ws.archivedEventCount > 0) {
-            <p class="archived-note">+{{ ws.archivedEventCount }} archived events not shown</p>
-          }
-        </div>
-      }
-
-    </aside>
+  @if (showWorldPanel() && worldStateService.state()) {
+    <llama-world-panel
+      [worldState]="worldStateService.state()!"
+      [activeTab]="worldTab()"
+      (tabChange)="setWorldTab($event)"
+      (panelClose)="toggleWorldPanel()"
+    />
   }
 </div>

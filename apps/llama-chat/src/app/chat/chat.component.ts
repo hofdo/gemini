@@ -1,6 +1,6 @@
-import { Component, computed, effect, inject, signal, ViewChild, ElementRef, OnInit } from '@angular/core';
+import { Component, computed, effect, inject, signal, ViewChild, ElementRef, OnInit, SecurityContext } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SecurityContext } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { marked } from 'marked';
 import { ChatService } from './chat.service';
@@ -8,12 +8,13 @@ import { ScenarioService } from '../scenario/scenario.service';
 import { AiAssistService } from '../shared/ai-assist.service';
 import { InputType } from '../scenario/scenario.model';
 import { WorldStateService } from '../world-state/world-state.service';
-import { WorldState } from '../world-state/world-state.model';
+import { SessionService } from '../session/session.service';
+import { WorldPanelComponent } from '../world-state/world-panel/world-panel.component';
 
 @Component({
   selector: 'llama-chat',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, WorldPanelComponent],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.scss',
 })
@@ -21,6 +22,7 @@ export class ChatComponent implements OnInit {
   protected chatService = inject(ChatService);
   protected scenarioService = inject(ScenarioService);
   protected worldStateService = inject(WorldStateService);
+  protected sessionService = inject(SessionService);
   private aiAssist = inject(AiAssistService);
   private router = inject(Router);
   private readonly _sanitizer = inject(DomSanitizer);
@@ -57,7 +59,14 @@ export class ChatComponent implements OnInit {
     const loading = this.chatService.loading();
     if (!loading && this._wasLoading) {
       this._wasLoading = false;
-      this.triggerWorldStateUpdate();
+      const messages = this.chatService.messages();
+      const lastMsg = messages[messages.length - 1];
+      if (lastMsg?.role === 'assistant') {
+        this.sessionService.onTurnComplete(lastMsg.content).then(() => {
+          const found = this.worldStateService.detectContradictions(lastMsg.content);
+          if (found.length) this.contradictions.set(found);
+        });
+      }
     }
     if (loading) this._wasLoading = true;
   });
@@ -185,56 +194,6 @@ export class ChatComponent implements OnInit {
 
   dismissContradictions(): void {
     this.contradictions.set([]);
-  }
-
-  protected standingLabel(v: number): string {
-    if (v >= 75)  return 'Allied';
-    if (v >= 40)  return 'Friendly';
-    if (v >= 10)  return 'Neutral+';
-    if (v >= -10) return 'Neutral';
-    if (v >= -40) return 'Unfriendly';
-    if (v >= -75) return 'Hostile';
-    return 'Enemy';
-  }
-
-  protected standingColor(v: number): string {
-    if (v >= 40)  return '#4caf50';
-    if (v >= -10) return '#ff9800';
-    if (v >= -40) return '#f44336';
-    return '#9c27b0';
-  }
-
-  protected findNpcById(ws: WorldState, id: string) {
-    return ws.npcStates.find(n => n.npcId === id);
-  }
-
-  private triggerWorldStateUpdate(): void {
-    const ws = this.worldStateService.state();
-    if (!ws) return;
-    const scenario = this.scenarioService.activeScenario();
-    if (!scenario) return;
-    const messages = this.chatService.messages();
-    const lastExchanges = messages.slice(-6);
-    if (lastExchanges.length === 0) return;
-
-    this.aiAssist.updateWorldState({
-      scenario: this.chatService.buildScenarioPayload(scenario),
-      world_state: ws,
-      last_exchanges: lastExchanges.map(m => ({
-        role: m.role,
-        content: m.content,
-        input_type: m.inputType ?? 'dialogue',
-      })),
-    }).then(delta => {
-      this.worldStateService.applyDelta(delta);
-      const lastMsg = messages[messages.length - 1];
-      if (lastMsg?.role === 'assistant') {
-        const found = this.worldStateService.detectContradictions(lastMsg.content);
-        if (found.length) this.contradictions.set(found);
-      }
-    }).catch(err => {
-      console.warn('World state update failed (non-blocking)', err);
-    });
   }
 
   async aiSuggestOrRewrite(): Promise<void> {

@@ -11,6 +11,7 @@ export interface LlmBackend {
   repeat_penalty: number;
   min_p?: number;
   system_prompt_style?: string;
+  context_window?: number;
 }
 
 export interface BackendsConfig {
@@ -29,6 +30,7 @@ export class SettingsService {
   loading = signal(false);
   readonly enableThinking = signal<boolean>(localStorage.getItem(THINKING_KEY) === 'true');
   patchError = signal<string | null>(null);
+  contextWindow = signal<number>(8192);
 
   async loadConfig(): Promise<void> {
     this.loading.set(true);
@@ -44,6 +46,12 @@ export class SettingsService {
       const savedValid = savedId && data.backends.some(b => b.id === savedId);
       const targetId = savedValid && savedId ? savedId : data.active_id;
       this.activeId.set(targetId);
+
+      // Update contextWindow from the active backend
+      const activeBackend = data.backends.find(b => b.id === targetId);
+      if (activeBackend?.context_window) {
+        this.contextWindow.set(activeBackend.context_window);
+      }
 
       // Sync proxy if localStorage differs
       if (targetId !== data.active_id) {
@@ -64,6 +72,10 @@ export class SettingsService {
       await this._patchBackend(id);
       this.activeId.set(id);
       localStorage.setItem(STORAGE_KEY, id);
+      const backend = this.backends().find(b => b.id === id);
+      if (backend?.context_window) {
+        this.contextWindow.set(backend.context_window);
+      }
     } catch (err) {
       this.patchError.set(err instanceof Error ? err.message : 'Switch failed');
     }
