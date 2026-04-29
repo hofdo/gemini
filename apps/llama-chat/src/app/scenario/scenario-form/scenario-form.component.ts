@@ -3,7 +3,8 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ScenarioService } from '../scenario.service';
-import { AiAssistService } from '../../shared/ai-assist.service';
+import { ScenarioApiService } from '../scenario-api.service';
+import { DmApiService } from '../../dm/dm-api.service';
 import { Scenario, ScenarioType, NpcMode } from '../scenario.model';
 import { PresetScenarioService, PresetMeta } from '../preset-scenario.service';
 
@@ -19,7 +20,8 @@ export class ScenarioFormComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private scenarioService = inject(ScenarioService);
-  private aiAssist = inject(AiAssistService);
+  private scenarioApi = inject(ScenarioApiService);
+  private dmApi = inject(DmApiService);
   private presetService = inject(PresetScenarioService);
 
   scenarioType = signal<ScenarioType>('adventure');
@@ -177,7 +179,7 @@ export class ScenarioFormComponent {
       const tone = this.form.get('tone')?.value ?? '';
       const title = this.form.get('title')?.value ?? '';
 
-      const result = await this.aiAssist.generateNpc(name, description, setting, tone, title);
+      const result = await this.dmApi.generateNpc(name, description, setting, tone, title);
 
       // Update name/description only if they were empty
       if (result.name && !name) npcGroup.get('name')?.setValue(result.name);
@@ -308,7 +310,7 @@ export class ScenarioFormComponent {
     if (!desc || this.generatingScenario()) return;
     this.generatingScenario.set(true);
     try {
-      const scenario = await this.aiAssist.generateScenario(desc, this.scenarioType());
+      const scenario = await this.scenarioApi.generateScenario(desc, this.scenarioType());
       this.form.patchValue({
         scenarioType: scenario.scenarioType,
         title: scenario.title,

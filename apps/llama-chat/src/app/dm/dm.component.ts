@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { Router } from '@angular/router';
-import { AiAssistService } from '../shared/ai-assist.service';
+import { DmApiService } from './dm-api.service';
 import { DmNpc, DmNpcAction, DmNpcClass, Quest, QuestEncounter, QuestMonster, QuestReward } from './dm.model';
 import { WorldStateService } from '../world-state/world-state.service';
 import { ScenarioService } from '../scenario/scenario.service';
@@ -20,7 +20,7 @@ const STORAGE_KEY_NPCS = 'dm_saved_npcs';
 })
 export class DmComponent {
   private router = inject(Router);
-  private aiAssist = inject(AiAssistService);
+  private dmApi = inject(DmApiService);
   private worldStateService = inject(WorldStateService);
   private scenarioService = inject(ScenarioService);
 
@@ -67,7 +67,7 @@ export class DmComponent {
     if (!prompt || this.generatingQuest()) return;
     this.generatingQuest.set(true);
     try {
-      const quest = await this.aiAssist.generateQuest(
+      const quest = await this.dmApi.generateQuest(
         prompt,
         this.questSetting() || undefined,
         this.questTone() || undefined,
@@ -232,7 +232,7 @@ export class DmComponent {
     if (this.generatingNpc()) return;
     this.generatingNpc.set(true);
     try {
-      const raw = await this.aiAssist.generateNpc(
+      const raw = await this.dmApi.generateNpc(
         this.npcName(), this.npcDescription(), this.npcSetting(), this.npcTone(), '',
       );
       const npc: DmNpc = {

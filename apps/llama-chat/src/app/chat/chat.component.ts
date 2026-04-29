@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { marked } from 'marked';
 import { ChatService } from './chat.service';
 import { ScenarioService } from '../scenario/scenario.service';
-import { AiAssistService } from '../shared/ai-assist.service';
+import { ChatAssistService } from './chat-assist.service';
 import { InputType } from '../scenario/scenario.model';
 import { WorldStateService } from '../world-state/world-state.service';
 import { SessionService } from '../session/session.service';
@@ -31,7 +31,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   protected scenarioService = inject(ScenarioService);
   protected worldStateService = inject(WorldStateService);
   protected sessionService = inject(SessionService);
-  private aiAssist = inject(AiAssistService);
+  private aiAssist = inject(ChatAssistService);
   private router = inject(Router);
   private readonly _sanitizer = inject(DomSanitizer);
   private loadingBus = inject(LoadingBusService);

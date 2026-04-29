@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { WorldStateService } from '../world-state/world-state.service';
 import { ScenarioService } from '../scenario/scenario.service';
-import { WorldSyncService } from '../shared/world-sync.service';
+import { WorldSyncService } from '../chat/world-sync.service';
 import { ChatService } from '../chat/chat.service';
 import { SessionSummary, WorldState } from '../world-state/world-state.model';
 
