@@ -1,4 +1,4 @@
-import { Injectable, effect, inject, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   AmbientEvent,
   CombatDelta,
@@ -7,26 +7,26 @@ import {
   Faction,
   NpcState,
   QuestEntry,
-  RelationshipTier,
   SceneTension,
   SessionSummary,
   StoryBeat,
   StoryEvent,
   TimeOfDay,
-
   WorldState,
   WorldStateDelta,
 } from './world-state.model';
 import { Scenario } from '../scenario/scenario.model';
-import { StorageService } from '../shared/storage.service';
+import { WorldStateStore } from './world-state.store';
+import { NpcStateService } from './npc-state.service';
+import { QuestStateService } from './quest-state.service';
+import { PlayerStateService } from './player-state.service';
+import { FactionStateService } from './faction-state.service';
+import { BondStateService } from './bond-state.service';
+import { CombatStateService } from './combat-state.service';
 
 const CURRENT_SCHEMA_VERSION = 3;
 const MAX_HOT_EVENTS = 50;
 const MAX_KEY_FACTS = 10;
-const STORAGE_KEY_PREFIX = 'llama-world-state-';
-const WORLD_INDEX_KEY = 'llama-world-index';
-
-type WorldIndex = { id: string; title: string; lastUpdated: string }[];
 const COMPACT_PROMPT_APPROX_CHARS_PER_TOKEN = 4;
 
 function standingLabel(v: number): string {
@@ -41,34 +41,15 @@ function standingLabel(v: number): string {
 
 @Injectable({ providedIn: 'root' })
 export class WorldStateService {
-  private storageService = inject(StorageService);
-  readonly state = signal<WorldState | null>(null);
+  private store = inject(WorldStateStore);
+  private npcService = inject(NpcStateService);
+  private questService = inject(QuestStateService);
+  private playerService = inject(PlayerStateService);
+  private factionService = inject(FactionStateService);
+  private bondService = inject(BondStateService);
+  private combatService = inject(CombatStateService);
 
-  constructor() {
-    // effect() — single write path for all mutations except applyDelta()
-    // fires asynchronously after any signal change
-    effect(() => {
-      const current = this.state();
-      if (current) {
-        this.persistNow(current).catch(err =>
-          console.warn('WorldStateService: async persist failed', err)
-        );
-      }
-    });
-
-    // Fix 3E: synchronous localStorage fallback on page unload so we don't
-    // lose the latest state if the async effect() hasn't flushed yet.
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', () => {
-        const current = this.state();
-        if (current) {
-          try {
-            localStorage.setItem('worldState_fallback', JSON.stringify(current));
-          } catch { /* storage full — ignore */ }
-        }
-      });
-    }
-  }
+  get state() { return this.store.state; }
 
   initForScenario(scenario: Scenario): void {
     const id = crypto.randomUUID();
@@ -114,35 +95,7 @@ export class WorldStateService {
   }
 
   async loadForScenario(scenarioTitle: string): Promise<boolean> {
-    try {
-      const index = await this.storageService.load<WorldIndex>(WORLD_INDEX_KEY);
-      if (index) {
-        const entry = index.find(e => e.title === scenarioTitle);
-        if (entry) {
-          const parsed = await this.storageService.load<Partial<WorldState>>(
-            `${STORAGE_KEY_PREFIX}${entry.id}`
-          );
-          if (parsed) {
-            this.state.set(this.migrate(parsed));
-            return true;
-          }
-        }
-      }
-    } catch { /* fall through */ }
-
-    // Fallback: linear scan via prefix
-    try {
-      const keys = await this.storageService.listByPrefix(STORAGE_KEY_PREFIX);
-      for (const key of keys) {
-        const parsed = await this.storageService.load<Partial<WorldState>>(key);
-        if (parsed?.scenarioTitle === scenarioTitle) {
-          this.state.set(this.migrate(parsed));
-          return true;
-        }
-      }
-    } catch { /* give up */ }
-
-    return false;
+    return this.store.loadForScenario(scenarioTitle);
   }
 
   applyDelta(delta: WorldStateDelta): void {
@@ -172,32 +125,6 @@ export class WorldStateService {
 
     this.state.update(current => {
       if (!current) return current;
-
-      // Apply faction changes
-      const factions = current.factions.map(f => {
-        const change = validFactionChanges.find(c => c.factionId === f.id);
-        if (!change) return f;
-        const clampedDelta = Math.max(-25, Math.min(25, change.standingDelta));
-        return {
-          ...f,
-          standing: Math.max(-100, Math.min(100, f.standing + clampedDelta)),
-          notes: change.notesAppend ? `${f.notes}\n${change.notesAppend}`.trim() : f.notes,
-        };
-      });
-
-      // Apply NPC changes
-      const npcStates = current.npcStates.map(n => {
-        const change = validNpcChanges.find(c => c.npcId === n.npcId);
-        if (!change) return n;
-        const clampedDelta = Math.max(-25, Math.min(25, change.dispositionDelta));
-        return {
-          ...n,
-          status: change.newStatus ?? n.status,
-          disposition: Math.max(-100, Math.min(100, n.disposition + clampedDelta)),
-          knownFacts: [...n.knownFacts, ...change.newKnownFacts],
-          notes: change.notesAppend ? `${n.notes}\n${change.notesAppend}`.trim() : n.notes,
-        };
-      });
 
       // Apply scene update
       let currentScene = current.currentScene;
@@ -253,40 +180,6 @@ export class WorldStateService {
         storyEvents = storyEvents.slice(overflow);
       }
 
-      // Apply quest updates
-      const questLog = current.questLog.map(q => {
-        const update = delta.questUpdates.find(u => u.questId === q.id);
-        if (!update) return q;
-        const objectivesDone = update.objectivesDone;
-        const objectives = objectivesDone
-          ? q.objectives.map((o, i) => objectivesDone.includes(i) ? { ...o, done: true } : o)
-          : q.objectives;
-        return {
-          ...q,
-          status: update.newStatus ?? q.status,
-          objectives,
-          resolvedAtTurn: update.newStatus && update.newStatus !== 'active' ? current.turnCount : q.resolvedAtTurn,
-        };
-      });
-
-      // Apply player update
-      let playerCharacter = current.playerCharacter;
-      if (delta.playerUpdate && playerCharacter) {
-        const pu = delta.playerUpdate;
-        const newHp = pu.hpDelta
-          ? { ...playerCharacter.hp, current: Math.max(0, Math.min(playerCharacter.hp.max, playerCharacter.hp.current + pu.hpDelta)) }
-          : playerCharacter.hp;
-        const conditions = [
-          ...playerCharacter.conditions.filter(c => !pu.conditionsRemove?.includes(c)),
-          ...(pu.conditionsAdd ?? []),
-        ];
-        const inventory = [
-          ...playerCharacter.inventory.filter(i => !pu.inventoryRemove?.includes(i)),
-          ...(pu.inventoryAdd ?? []),
-        ];
-        playerCharacter = { ...playerCharacter, hp: newHp, conditions, inventory };
-      }
-
       // Apply story beat
       const storyBeat: StoryBeat = delta.storyBeatUpdate !== undefined ? delta.storyBeatUpdate : current.storyBeat;
 
@@ -296,76 +189,65 @@ export class WorldStateService {
         ambientQueue = [...ambientQueue, { text: delta.ambientInject, generatedAt: new Date().toISOString() }].slice(-3);
       }
 
-      // Phase 3d: bond update
-      let bondState = current.bondState;
-      if (delta.bondUpdate && bondState) {
-        const bu = delta.bondUpdate;
-        const newTier = Math.max(0, Math.min(5, bondState.tier + (bu.tierDelta ?? 0))) as RelationshipTier;
-        const anchors = bu.newAnchor
-          ? [...bondState.memoryAnchors, {
-              id: crypto.randomUUID(),
-              description: bu.newAnchor,
-              createdAtTurn: current.turnCount,
-              playerInvokedCount: 0,
-            }]
-          : bondState.memoryAnchors;
-        bondState = {
-          ...bondState,
-          tier: newTier,
-          temperature: bu.temperatureChange ?? bondState.temperature,
-          memoryAnchors: anchors,
-          milestones: bu.newMilestone ? [...bondState.milestones, bu.newMilestone] : bondState.milestones,
-          companionMood: bu.companionMoodUpdate ?? bondState.companionMood,
-        };
-      }
-
       return {
         ...current,
-        factions,
-        npcStates,
         currentScene,
         worldClock,
         keyFacts,
         storyEvents,
         archivedEventCount,
         turnCount: turn,
-        questLog,
-        playerCharacter,
         storyBeat,
         ambientQueue,
-        bondState,
         lastUpdated: new Date().toISOString(),
       };
     });
 
+    // Apply faction changes via factionService
+    if (validFactionChanges.length) {
+      this.factionService.applyFactionChanges(validFactionChanges);
+    }
+
+    // Apply NPC changes via npcService
+    if (validNpcChanges.length) {
+      this.npcService.applyNpcChanges(validNpcChanges);
+    }
+
+    // Apply quest updates via questService
+    if (delta.questUpdates?.length) {
+      this.questService.applyQuestUpdates(delta.questUpdates, s.turnCount);
+    }
+
+    // Apply player update via playerService
+    if (delta.playerUpdate) {
+      this.playerService.applyPlayerUpdate(delta.playerUpdate);
+    }
+
+    // Apply bond update via bondService
+    if (delta.bondUpdate) {
+      this.bondService.applyBondUpdate(delta.bondUpdate);
+    }
+
     // Phase 5a: combat delta (applied after state.update so state() is fresh)
     if (delta.combatDelta) {
-      this.applyCombatDelta(delta.combatDelta);
+      this.combatService.applyCombatDelta(delta.combatDelta);
     }
 
     // Synchronous write — bypasses the async effect() write path
     const updated = this.state();
     if (updated) {
-      this.persistNow(updated).catch(err =>
+      this.store.persistNow(updated).catch(err =>
         console.warn('WorldStateService: applyDelta persist failed', err)
       );
     }
   }
 
   updateFaction(id: string, patch: Partial<Faction>): void {
-    this.state.update(s => s ? {
-      ...s,
-      factions: s.factions.map(f => f.id === id ? { ...f, ...patch } : f),
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.factionService.updateFaction(id, patch);
   }
 
   updateNpcState(id: string, patch: Partial<NpcState>): void {
-    this.state.update(s => s ? {
-      ...s,
-      npcStates: s.npcStates.map(n => n.npcId === id ? { ...n, ...patch } : n),
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.npcService.updateNpcState(id, patch);
   }
 
   updateScene(patch: Partial<CurrentScene>): void {
@@ -377,20 +259,11 @@ export class WorldStateService {
   }
 
   addFaction(faction: Omit<Faction, 'id'>): void {
-    const id = crypto.randomUUID();
-    this.state.update(s => s ? {
-      ...s,
-      factions: [...s.factions, { ...faction, id }],
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.factionService.addFaction(faction);
   }
 
   addNpcState(npcState: NpcState): void {
-    this.state.update(s => s ? {
-      ...s,
-      npcStates: [...s.npcStates, npcState],
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.npcService.addNpcState(npcState);
   }
 
   addEvent(event: Omit<StoryEvent, 'id' | 'turn'>): void {
@@ -408,21 +281,11 @@ export class WorldStateService {
   }
 
   addQuest(quest: Omit<QuestEntry, 'id' | 'addedAtTurn'>): void {
-    this.state.update(s => s ? {
-      ...s,
-      questLog: [...s.questLog, { ...quest, id: crypto.randomUUID(), addedAtTurn: s.turnCount }],
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.questService.addQuest(quest);
   }
 
   updateQuestObjective(questId: string, objectiveIndex: number, done: boolean): void {
-    this.state.update(s => s ? {
-      ...s,
-      questLog: s.questLog.map(q => q.id === questId
-        ? { ...q, objectives: q.objectives.map((o, i) => i === objectiveIndex ? { ...o, done } : o) }
-        : q),
-      lastUpdated: new Date().toISOString(),
-    } : s);
+    this.questService.updateQuestObjective(questId, objectiveIndex, done);
   }
 
   addSessionSummary(summary: SessionSummary): void {
@@ -436,28 +299,11 @@ export class WorldStateService {
   }
 
   exportToFile(): void {
-    const state = this.state();
-    if (!state) return;
-    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `world-state-${state.scenarioTitle.replace(/\s+/g, '-')}-${Date.now()}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    this.store.exportToFile();
   }
 
   async importFromFile(file: File): Promise<boolean> {
-    try {
-      const text = await file.text();
-      const parsed = JSON.parse(text) as Partial<WorldState>;
-      if (!parsed.id || !parsed.scenarioTitle) return false;
-      const migrated = this.migrate(parsed);
-      this.state.set(migrated);
-      return true;
-    } catch {
-      return false;
-    }
+    return this.store.importFromFile(file);
   }
 
   toCompactPrompt(maxBudget = 600): string {
@@ -582,131 +428,16 @@ export class WorldStateService {
 
   // Phase 5a: Set combat state directly (used by CombatService)
   setCombatState(cs: CombatState | null): void {
-    this.state.update(s => s ? { ...s, combatState: cs, lastUpdated: new Date().toISOString() } : s);
+    this.combatService.setCombatState(cs);
   }
 
   clearState(): void {
-    const s = this.state();
-    if (s) {
-      // Deletion is best-effort; errors are intentionally ignored
-      void this.storageService.delete(`${STORAGE_KEY_PREFIX}${s.id}`);
-    }
-    this.state.set(null);
+    this.store.clearState();
   }
 
   // Phase 5b: exposed for CombatService direct calls
   applyCombatDelta(delta: CombatDelta): void {
-    if (delta.action === 'start') {
-      // CombatService sets state directly via setCombatState — nothing to do here
-      return;
-    }
-
-    this.state.update(current => {
-      if (!current || !current.combatState) return current;
-      const cs = current.combatState;
-
-      if (delta.action === 'next_turn') {
-        // Remove entities
-        const removedIds = new Set(delta.removedEntityIds ?? []);
-        let order = cs.initiativeOrder.filter(p => !removedIds.has(p.entityId));
-
-        // Apply HP changes
-        if (delta.hpChanges?.length) {
-          order = order.map(p => {
-            const change = delta.hpChanges?.find(c => c.entityId === p.entityId);
-            if (!change) return p;
-            return {
-              ...p,
-              hp: {
-                ...p.hp,
-                current: Math.max(0, Math.min(p.hp.max, p.hp.current + change.hpDelta)),
-              },
-            };
-          });
-        }
-
-        // Advance initiative index cyclically
-        const nextIndex = order.length > 0
-          ? (cs.activeEntityIndex + 1) % order.length
-          : 0;
-
-        // Append round log
-        const log = delta.roundLogAppend
-          ? [...cs.log, delta.roundLogAppend]
-          : cs.log;
-
-        return {
-          ...current,
-          combatState: { ...cs, initiativeOrder: order, activeEntityIndex: nextIndex, log },
-          lastUpdated: new Date().toISOString(),
-        };
-      }
-
-      if (delta.action === 'end') {
-        const log = delta.roundLogAppend
-          ? [...cs.log, delta.roundLogAppend]
-          : cs.log;
-
-        return {
-          ...current,
-          combatState: { ...cs, active: false, log },
-          lastUpdated: new Date().toISOString(),
-        };
-      }
-
-      return current;
-    });
+    this.combatService.applyCombatDelta(delta);
   }
 
-  private async persistNow(state: WorldState): Promise<void> {
-    await this.storageService.save(`${STORAGE_KEY_PREFIX}${state.id}`, state);
-    // Update world index
-    const index: WorldIndex = (await this.storageService.load<WorldIndex>(WORLD_INDEX_KEY)) ?? [];
-    const entry = { id: state.id, title: state.scenarioTitle, lastUpdated: state.lastUpdated };
-    const existingIdx = index.findIndex(e => e.id === state.id);
-    if (existingIdx >= 0) {
-      index[existingIdx] = entry;
-    } else {
-      index.push(entry);
-    }
-    await this.storageService.save(WORLD_INDEX_KEY, index);
-  }
-
-  private migrate(raw: Partial<WorldState>): WorldState {
-    const version = raw._schemaVersion ?? 0;
-
-    if (version < 1) {
-      raw.worldClock = raw.worldClock ?? { dayNumber: 1, timeOfDay: 'morning', season: 'spring', turnsPerDay: 8 };
-      raw.archivedEventCount = raw.archivedEventCount ?? 0;
-      raw.archivedEventSummary = raw.archivedEventSummary ?? '';
-      raw.currentScene = raw.currentScene ?? null;
-      raw.keyFacts = raw.keyFacts ?? [];
-      raw.sessionSummaries = raw.sessionSummaries ?? [];
-      raw.locations = raw.locations ?? [];
-      raw.factions = raw.factions ?? [];
-      raw.npcStates = raw.npcStates ?? [];
-      raw.storyEvents = raw.storyEvents ?? [];
-    }
-
-    // v1→v2: clockAdvance changed from boolean to ClockAdvance|null in the delta type (not stored state)
-    // No stored data changes needed.
-
-    // v2→v3: add questLog, playerCharacter, choiceChronicle, storyBeat, ambientQueue, bondState
-    if (version < 3) {
-      raw.questLog = raw.questLog ?? [];
-      raw.playerCharacter = raw.playerCharacter ?? null;
-      raw.choiceChronicle = raw.choiceChronicle ?? [];
-      raw.storyBeat = raw.storyBeat ?? null;
-      raw.ambientQueue = raw.ambientQueue ?? [];
-      raw.bondState = raw.bondState ?? null;
-    }
-
-    // v3→current: add combatState (Phase 5a)
-    raw.combatState = raw.combatState ?? null;
-
-    return {
-      ...raw,
-      _schemaVersion: CURRENT_SCHEMA_VERSION,
-    } as WorldState;
-  }
 }
