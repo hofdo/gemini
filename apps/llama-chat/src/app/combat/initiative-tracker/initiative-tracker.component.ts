@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { CombatParticipant } from '../../world-state/world-state.model';
+import { CombatParticipant } from '../../world-state/combat.model';
 
 @Component({
   selector: 'llama-initiative-tracker',

@@ -2,7 +2,8 @@ import { Injectable, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ScenarioService } from '../scenario/scenario.service';
 import { WorldStateService } from '../world-state/world-state.service';
-import { CombatParticipant, CombatState, PlayerCharacter } from '../world-state/world-state.model';
+import { CombatParticipant, CombatState } from '../world-state/combat.model';
+import { PlayerCharacter } from '../world-state/player.model';
 import { Scenario } from '../scenario/scenario.model';
 
 export interface CombatResolution {

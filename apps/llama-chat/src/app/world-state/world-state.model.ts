@@ -1,105 +1,18 @@
-export type NpcStatus = 'alive' | 'dead' | 'missing' | 'unknown';
+export type { CombatDelta, CombatParticipant, CombatState } from './combat.model';
+export type { BondState, BondUpdate, EmotionalTemperature, MemoryAnchor, RelationshipTier } from './bond.model';
+export type { FactionChange, Faction } from './faction.model';
+export type { NpcChange, NpcRelationship, NpcState, NpcStatus } from './npc.model';
+export type { PlayerCharacter, PlayerUpdate } from './player.model';
+export type { QuestEntry, QuestUpdate } from './quest.model';
+export type { AmbientEvent, EventCertainty, EventType, SceneTension, StoryBeat, StoryEvent, TimeOfDay } from './story.model';
 
-// Phase 3a: Heartbeat / ambient queue
-export interface AmbientEvent {
-  text: string;
-  generatedAt: string;
-}
-
-// Phase 3d: Bond Mode Engine
-export type RelationshipTier = 0 | 1 | 2 | 3 | 4 | 5;
-export type EmotionalTemperature = 'cold' | 'warm' | 'charged' | 'tender' | 'raw';
-
-export interface MemoryAnchor {
-  id: string;
-  description: string;
-  createdAtTurn: number;
-  playerInvokedCount: number;
-}
-
-export interface BondState {
-  tier: RelationshipTier;
-  temperature: EmotionalTemperature;
-  memoryAnchors: MemoryAnchor[];
-  milestones: string[];
-  companionMood: string;
-}
-
-export interface BondUpdate {
-  tierDelta?: number;
-  temperatureChange?: EmotionalTemperature;
-  newMilestone?: string;
-  newAnchor?: string;
-  companionMoodUpdate?: string;
-}
-
-export interface QuestEntry {
-  id: string;
-  title: string;
-  description: string;
-  status: 'active' | 'completed' | 'failed' | 'abandoned';
-  objectives: { text: string; done: boolean }[];
-  addedAtTurn: number;
-  resolvedAtTurn?: number;
-  linkedNpcIds: string[];
-  rewards?: { gold?: number; items?: string[] };
-}
-
-export interface PlayerCharacter {
-  name: string;
-  epithets: string[];
-  aptitudes: {
-    bold: number;
-    subtle: number;
-    learned: number;
-    connected: number;
-    fierce: number;
-    resilient: number;
-  };
-  scarsAndGlories: string[];
-  inventory: string[];
-  conditions: string[];
-  hp: { current: number; max: number };
-}
-
-export type StoryBeat =
-  | 'inciting_incident'
-  | 'rising_tension'
-  | 'dark_moment'
-  | 'climax_pending'
-  | 'resolution'
-  | null;
-
-export interface QuestUpdate {
-  questId: string;
-  newStatus?: QuestEntry['status'];
-  objectivesDone?: number[];
-  notesAppend?: string;
-}
-
-export interface PlayerUpdate {
-  hpDelta?: number;
-  conditionsAdd?: string[];
-  conditionsRemove?: string[];
-  inventoryAdd?: string[];
-  inventoryRemove?: string[];
-}
-export type EventType = 'combat' | 'dialogue' | 'discovery' | 'faction' | 'world';
-export type EventCertainty = 'witnessed' | 'rumored' | 'deduced' | 'false';
-export type SceneTension = 'calm' | 'tense' | 'hostile' | 'combat';
-export type TimeOfDay = 'dawn' | 'morning' | 'afternoon' | 'evening' | 'night';
-
-export interface Faction {
-  id: string;
-  name: string;
-  description: string;
-  archetypes: string[];
-  standing: number;
-  territories: string[];
-  allies: string[];
-  enemies: string[];
-  notes: string;
-}
+import { BondState, BondUpdate } from './bond.model';
+import { CombatDelta, CombatState } from './combat.model';
+import { Faction, FactionChange } from './faction.model';
+import { NpcChange, NpcState } from './npc.model';
+import { PlayerCharacter, PlayerUpdate } from './player.model';
+import { QuestEntry, QuestUpdate } from './quest.model';
+import { AmbientEvent, SceneTension, StoryBeat, StoryEvent, TimeOfDay } from './story.model';
 
 export interface WorldLocation {
   id: string;
@@ -110,34 +23,11 @@ export interface WorldLocation {
   visitCount: number;
 }
 
-export interface NpcRelationship {
-  targetNpcId: string;
-  disposition: number;
-  note: string;
-}
-
-export interface NpcState {
-  npcId: string;
-  name: string;
-  status: NpcStatus;
-  locationId?: string;
-  disposition: number;
-  relationships: NpcRelationship[];
-  knownFacts: string[];
-  notes: string;
-}
-
-export interface StoryEvent {
-  id: string;
-  turn: number;
-  title: string;
-  description: string;
-  type: EventType;
-  certainty: EventCertainty;
-  source?: string;
-  involvedNpcIds: string[];
-  involvedFactionIds: string[];
-  locationId?: string;
+export interface WorldClock {
+  dayNumber: number;
+  timeOfDay: TimeOfDay;
+  season: 'spring' | 'summer' | 'autumn' | 'winter';
+  turnsPerDay: number;
 }
 
 export interface CurrentScene {
@@ -145,13 +35,6 @@ export interface CurrentScene {
   presentNpcIds: string[];
   tension: SceneTension;
   sceneNote: string;
-}
-
-export interface WorldClock {
-  dayNumber: number;
-  timeOfDay: TimeOfDay;
-  season: 'spring' | 'summer' | 'autumn' | 'winter';
-  turnsPerDay: number;
 }
 
 export interface SessionSummary {
@@ -162,27 +45,17 @@ export interface SessionSummary {
   createdAt: string;
 }
 
-export interface CombatParticipant {
-  entityId: string;
-  name: string;
-  initiative: number;
-  hp: { current: number; max: number };
-  isPlayer: boolean;
+// WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
+export interface ClockAdvance {
+  turns: number;
 }
 
-export interface CombatState {
-  active: boolean;
-  round: number;
-  initiativeOrder: CombatParticipant[];
-  activeEntityIndex: number;
-  log: string[];
-}
-
-export interface CombatDelta {
-  action: 'start' | 'next_turn' | 'end';
-  hpChanges?: { entityId: string; hpDelta: number }[];
-  roundLogAppend?: string;
-  removedEntityIds?: string[];
+export interface SceneUpdate {
+  locationId: string | null;
+  addNpcIds: string[];
+  removeNpcIds: string[];
+  newTension: SceneTension | null;
+  sceneNote: string;
 }
 
 export interface WorldState {
@@ -210,11 +83,6 @@ export interface WorldState {
   combatState: CombatState | null;
 }
 
-// WorldState schema v2: clockAdvance changed from boolean to ClockAdvance | null
-export interface ClockAdvance {
-  turns: number;
-}
-
 export interface WorldStateDelta {
   factionChanges: FactionChange[];
   npcChanges: NpcChange[];
@@ -232,26 +100,4 @@ export interface WorldStateDelta {
   // Phase 3d: Bond mode
   bondUpdate: BondUpdate | null;
   combatDelta: CombatDelta | null;
-}
-
-export interface FactionChange {
-  factionId: string;
-  standingDelta: number;
-  notesAppend: string;
-}
-
-export interface NpcChange {
-  npcId: string;
-  newStatus: NpcStatus | null;
-  dispositionDelta: number;
-  newKnownFacts: string[];
-  notesAppend: string;
-}
-
-export interface SceneUpdate {
-  locationId: string | null;
-  addNpcIds: string[];
-  removeNpcIds: string[];
-  newTension: SceneTension | null;
-  sceneNote: string;
 }

@@ -1,5 +1,6 @@
 import { DmNpc, Quest } from './dm.model';
-import { NpcState, QuestEntry } from '../world-state/world-state.model';
+import { NpcState } from '../world-state/npc.model';
+import { QuestEntry } from '../world-state/quest.model';
 
 export function dmNpcToNpcState(dmNpc: DmNpc): NpcState {
   return {

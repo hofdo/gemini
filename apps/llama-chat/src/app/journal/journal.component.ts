@@ -2,7 +2,8 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { Router } from '@angular/router';
 import { TitleCasePipe } from '@angular/common';
 import { WorldStateService } from '../world-state/world-state.service';
-import { QuestEntry, StoryEvent } from '../world-state/world-state.model';
+import { QuestEntry } from '../world-state/quest.model';
+import { StoryEvent } from '../world-state/story.model';
 
 @Component({
   selector: 'llama-journal',
