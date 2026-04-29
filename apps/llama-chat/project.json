@@ -4,7 +4,7 @@
   "projectType": "application",
   "prefix": "llama",
   "sourceRoot": "apps/llama-chat/src",
-  "tags": ["scope:frontend", "lang:typescript"],
+  "tags": ["scope:app", "lang:angular"],
   "targets": {
     "build": {
       "executor": "@angular/build:application",
