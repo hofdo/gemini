@@ -2,8 +2,11 @@
   "name": "@nx-monorepo-experiment/feature-scenario",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^21.1.0",
-    "@angular/core": "^21.1.0"
+    "@angular/core": "^21.1.0",
+    "@nx-monorepo-experiment/shared-scenario": "0.0.1",
+    "@nx-monorepo-experiment/shared-config": "0.0.1",
+    "@angular/forms": "~21.1.0",
+    "@angular/router": "~21.1.0"
   },
   "sideEffects": false
 }

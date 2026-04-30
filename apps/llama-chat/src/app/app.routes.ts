@@ -4,42 +4,42 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./menu/menu.component').then((m) => m.MenuComponent),
+      import('@nx-monorepo-experiment/feature-menu').then((m) => m.MenuComponent),
   },
   {
     path: 'scenario/:mode',
     loadComponent: () =>
-      import('./scenario/scenario-form/scenario-form.component').then((m) => m.ScenarioFormComponent),
+      import('@nx-monorepo-experiment/feature-scenario').then((m) => m.ScenarioFormComponent),
   },
   {
     path: 'dm',
     loadComponent: () =>
-      import('./dm/dm.component').then((m) => m.DmComponent),
+      import('@nx-monorepo-experiment/feature-dm').then((m) => m.DmComponent),
   },
   {
     path: 'dm/session-zero',
     loadComponent: () =>
-      import('./dm/session-zero/session-zero.component').then((m) => m.SessionZeroComponent),
+      import('@nx-monorepo-experiment/feature-dm').then((m) => m.SessionZeroComponent),
   },
   {
     path: 'chat',
     loadComponent: () =>
-      import('./chat/chat.component').then((m) => m.ChatComponent),
+      import('@nx-monorepo-experiment/feature-chat').then((m) => m.ChatComponent),
   },
   {
     path: 'settings',
     loadComponent: () =>
-      import('./settings/settings.component').then((m) => m.SettingsComponent),
+      import('@nx-monorepo-experiment/feature-settings').then((m) => m.SettingsComponent),
   },
   {
     path: 'journal',
     loadComponent: () =>
-      import('./journal/journal.component').then((m) => m.JournalComponent),
+      import('@nx-monorepo-experiment/feature-journal').then((m) => m.JournalComponent),
   },
   {
     path: 'combat',
     loadComponent: () =>
-      import('./combat/combat.component').then((m) => m.CombatComponent),
+      import('@nx-monorepo-experiment/feature-combat').then((m) => m.CombatComponent),
   },
   { path: '**', redirectTo: '' },
 ];

@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ErrorBoundaryComponent } from './shared/error-boundary.component';
-import { ChatService } from './chat/chat.service';
+import { ErrorBoundaryComponent, AppErrorService } from '@nx-monorepo-experiment/shared-ui';
 
 @Component({
   imports: [RouterOutlet, ErrorBoundaryComponent],
@@ -11,10 +10,9 @@ import { ChatService } from './chat/chat.service';
 })
 export class App {
   protected title = 'llama-chat';
-  // Fix 3A: retry last chat stream when error boundary fires retry
-  private chatService = inject(ChatService);
+  private appErrorService = inject(AppErrorService);
 
   onRetry(): void {
-    this.chatService.retryLastStream();
+    this.appErrorService.retry();
   }
 }

@@ -1,1 +1,1 @@
-export * from './lib/feature-settings/feature-settings';
+export { SettingsComponent } from './lib/settings.component';

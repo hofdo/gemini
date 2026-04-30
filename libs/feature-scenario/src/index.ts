@@ -1,1 +1,1 @@
-export * from './lib/feature-scenario/feature-scenario';
+export { ScenarioFormComponent } from './lib/scenario-form/scenario-form.component';

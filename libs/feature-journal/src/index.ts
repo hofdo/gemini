@@ -1,1 +1,1 @@
-export * from './lib/feature-journal/feature-journal';
+export { JournalComponent } from './lib/journal.component';

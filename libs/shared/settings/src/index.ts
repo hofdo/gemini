@@ -1,1 +1,1 @@
-export * from './lib/shared-settings/shared-settings';
+export * from './lib/settings.service';

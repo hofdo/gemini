@@ -1,1 +1,2 @@
-export * from './lib/shared-scenario/shared-scenario';
+export * from './lib/scenario.model';
+export * from './lib/scenario.service';

@@ -40,6 +40,12 @@
       ],
       "@nx-monorepo-experiment/feature-scenario": [
         "libs/feature-scenario/src/index.ts"
+      ],
+      "@nx-monorepo-experiment/feature-menu": [
+        "libs/feature-menu/src/index.ts"
+      ],
+      "@nx-monorepo-experiment/shared-config": [
+        "libs/shared/config/src/index.ts"
       ]
     }
   },

@@ -1,1 +1,1 @@
-export * from './lib/feature-combat/feature-combat';
+export { CombatComponent } from './lib/combat.component';

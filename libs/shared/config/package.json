@@ -1,0 +1,6 @@
+{
+  "name": "@nx-monorepo-experiment/shared-config",
+  "version": "0.0.1",
+  "peerDependencies": {},
+  "sideEffects": false
+}

@@ -2,8 +2,10 @@
   "name": "@nx-monorepo-experiment/shared-world-state",
   "version": "0.0.1",
   "peerDependencies": {
-    "@angular/common": "^21.1.0",
-    "@angular/core": "^21.1.0"
+    "@angular/core": "^21.1.0",
+    "@angular/router": "~21.1.0",
+    "@nx-monorepo-experiment/shared-scenario": "0.0.1",
+    "idb": "^8.0.3"
   },
   "sideEffects": false
 }
