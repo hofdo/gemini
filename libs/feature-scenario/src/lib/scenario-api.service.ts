@@ -1,19 +1,10 @@
-import { Injectable } from '@angular/core';
-import { Scenario, ScenarioType } from '@nx-monorepo-experiment/shared-scenario';
+import { inject, Injectable } from '@angular/core';
+import { NpcApiService, Scenario, ScenarioType } from '@nx-monorepo-experiment/shared-scenario';
 import { APP_CONFIG } from '@nx-monorepo-experiment/shared-config';
-
-export interface GeneratedNpcDraft {
-  name?: string;
-  description?: string;
-  personality?: string;
-  stats?: Record<string, number>;
-  foes?: string[];
-  friends?: string[];
-  plot_twists?: string[];
-}
 
 @Injectable({ providedIn: 'root' })
 export class ScenarioApiService {
+  private readonly npcApiService = inject(NpcApiService);
   async generateScenario(
     description: string,
     scenarioType: ScenarioType,
@@ -67,20 +58,13 @@ export class ScenarioApiService {
     } as Scenario;
   }
 
-  async generateNpc(
+  generateNpc(
     npcName: string,
     npcDescription: string,
     setting: string,
     tone: string,
     title: string,
-  ): Promise<GeneratedNpcDraft> {
-    const response = await fetch('/generate-npc', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      signal: AbortSignal.timeout(APP_CONFIG.timeoutMs),
-      body: JSON.stringify({ npc_name: npcName, npc_description: npcDescription, setting, tone, title }),
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
+  ) {
+    return this.npcApiService.generateNpc(npcName, npcDescription, setting, tone, title);
   }
 }
