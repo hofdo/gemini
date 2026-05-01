@@ -97,14 +97,16 @@ export class ChatService {
     const scenario = this.scenarioService.activeScenario();
     if (!scenario || this.messages().length > 0) return;
 
-    this.streamWithRetry({
+    const payload = {
       messages: [] as never[],
       stream: true,
       stream_options: { include_usage: true },
       scenario: this.buildScenarioPayload(scenario),
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
-    });
+    };
+    this._lastStreamPayload = payload;
+    void this.streamRequest(payload);
   }
 
   sendMessage(content: string, inputType: InputType = 'dialogue'): void {
@@ -113,7 +115,7 @@ export class ChatService {
     this.messages.update((msgs) => [...msgs, { id: crypto.randomUUID(), role: 'user' as const, content, inputType }]);
 
     const scenario = this.scenarioService.activeScenario();
-    this.streamWithRetry({
+    const payload = {
       messages: this.messages().map((m) => ({
         role: m.role,
         content: m.content,
@@ -125,7 +127,9 @@ export class ChatService {
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
       tone_settings: this.settingsService.toneSettings(),
-    });
+    };
+    this._lastStreamPayload = payload;
+    void this.streamRequest(payload);
   }
 
   regenerateLastResponse(): void {
@@ -136,7 +140,7 @@ export class ChatService {
     this.messages.set(msgs.slice(0, msgs.length - 1 - lastAssistantIdx));
 
     const scenario = this.scenarioService.activeScenario();
-    this.streamWithRetry({
+    const payload = {
       messages: this.messages().map((m) => ({
         role: m.role,
         content: m.content,
@@ -147,7 +151,9 @@ export class ChatService {
       scenario: scenario ? this.buildScenarioPayload(scenario) : null,
       world_state: this.worldStateService.state() ?? null,
       enable_thinking: this.settingsService.enableThinking(),
-    });
+    };
+    this._lastStreamPayload = payload;
+    void this.streamRequest(payload);
   }
 
   buildScenarioPayload(
@@ -274,20 +280,7 @@ export class ChatService {
       }
       return msgs;
     });
-    void this.streamWithRetry(this._lastStreamPayload);
-  }
-
-  private async streamWithRetry(payload: Record<string, unknown>, retries = environment.retryAttempts): Promise<void> {
-    this._lastStreamPayload = payload;
-    for (let i = 0; i <= retries; i++) {
-      try {
-        return await this.streamRequest(payload);
-      } catch (err) {
-        if (i === retries) throw err;
-        console.warn(`Stream attempt ${i + 1} failed, retrying...`, err);
-        await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-      }
-    }
+    void this.streamRequest(this._lastStreamPayload);
   }
 
   private appendToLastMessage(token: string): void {
