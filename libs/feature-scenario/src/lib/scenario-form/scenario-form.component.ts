@@ -1,10 +1,8 @@
 import { Component, inject, signal } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ScenarioService } from '@nx-monorepo-experiment/shared-scenario';
+import { NpcApiService, Scenario, ScenarioService, ScenarioType, NpcMode } from '@nx-monorepo-experiment/shared-scenario';
 import { ScenarioApiService } from '../scenario-api.service';
-import { Scenario, ScenarioType, NpcMode } from '@nx-monorepo-experiment/shared-scenario';
 import { PresetScenarioService, PresetMeta } from '../preset-scenario.service';
 
 @Component({
@@ -20,6 +18,7 @@ export class ScenarioFormComponent {
   private route = inject(ActivatedRoute);
   private scenarioService = inject(ScenarioService);
   private scenarioApi = inject(ScenarioApiService);
+  private npcApi = inject(NpcApiService);
   private presetService = inject(PresetScenarioService);
 
   scenarioType = signal<ScenarioType>('adventure');
@@ -177,7 +176,7 @@ export class ScenarioFormComponent {
       const tone = this.form.get('tone')?.value ?? '';
       const title = this.form.get('title')?.value ?? '';
 
-      const result = await this.scenarioApi.generateNpc(name, description, setting, tone, title);
+      const result = await this.npcApi.generateNpc(name, description, setting, tone, title);
 
       // Update name/description only if they were empty
       if (result.name && !name) npcGroup.get('name')?.setValue(result.name);

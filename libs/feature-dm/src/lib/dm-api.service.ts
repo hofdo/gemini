@@ -1,22 +1,14 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import type { Quest, QuestEncounter, QuestMonster } from './dm.model';
 import { APP_CONFIG } from '@nx-monorepo-experiment/shared-config';
-import { NpcApiService } from '@nx-monorepo-experiment/shared-scenario';
+
+interface RawEncounter {
+  description?: string;
+  monsters?: { name?: string; cr?: string }[];
+}
 
 @Injectable({ providedIn: 'root' })
 export class DmApiService {
-  private readonly npcApiService = inject(NpcApiService);
-
-  generateNpc(
-    npcName: string,
-    npcDescription: string,
-    setting: string,
-    tone: string,
-    title: string,
-  ) {
-    return this.npcApiService.generateNpc(npcName, npcDescription, setting, tone, title);
-  }
-
   async generateQuest(
     prompt: string,
     setting?: string,
@@ -50,7 +42,7 @@ export class DmApiService {
         silver: d.rewards?.silver ?? 0,
         items: d.rewards?.items ?? [],
       },
-      encounters: (d.encounters ?? []).map((e: { description?: string; monsters?: { name?: string; cr?: string }[] }): QuestEncounter => ({
+      encounters: (d.encounters ?? []).map((e: RawEncounter): QuestEncounter => ({
         description: e.description ?? '',
         monsters: (e.monsters ?? []).map((m): QuestMonster => ({
           name: m.name ?? '',

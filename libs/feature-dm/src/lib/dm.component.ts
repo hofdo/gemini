@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { DmApiService } from './dm-api.service';
 import { DmNpc, DmNpcAction, DmNpcClass, Quest, QuestEncounter, QuestMonster, QuestReward } from './dm.model';
 import { WorldStateService } from '@nx-monorepo-experiment/shared-world-state';
-import { ScenarioService } from '@nx-monorepo-experiment/shared-scenario';
+import { NpcApiService, ScenarioService } from '@nx-monorepo-experiment/shared-scenario';
 import { dmNpcToNpcState, dmQuestToQuestEntry } from './dm-npc-adapter';
 
 const STORAGE_KEY_QUESTS = 'dm_saved_quests';
@@ -21,6 +21,7 @@ const STORAGE_KEY_NPCS = 'dm_saved_npcs';
 export class DmComponent {
   private router = inject(Router);
   private dmApi = inject(DmApiService);
+  private npcApi = inject(NpcApiService);
   private worldStateService = inject(WorldStateService);
   private scenarioService = inject(ScenarioService);
 
@@ -232,7 +233,7 @@ export class DmComponent {
     if (this.generatingNpc()) return;
     this.generatingNpc.set(true);
     try {
-      const raw = await this.dmApi.generateNpc(
+      const raw = await this.npcApi.generateNpc(
         this.npcName(), this.npcDescription(), this.npcSetting(), this.npcTone(), '',
       );
       const npc: DmNpc = {
