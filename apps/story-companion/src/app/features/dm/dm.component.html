@@ -1,0 +1,262 @@
+<section class="dm-tools">
+  <header class="dm-header">
+    <h2>DM Tools</h2>
+    <a [routerLink]="['/workspace', workspaceId]">Back to Story</a>
+  </header>
+
+  <nav class="tabs">
+    <button
+      type="button"
+      [class.active]="activeTab() === 'quests'"
+      (click)="setTab('quests')"
+    >Quests</button>
+    <button
+      type="button"
+      [class.active]="activeTab() === 'npcs'"
+      (click)="setTab('npcs')"
+    >NPCs</button>
+  </nav>
+
+  @if (error()) {
+    <p class="error">{{ error() }}</p>
+  }
+
+  <!-- ====== QUESTS TAB ====== -->
+  @if (activeTab() === 'quests') {
+    <section class="tab-panel">
+      @if (!currentQuest()) {
+        <section class="generator-form">
+          <h3>Generate Quest</h3>
+          <label>
+            Prompt
+            <input
+              type="text"
+              [ngModel]="questPrompt()"
+              (ngModelChange)="questPrompt.set($event)"
+              placeholder="e.g. Rescue the kidnapped merchant"
+            />
+          </label>
+          <label>
+            Party Level
+            <input
+              type="number"
+              [ngModel]="questPartyLevel()"
+              (ngModelChange)="questPartyLevel.set(+$event)"
+              min="1"
+              max="20"
+            />
+          </label>
+          <label>
+            Setting (optional)
+            <input
+              type="text"
+              [ngModel]="questSetting()"
+              (ngModelChange)="questSetting.set($event)"
+              placeholder="e.g. Dark Forest"
+            />
+          </label>
+          <label>
+            Tone (optional)
+            <input
+              type="text"
+              [ngModel]="questTone()"
+              (ngModelChange)="questTone.set($event)"
+              placeholder="e.g. gritty"
+            />
+          </label>
+          <button
+            type="button"
+            (click)="generateQuest()"
+            [disabled]="loading() || !questPrompt().trim()"
+          >
+            @if (loading()) { Generating… } @else { Generate Quest }
+          </button>
+        </section>
+      } @else {
+        <section class="result-form">
+          <h3>Quest Result</h3>
+          <label>
+            Title
+            <input
+              type="text"
+              [ngModel]="currentQuest()!.title"
+              (ngModelChange)="updateQuestTitle($event)"
+            />
+          </label>
+          <label>
+            Description
+            <textarea
+              rows="4"
+              [ngModel]="currentQuest()!.description"
+              (ngModelChange)="updateQuestDescription($event)"
+            ></textarea>
+          </label>
+
+          <section class="block">
+            <header>
+              <h4>Objectives</h4>
+              <button type="button" (click)="addQuestObjective()">Add</button>
+            </header>
+            @for (obj of currentQuest()!.objectives; track $index) {
+              <div class="row">
+                <input
+                  type="text"
+                  [ngModel]="obj"
+                  (ngModelChange)="updateQuestObjective($index, $event)"
+                />
+                <button type="button" (click)="removeQuestObjective($index)">Remove</button>
+              </div>
+            }
+          </section>
+
+          <label>
+            Reward
+            <input
+              type="text"
+              [ngModel]="currentQuest()!.reward"
+              (ngModelChange)="updateQuestReward($event)"
+            />
+          </label>
+
+          <div class="actions">
+            <button type="button" (click)="saveQuestToCollection()">Save to Collection</button>
+            <button type="button" (click)="promoteQuestToLog(currentQuest()!)">Promote to Quest Log</button>
+            <button type="button" (click)="newQuest()">New Quest</button>
+          </div>
+        </section>
+      }
+
+      @if (savedQuests().length > 0) {
+        <section class="saved-list">
+          <h3>Saved Quests</h3>
+          @for (quest of savedQuests(); track quest.id) {
+            <article class="saved-item">
+              <strong>{{ quest.title }}</strong>
+              <p>{{ quest.description }}</p>
+              <button type="button" (click)="promoteQuestToLog(quest)">Promote to Quest Log</button>
+            </article>
+          }
+        </section>
+      }
+    </section>
+  }
+
+  <!-- ====== NPCS TAB ====== -->
+  @if (activeTab() === 'npcs') {
+    <section class="tab-panel">
+      @if (!currentNpc()) {
+        <section class="generator-form">
+          <h3>Generate NPC</h3>
+          <label>
+            Name
+            <input
+              type="text"
+              [ngModel]="npcName()"
+              (ngModelChange)="npcName.set($event)"
+              placeholder="e.g. Thornwick the Fence"
+            />
+          </label>
+          <label>
+            Description
+            <textarea
+              rows="3"
+              [ngModel]="npcDescription()"
+              (ngModelChange)="npcDescription.set($event)"
+              placeholder="e.g. A wiry halfling who trades in secrets"
+            ></textarea>
+          </label>
+          <label>
+            Setting (optional)
+            <input
+              type="text"
+              [ngModel]="npcSetting()"
+              (ngModelChange)="npcSetting.set($event)"
+              placeholder="e.g. City slums"
+            />
+          </label>
+          <label>
+            Tone (optional)
+            <input
+              type="text"
+              [ngModel]="npcTone()"
+              (ngModelChange)="npcTone.set($event)"
+              placeholder="e.g. mysterious"
+            />
+          </label>
+          <button
+            type="button"
+            (click)="generateNpc()"
+            [disabled]="loading() || !npcName().trim()"
+          >
+            @if (loading()) { Generating… } @else { Generate NPC }
+          </button>
+        </section>
+      } @else {
+        <section class="result-form">
+          <h3>NPC Result</h3>
+          <label>
+            Name
+            <input
+              type="text"
+              [ngModel]="currentNpc()!.name"
+              (ngModelChange)="updateNpcName($event)"
+            />
+          </label>
+          <label>
+            Description
+            <textarea
+              rows="3"
+              [ngModel]="currentNpc()!.description"
+              (ngModelChange)="updateNpcDescription($event)"
+            ></textarea>
+          </label>
+          <label>
+            Personality
+            <input
+              type="text"
+              [ngModel]="currentNpc()!.personality"
+              (ngModelChange)="updateNpcPersonality($event)"
+            />
+          </label>
+
+          @if (currentNpc()!.stats) {
+            <section class="block">
+              <h4>Stats</h4>
+              <div class="stats-grid">
+                @for (stat of statKeys(); track stat) {
+                  <label>
+                    {{ stat.toUpperCase() }}
+                    <input
+                      type="number"
+                      [ngModel]="readNpcStat(stat)"
+                      (ngModelChange)="updateNpcStat(stat, $event)"
+                    />
+                  </label>
+                }
+              </div>
+            </section>
+          }
+
+          <div class="actions">
+            <button type="button" (click)="saveNpcToCollection()">Save to Collection</button>
+            <button type="button" (click)="promoteNpcToWorld(currentNpc()!)">Promote to World</button>
+            <button type="button" (click)="newNpc()">New NPC</button>
+          </div>
+        </section>
+      }
+
+      @if (savedNpcs().length > 0) {
+        <section class="saved-list">
+          <h3>Saved NPCs</h3>
+          @for (npc of savedNpcs(); track npc.name) {
+            <article class="saved-item">
+              <strong>{{ npc.name }}</strong>
+              <p>{{ npc.description }}</p>
+              <button type="button" (click)="promoteNpcToWorld(npc)">Promote to World</button>
+            </article>
+          }
+        </section>
+      }
+    </section>
+  }
+</section>

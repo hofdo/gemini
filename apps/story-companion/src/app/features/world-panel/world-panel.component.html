@@ -1,0 +1,70 @@
+<section class="panel">
+  <div class="tabs">
+    <button type="button" [class.active]="tab() === 'scene'" (click)="tab.set('scene')">Scene</button>
+    <button type="button" [class.active]="tab() === 'factions'" (click)="tab.set('factions')">Factions</button>
+    <button type="button" [class.active]="tab() === 'npcs'" (click)="tab.set('npcs')">NPCs</button>
+    <button type="button" [class.active]="tab() === 'events'" (click)="tab.set('events')">Events</button>
+    <button type="button" [class.active]="tab() === 'quests'" (click)="tab.set('quests')">Quests</button>
+  </div>
+
+  @if (worldState; as world) {
+    @if (tab() === 'scene') {
+      <dl>
+        <dt>Location</dt>
+        <dd>{{ world.currentScene?.locationId || 'Unknown' }}</dd>
+        <dt>Tension</dt>
+        <dd>{{ world.currentScene?.tension || 'calm' }}</dd>
+        <dt>Note</dt>
+        <dd>{{ world.currentScene?.sceneNote || 'No note.' }}</dd>
+      </dl>
+    }
+
+    @if (tab() === 'factions') {
+      @if ((world.factions ?? []).length === 0) {
+        <p>No factions tracked.</p>
+      } @else {
+        <ul>
+          @for (faction of world.factions; track faction.id) {
+            <li>{{ faction.name }} ({{ faction.standing }})</li>
+          }
+        </ul>
+      }
+    }
+
+    @if (tab() === 'npcs') {
+      @if ((world.npcStates ?? []).length === 0) {
+        <p>No NPC state yet.</p>
+      } @else {
+        <ul>
+          @for (npc of world.npcStates; track npc.npcId) {
+            <li>{{ npc.name }} - {{ npc.status }} ({{ npc.disposition }})</li>
+          }
+        </ul>
+      }
+    }
+
+    @if (tab() === 'events') {
+      @if ((world.events ?? []).length === 0) {
+        <p>No events logged.</p>
+      } @else {
+        <ul>
+          @for (event of world.events; track event.id) {
+            <li><strong>{{ event.title }}</strong> - {{ event.description }}</li>
+          }
+        </ul>
+      }
+    }
+
+    @if (tab() === 'quests') {
+      @if ((world.questLog ?? []).length === 0) {
+        <p>No quests tracked.</p>
+      } @else {
+        <ul>
+          @for (quest of world.questLog; track quest.id) {
+            <li>{{ quest.title }} - {{ quest.status }}</li>
+          }
+        </ul>
+      }
+    }
+  }
+</section>

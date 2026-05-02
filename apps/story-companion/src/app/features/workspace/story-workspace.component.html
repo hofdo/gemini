@@ -1,0 +1,137 @@
+<main class="workspace">
+  @if (session(); as active) {
+    <header class="topbar">
+      <a routerLink="/" class="back">Sessions</a>
+      <div>
+        <h1>{{ active.title }}</h1>
+        <p>{{ active.scenario.setting }}</p>
+      </div>
+      <nav class="workspace-nav" aria-label="Workspace navigation">
+        <a [routerLink]="['/workspace', active.id]">Chat</a>
+        <a [routerLink]="['/workspace', active.id, 'dm']">DM</a>
+        <a [routerLink]="['/workspace', active.id, 'journal']">Journal</a>
+        <a [routerLink]="['/workspace', active.id, 'combat']">Combat</a>
+      </nav>
+      <div class="provider" aria-label="Provider mode">
+        <button type="button" [class.active]="active.providerMode === 'local'" (click)="setProvider('local')">Local</button>
+        <button type="button" [class.active]="active.providerMode === 'puter'" (click)="setProvider('puter')">Puter/Grok</button>
+        <button type="button" (click)="toggleWorldPanel()">{{ showWorldPanel() ? 'Hide World' : 'Show World' }}</button>
+      </div>
+    </header>
+
+    <section class="chat">
+      <div class="messages" #messageList>
+        @if (messages().length === 0) {
+          <p class="empty">Start the opening exchange when you are ready.</p>
+        }
+        @for (message of messages(); track message.id) {
+          <article [class.user]="message.role === 'user'" [class.failed]="message.failed">
+            <span>{{ message.role }}</span>
+            @if (message.role === 'assistant') {
+              <div class="assistant-body" [innerHTML]="renderAssistantMessage(message.content)"></div>
+            } @else {
+              <p>{{ message.content }}</p>
+            }
+          </article>
+        }
+      </div>
+
+      <section class="chat-controls">
+        <button type="button" (click)="stop()" [disabled]="!loading()">Stop</button>
+        <button type="button" (click)="regenerate()" [disabled]="loading()">Regenerate</button>
+        <button type="button" (click)="retry()" [disabled]="loading()">Retry</button>
+        <button type="button" (click)="requestConfirmation('reset')" [disabled]="loading()">Reset</button>
+        <button type="button" (click)="requestConfirmation('new')" [disabled]="loading()">New</button>
+        <button type="button" (click)="requestConfirmation('change')" [disabled]="loading()">Edit</button>
+        <button type="button" (click)="requestConfirmation('delete')" [disabled]="loading()">Delete</button>
+      </section>
+
+      @if (confirmation()) {
+        <section class="confirm-bar">
+          <span>Confirm {{ confirmation() }} action?</span>
+          <button type="button" class="primary" (click)="confirmAction()">Confirm</button>
+          <button type="button" (click)="clearConfirmation()">Cancel</button>
+        </section>
+      }
+
+      @if (error()) {
+        <p class="error">{{ error() }}</p>
+      }
+
+      @if (worldState()?.ambientInject; as ambient) {
+        <p class="ambient">{{ ambient }}</p>
+      }
+
+      @if (contradictionWarning(); as warning) {
+        <section class="warning">
+          <span>{{ warning }}</span>
+          <button type="button" (click)="dismissContradiction()">Dismiss</button>
+        </section>
+      }
+
+      <section class="context-panel">
+        <div [class.warn]="contextWarning()" [class.critical]="contextCritical()">
+          Context usage: {{ tokenEstimate() }} / {{ contextWindow() }} tokens ({{ contextUsagePercent() }}%)
+        </div>
+        <label>
+          Keep last messages
+          <input type="number" min="1" [ngModel]="keepLastCount()" (ngModelChange)="keepLastCount.set(+$event || 1)" />
+        </label>
+        <div class="context-actions">
+          <button type="button" (click)="trimContext()">Trim Context</button>
+          <button type="button" (click)="exportSession()">Export</button>
+          <button type="button" (click)="exportAndReset()">Export + Reset</button>
+        </div>
+      </section>
+
+      <form class="composer" (ngSubmit)="send()">
+        <div class="modes">
+          <button type="button" [class.active]="inputMode() === 'dialogue'" (click)="inputMode.set('dialogue')">Dialogue</button>
+          <button type="button" [class.active]="inputMode() === 'action'" (click)="inputMode.set('action')">Action</button>
+          <button type="button" [class.active]="inputMode() === 'direct'" (click)="inputMode.set('direct')">Direct</button>
+          <button type="button" [class.active]="inputMode() === 'remember'" (click)="inputMode.set('remember')">Remember</button>
+        </div>
+        <textarea
+          #composerInput
+          [ngModel]="draft()"
+          (ngModelChange)="draft.set($event)"
+          (keydown)="onComposerKeydown($event)"
+          name="draft"
+          rows="4"
+        ></textarea>
+        <button type="button" (click)="assistInput()" [disabled]="assistLoading() || loading()">
+          {{ assistLoading() ? 'Working...' : (draft().trim() ? 'Rewrite Input' : 'Suggest Input') }}
+        </button>
+        <button type="submit" class="primary" [disabled]="loading()">{{ loading() ? 'Writing...' : 'Send' }}</button>
+      </form>
+    </section>
+
+    <aside class="world" [hidden]="!showWorldPanel()">
+      <h2>World State</h2>
+      <story-world-panel [worldState]="worldState()" />
+
+      <section class="oracle-panel">
+        <h3>Oracle</h3>
+        <div class="oracle-actions">
+          <button type="button" (click)="generateOracle('npc_name')">NPC Name</button>
+          <button type="button" (click)="generateOracle('location_name')">Location</button>
+          <button type="button" (click)="generateOracle('quest_hook')">Quest Hook</button>
+        </div>
+        @if (oracleResults().length === 0) {
+          <p>No oracle results yet.</p>
+        } @else {
+          <ul>
+            @for (entry of oracleResults(); track $index) {
+              <li><strong>{{ entry.result }}</strong><br /><span>{{ entry.detail }}</span></li>
+            }
+          </ul>
+        }
+      </section>
+    </aside>
+  } @else {
+    <section class="missing">
+      <h1>Session not found</h1>
+      <a routerLink="/">Return to scenario wizard</a>
+    </section>
+  }
+</main>

@@ -1,0 +1,154 @@
+<section class="editor">
+  <label>
+    Title
+    <input [disabled]="readonly" [(ngModel)]="model().title" (ngModelChange)="update()" />
+  </label>
+  <label>
+    Setting
+    <textarea [disabled]="readonly" [(ngModel)]="model().setting" (ngModelChange)="update()" rows="3"></textarea>
+  </label>
+  <label>
+    Tone
+    <input [disabled]="readonly" [(ngModel)]="model().tone" (ngModelChange)="update()" />
+  </label>
+  <label>
+    Character Name
+    <input [disabled]="readonly" [(ngModel)]="model().character_name" (ngModelChange)="update()" />
+  </label>
+  <label>
+    Character Description
+    <textarea
+      [disabled]="readonly"
+      [(ngModel)]="model().character_description"
+      (ngModelChange)="update()"
+      rows="3"
+    ></textarea>
+  </label>
+
+  <section class="block">
+    <header>
+      <h3>NPCs</h3>
+      <button type="button" (click)="addNpc()" [disabled]="readonly">Add NPC</button>
+    </header>
+    @for (npc of model().npcs; track $index) {
+      <article class="npc">
+        <label>
+          Name
+          <input [disabled]="readonly" [(ngModel)]="npc.name" (ngModelChange)="update()" />
+        </label>
+        <label>
+          Description
+          <textarea [disabled]="readonly" [(ngModel)]="npc.description" (ngModelChange)="update()" rows="2"></textarea>
+        </label>
+        <label>
+          Mode
+          <select [disabled]="readonly" [(ngModel)]="npc.mode" (ngModelChange)="update()">
+            <option value="simple">simple</option>
+            <option value="detailed">detailed</option>
+          </select>
+        </label>
+        <label>
+          Personality
+          <input [disabled]="readonly" [(ngModel)]="npc.personality" (ngModelChange)="update()" />
+        </label>
+        <div class="stats-grid">
+          <label>
+            STR
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'str')"
+              (ngModelChange)="updateStat($index, 'str', $event)"
+            />
+          </label>
+          <label>
+            DEX
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'dex')"
+              (ngModelChange)="updateStat($index, 'dex', $event)"
+            />
+          </label>
+          <label>
+            CON
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'con')"
+              (ngModelChange)="updateStat($index, 'con', $event)"
+            />
+          </label>
+          <label>
+            INT
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'int')"
+              (ngModelChange)="updateStat($index, 'int', $event)"
+            />
+          </label>
+          <label>
+            WIS
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'wis')"
+              (ngModelChange)="updateStat($index, 'wis', $event)"
+            />
+          </label>
+          <label>
+            CHA
+            <input
+              type="number"
+              [disabled]="readonly"
+              [ngModel]="readStat($index, 'cha')"
+              (ngModelChange)="updateStat($index, 'cha', $event)"
+            />
+          </label>
+        </div>
+        <label>
+          Foes
+          <input
+            [disabled]="readonly"
+            [ngModel]="readListField($index, 'foes')"
+            (ngModelChange)="updateListField($index, 'foes', $event)"
+          />
+        </label>
+        <label>
+          Friends
+          <input
+            [disabled]="readonly"
+            [ngModel]="readListField($index, 'friends')"
+            (ngModelChange)="updateListField($index, 'friends', $event)"
+          />
+        </label>
+        <label>
+          Plot Twists
+          <input
+            [disabled]="readonly"
+            [ngModel]="readListField($index, 'plot_twists')"
+            (ngModelChange)="updateListField($index, 'plot_twists', $event)"
+          />
+        </label>
+        <div class="row">
+          <button type="button" (click)="generateNpcDetails($index)" [disabled]="readonly">Generate NPC Details</button>
+          <button type="button" (click)="removeNpc($index)" [disabled]="readonly">Remove</button>
+        </div>
+      </article>
+    }
+  </section>
+
+  <section class="block">
+    <header>
+      <h3>Rules</h3>
+      <button type="button" (click)="addRule()" [disabled]="readonly">Add Rule</button>
+    </header>
+    @for (rule of model().rules; track $index) {
+      <div class="row">
+        <input [disabled]="readonly" [(ngModel)]="model().rules[$index]" (ngModelChange)="update()" />
+        <button type="button" (click)="removeRule($index)" [disabled]="readonly">Remove</button>
+      </div>
+    }
+  </section>
+</section>

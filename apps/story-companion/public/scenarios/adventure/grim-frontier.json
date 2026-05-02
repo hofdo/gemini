@@ -1,0 +1,35 @@
+{
+  "scenario_type": "adventure",
+  "title": "The Last Stockade",
+  "setting": "Dustwall is a crumbling frontier fortress town three weeks before a deadly winter. Supply roads are cut and the garrison is shrinking.",
+  "tone": "grimdark survival",
+  "character_name": "Mira Voss",
+  "character_description": "A veteran scout returned to Dustwall with no illusions and no easy loyalties.",
+  "npcs": [
+    {
+      "name": "Commander Vael Orris",
+      "description": "Garrison commander holding a brittle line with too few soldiers.",
+      "mode": "detailed",
+      "personality": "Controlled, strategic, and increasingly desperate.",
+      "foes": ["Imperial command", "Panic in the settlement"],
+      "friends": ["Captain Senna"],
+      "plot_twists": ["The empire quietly abandoned Dustwall."],
+      "stats": { "str": 14, "dex": 11, "con": 15, "int": 16, "wis": 17, "cha": 13 }
+    },
+    {
+      "name": "Marta Fen",
+      "description": "Herbalist and de facto civilian leader balancing grim bargains.",
+      "mode": "detailed",
+      "personality": "Practical and unsentimental.",
+      "foes": ["Hawkish militia voices"],
+      "friends": ["Town midwives"],
+      "plot_twists": ["She has secret cease-trade talks with an orc clan."],
+      "stats": { "str": 9, "dex": 12, "con": 12, "int": 15, "wis": 18, "cha": 14 }
+    }
+  ],
+  "rules": [
+    "Resources are finite and consequences persist.",
+    "Faction trust shifts slowly and never for free.",
+    "Winter pressure advances regardless of player intent."
+  ]
+}

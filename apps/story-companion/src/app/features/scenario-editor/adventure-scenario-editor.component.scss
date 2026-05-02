@@ -1,0 +1,57 @@
+.editor {
+  display: grid;
+  gap: 10px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+}
+
+input,
+textarea,
+select {
+  width: 100%;
+  border: 1px solid #c9d1df;
+  border-radius: 6px;
+  padding: 8px;
+  font: inherit;
+}
+
+.block {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid #d8dde7;
+  padding-top: 10px;
+}
+
+.npc {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #d8dde7;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+header,
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+button {
+  border: 1px solid #c8d1df;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #1c2430;
+  padding: 6px 10px;
+  cursor: pointer;
+}

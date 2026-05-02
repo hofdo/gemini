@@ -1,0 +1,109 @@
+.wizard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.intro,
+.panel {
+  grid-column: 1;
+}
+
+.intro h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.eyebrow,
+.summary,
+.mode,
+.panel p,
+.recent p,
+.recent span {
+  color: #5f6877;
+}
+
+.panel,
+.recent {
+  border: 1px solid #d8dde7;
+  border-radius: 8px;
+  background: #fff;
+  padding: 18px;
+}
+
+.recent {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+}
+
+.toolbar,
+.actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+label {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  font-weight: 600;
+}
+
+textarea,
+select {
+  width: 100%;
+  border: 1px solid #c9d1df;
+  border-radius: 6px;
+  padding: 10px;
+  font: inherit;
+}
+
+button {
+  border: 1px solid #c8d1df;
+  border-radius: 6px;
+  background: #f8fafc;
+  color: #1c2430;
+  padding: 9px 12px;
+  cursor: pointer;
+}
+
+button.active,
+.primary {
+  background: #1f6feb;
+  border-color: #1f6feb;
+  color: #fff;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.recent button {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  margin-top: 10px;
+  text-align: left;
+}
+
+.error {
+  color: #b42318;
+}
+
+@media (max-width: 860px) {
+  .wizard {
+    grid-template-columns: 1fr;
+    padding: 18px;
+  }
+
+  .recent {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}

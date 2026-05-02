@@ -1,0 +1,78 @@
+<main class="wizard">
+  <section class="intro">
+    <p class="eyebrow">Story Companion</p>
+    <h1>Create the next session</h1>
+    <p class="summary">Generate a scenario first, review it, then enter the companion workspace.</p>
+  </section>
+
+  <section class="panel">
+    <div class="toolbar" aria-label="Provider mode">
+      <button type="button" [class.active]="providerMode() === 'local'" (click)="setProvider('local')">Local</button>
+      <button type="button" [class.active]="providerMode() === 'puter'" (click)="setProvider('puter')">Puter/Grok</button>
+    </div>
+
+    <label>
+      Prompt
+      <textarea [ngModel]="prompt()" (ngModelChange)="prompt.set($event)" rows="5"></textarea>
+    </label>
+
+    <div class="actions">
+      <button type="button" class="primary" [disabled]="loading()" (click)="generate()">
+        {{ loading() ? 'Generating...' : 'Generate scenario' }}
+      </button>
+      <span class="mode">{{ providerMode() === 'local' ? 'TS proxy' : 'x-ai/grok-4.3' }}</span>
+    </div>
+
+    <label>
+      Preset
+      <select [ngModel]="selectedPresetPath()" (ngModelChange)="loadPresetByPath($event)">
+        <option value="">Choose preset</option>
+        @for (preset of presets(); track preset.id) {
+          <option [value]="preset.path">{{ preset.label }}</option>
+        }
+      </select>
+    </label>
+
+    @if (error()) {
+      <p class="error">{{ error() }}</p>
+    }
+  </section>
+
+  <section class="panel review">
+    <header>
+      <h2>Scenario editor</h2>
+      <p>Build the adventure scenario in structured fields, then start the workspace.</p>
+    </header>
+    <story-adventure-scenario-editor
+      [scenario]="generatedScenario()"
+      [readonly]="loading()"
+      (scenarioChange)="onScenarioChange($event)"
+      (validityChange)="onValidityChange($event)"
+    />
+    <button type="button" (click)="toggleAdvanced()">{{ advancedOpen() ? 'Hide Advanced JSON' : 'Show Advanced JSON' }}</button>
+    @if (advancedOpen()) {
+      <textarea [ngModel]="scenarioJson()" (ngModelChange)="scenarioJson.set($event)" rows="14" spellcheck="false"></textarea>
+      <button type="button" (click)="validateJson()">Apply JSON</button>
+    }
+    @if (validationError()) {
+      <p class="error">{{ validationError() }}</p>
+    }
+    <button type="button" class="primary" [disabled]="!canConfirm()" (click)="confirm()">
+      {{ editSessionId() ? 'Save Scenario' : 'Start workspace' }}
+    </button>
+  </section>
+
+  <aside class="recent">
+    <h2>Recent sessions</h2>
+    @if (sessions().length === 0) {
+      <p>No saved sessions yet.</p>
+    } @else {
+      @for (session of sessions(); track session.id) {
+        <button type="button" (click)="openSession(session.id)">
+          <strong>{{ session.title }}</strong>
+          <span>{{ session.providerMode }} - {{ session.updatedAt | slice:0:10 }}</span>
+        </button>
+      }
+    }
+  </aside>
+</main>
