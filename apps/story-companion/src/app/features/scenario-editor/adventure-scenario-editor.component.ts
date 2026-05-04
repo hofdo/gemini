@@ -26,6 +26,11 @@ export class AdventureScenarioEditorComponent {
     this.validateAndEmit();
   }
 
+  clearForm(): void {
+    this.model.set(makeScenarioSeed());
+    this.validateAndEmit();
+  }
+
   addNpc(): void {
     const next = cloneScenario(this.model());
     next.npcs.push({

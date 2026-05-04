@@ -3,6 +3,11 @@
   gap: 10px;
 }
 
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 label {
   display: grid;
   gap: 6px;

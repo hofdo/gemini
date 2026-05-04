@@ -19,14 +19,18 @@ export class StoryWorkspaceComponent {
   readonly story = inject(StorySessionService);
   private readonly renderer = inject(ChatRenderingService);
   private readonly assist = inject(AdventureAssistService);
+  private restoredComposerSessionId: string | null = null;
 
   readonly draft = signal('');
   readonly inputMode = signal<InputMode>('dialogue');
+  readonly lastClearedDraft = signal<string | null>(null);
   readonly assistLoading = signal(false);
   readonly confirmation = signal<'reset' | 'new' | 'change' | 'delete' | null>(null);
   readonly keepLastCount = signal(20);
   readonly oracleResults = signal<Array<{ oracle_type: string; result: string; detail: string }>>([]);
   readonly showWorldPanel = signal(true);
+  readonly showSessionTools = signal(false);
+  readonly showContextTools = signal(false);
   readonly contradictionDismissed = signal(false);
   readonly session = this.story.activeSession;
   readonly loading = this.story.loading;
@@ -39,6 +43,12 @@ export class StoryWorkspaceComponent {
   readonly contextUsagePercent = computed(() => Math.round((this.tokenEstimate() / this.contextWindow()) * 100));
   readonly contextWarning = computed(() => this.contextUsagePercent() >= 50);
   readonly contextCritical = computed(() => this.contextUsagePercent() >= 75);
+  readonly providerDescription = computed(() => {
+    const mode = this.session()?.providerMode ?? this.story.providerMode();
+    return mode === 'local'
+      ? 'Fast local proxy with context-aware world tools'
+      : 'OpenRouter cloud with broader generation range';
+  });
   readonly contradictionWarning = computed(() => {
     if (this.contradictionDismissed()) return null;
     const facts = (this.worldState()?.keyFacts ?? []).map((value) => value.toLowerCase());
@@ -60,10 +70,28 @@ export class StoryWorkspaceComponent {
       this.loading();
       setTimeout(() => this.scrollToBottom(), 0);
     });
+
+    effect(() => {
+      const sessionId = this.session()?.id;
+      if (!sessionId) return;
+      if (this.restoredComposerSessionId !== sessionId) {
+        this.restoreComposerState(sessionId);
+        this.restoredComposerSessionId = sessionId;
+      }
+      this.persistComposerState(sessionId);
+    });
   }
 
   toggleWorldPanel(): void {
     this.showWorldPanel.set(!this.showWorldPanel());
+  }
+
+  toggleSessionTools(): void {
+    this.showSessionTools.update((value) => !value);
+  }
+
+  toggleContextTools(): void {
+    this.showContextTools.update((value) => !value);
   }
 
   dismissContradiction(): void {
@@ -74,6 +102,7 @@ export class StoryWorkspaceComponent {
     const text = this.draft().trim();
     if (!text) return;
     this.draft.set('');
+    this.lastClearedDraft.set(null);
     await this.story.sendMessage(text, this.inputMode());
   }
 
@@ -85,7 +114,27 @@ export class StoryWorkspaceComponent {
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       void this.send();
+      return;
     }
+    if (event.key === 'Escape' && this.confirmation()) {
+      event.preventDefault();
+      this.clearConfirmation();
+    }
+  }
+
+  clearDraft(): void {
+    const text = this.draft();
+    if (!text.trim()) return;
+    this.lastClearedDraft.set(text);
+    this.draft.set('');
+  }
+
+  undoClearDraft(): void {
+    const previous = this.lastClearedDraft();
+    if (!previous) return;
+    this.draft.set(previous);
+    this.lastClearedDraft.set(null);
+    this.focusComposer();
   }
 
   renderAssistantMessage(content: string): string {
@@ -210,5 +259,65 @@ export class StoryWorkspaceComponent {
     } catch {
       this.contextWindow.set(8192);
     }
+  }
+
+  private composerStorageKey(sessionId: string): string {
+    return `story-companion:workspace:${sessionId}`;
+  }
+
+  private restoreComposerState(sessionId: string): void {
+    const raw = safeStorageGet(this.composerStorageKey(sessionId));
+    if (!raw) {
+      this.draft.set('');
+      this.inputMode.set('dialogue');
+      this.lastClearedDraft.set(null);
+      return;
+    }
+    try {
+      const parsed = JSON.parse(raw) as Partial<{ draft: string; inputMode: InputMode }>;
+      this.draft.set(typeof parsed.draft === 'string' ? parsed.draft : '');
+      this.inputMode.set(isInputMode(parsed.inputMode) ? parsed.inputMode : 'dialogue');
+      this.lastClearedDraft.set(null);
+    } catch {
+      safeStorageRemove(this.composerStorageKey(sessionId));
+      this.draft.set('');
+      this.inputMode.set('dialogue');
+      this.lastClearedDraft.set(null);
+    }
+  }
+
+  private persistComposerState(sessionId: string): void {
+    safeStorageSet(this.composerStorageKey(sessionId), JSON.stringify({
+      draft: this.draft(),
+      inputMode: this.inputMode(),
+    }));
+  }
+}
+
+function isInputMode(value: unknown): value is InputMode {
+  return value === 'dialogue' || value === 'action' || value === 'direct' || value === 'remember';
+}
+
+function safeStorageGet(key: string): string | null {
+  try {
+    return globalThis.localStorage?.getItem(key) ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function safeStorageSet(key: string, value: string): void {
+  try {
+    globalThis.localStorage?.setItem(key, value);
+  } catch {
+    // Ignore storage failures so the workspace still functions without persistence.
+  }
+}
+
+function safeStorageRemove(key: string): void {
+  try {
+    globalThis.localStorage?.removeItem(key);
+  } catch {
+    // Ignore storage failures so the workspace still functions without persistence.
   }
 }

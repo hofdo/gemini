@@ -32,15 +32,6 @@ export const scenarioSchema = z.object({
   character_description: z.string(),
   npcs: z.array(npcSchema).default([]),
   rules: z.array(z.string()).default([]),
-  partner_name: z.string().default(''),
-  partner_gender: z.string().default(''),
-  partner_personality: z.string().default(''),
-  partner_body_description: z.string().default(''),
-  partner_appearance: z.string().default(''),
-  partner_relationship: z.string().default(''),
-  partner_likes: z.string().default(''),
-  partner_dislikes: z.string().default(''),
-  partner_turn_ons: z.string().default(''),
 });
 
 export const chatMessageSchema = z.object({

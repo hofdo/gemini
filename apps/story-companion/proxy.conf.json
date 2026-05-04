@@ -29,6 +29,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/cloud": {
+    "target": "http://localhost:8001",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/health": {
     "target": "http://localhost:8000",
     "secure": false,

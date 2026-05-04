@@ -1,7 +1,7 @@
 import { ReadableStream } from 'node:stream/web';
 
 import { LocalStoryProvider } from './local-story.provider';
-import { makeStorySession } from './story-factories';
+import { makeAssistantMessage, makeStorySession, makeUserMessage } from './story-factories';
 
 describe('LocalStoryProvider', () => {
   beforeEach(() => {
@@ -69,6 +69,35 @@ describe('LocalStoryProvider', () => {
     }
 
     expect(tokens).toEqual(['The ', 'gate opens.']);
+  });
+
+  it('filters empty assistant placeholders from chat requests', async () => {
+    const encoder = new TextEncoder();
+    jest.spyOn(globalThis, 'fetch').mockResolvedValue({
+      ok: true,
+      body: new ReadableStream({
+        start(controller) {
+          controller.enqueue(encoder.encode('data: [DONE]\n\n'));
+          controller.close();
+        },
+      }),
+    } as Response);
+    const provider = new LocalStoryProvider();
+    const session = makeStorySession();
+
+    for await (const _token of provider.streamChat({
+      session,
+      messages: [
+        makeUserMessage('Open the gate', 'action'),
+        makeAssistantMessage(''),
+      ],
+    })) {
+      // drain stream
+    }
+
+    const fetchOptions = (fetch as jest.Mock).mock.calls[0][1] as RequestInit;
+    expect(fetchOptions.body).toContain('"role":"user"');
+    expect(fetchOptions.body).not.toContain('"role":"assistant","content":""');
   });
 
   it('sends oracle generation requests to the TS proxy', async () => {

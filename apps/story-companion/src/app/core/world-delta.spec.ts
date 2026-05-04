@@ -9,17 +9,8 @@ describe('world-delta', () => {
       tone: 'tense',
       character_name: 'Mira',
       character_description: 'Captain',
-      npcs: [{ name: 'Sable', description: 'Scout', mode: 'simple' }],
+      npcs: [{ name: 'Sable', description: 'Scout', mode: 'simple', personality: '', foes: [], friends: [], plot_twists: [] }],
       rules: [],
-      partner_name: '',
-      partner_gender: '',
-      partner_personality: '',
-      partner_body_description: '',
-      partner_appearance: '',
-      partner_relationship: '',
-      partner_likes: '',
-      partner_dislikes: '',
-      partner_turn_ons: '',
     });
     const next = applyWorldDelta(world, {
       key_facts_append: ['The gate is barred.', 'The gate is barred.'],

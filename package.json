@@ -3,10 +3,11 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "npx nx run-many -t serve -p llama-proxy llm llama-chat --parallel=3 --configuration=uncensored",
-    "dev:qwen3": "npx nx run-many -t serve -p llama-proxy llm llama-chat --parallel=3 --configuration=qwen3-uncensored",
-    "serve:chat": "npx nx serve llama-chat",
-    "serve:proxy": "npx nx serve llama-proxy",
+    "dev": "npx nx run-many -t serve -p story-companion llama-proxy-ts openrouter-proxy-ts llm --parallel=4 --configuration=uncensored",
+    "dev:qwen3": "npx nx run-many -t serve -p story-companion llama-proxy-ts openrouter-proxy-ts llm --parallel=4 --configuration=qwen3-uncensored",
+    "serve:story": "npx nx serve story-companion",
+    "serve:proxy": "npx nx serve llama-proxy-ts",
+    "serve:openrouter": "npx nx serve openrouter-proxy-ts",
     "serve:llm": "npx nx serve llm --configuration=uncensored",
     "serve:llm:qwen3": "npx nx serve llm --configuration=qwen3-uncensored"
   },
@@ -19,9 +20,13 @@
     "@angular/platform-browser": "~21.1.0",
     "@angular/platform-browser-dynamic": "~21.1.0",
     "@angular/router": "~21.1.0",
+    "@fastify/cors": "^11.2.0",
+    "@openrouter/sdk": "^0.12.24",
+    "fastify": "^5.8.5",
     "idb": "^8.0.3",
     "marked": "^9.1.6",
-    "rxjs": "~7.8.0"
+    "rxjs": "~7.8.0",
+    "zod": "^4.4.1"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~21.1.0",
@@ -54,6 +59,7 @@
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-playwright": "^1.6.2",
+    "fake-indexeddb": "^6.2.5",
     "jest": "^30.0.2",
     "jest-environment-jsdom": "^30.0.2",
     "jest-preset-angular": "~16.0.0",
@@ -68,6 +74,7 @@
     "ts-jest": "^29.4.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",
+    "tsx": "^4.21.0",
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
     "vitest": "^4.0.8"

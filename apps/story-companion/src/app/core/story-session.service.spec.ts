@@ -147,6 +147,20 @@ describe('StorySessionService', () => {
     expect(Array.isArray(loaded!.worldState.keyFacts)).toBe(true);
   });
 
+  it('maps legacy puter sessions to openrouter mode when loading', async () => {
+    const session = makeStorySession({
+      providerMode: 'local',
+    });
+    (session as StorySession & { providerMode: 'local' | 'puter' }).providerMode = 'puter';
+    const { service } = setup(session);
+
+    const loaded = await service.loadSession(session.id);
+
+    expect(loaded).not.toBeNull();
+    expect(loaded!.providerMode).toBe('openrouter');
+    expect(service.providerMode()).toBe('openrouter');
+  });
+
   it('does not crash when loading a legacy session with no scenario', async () => {
     const session = makeStorySession({});
     // Simulate a corrupted/legacy session stored without a scenario field
@@ -176,6 +190,26 @@ describe('StorySessionService', () => {
 
     expect(updated.title).toBe('Updated');
     expect(updated.messages).toHaveLength(0);
+  });
+
+  it('does not send the placeholder assistant message when starting a streamed reply', async () => {
+    const session = makeStorySession({
+      messages: [makeUserMessage('Scout the gate', 'action')],
+    });
+    const { service, provider } = setup(session);
+    await service.loadSession(session.id);
+
+    await service.sendMessage('Open the gate', 'action');
+
+    expect(provider.streamChat).toHaveBeenCalledWith(expect.objectContaining({
+      messages: [
+        expect.objectContaining({ role: 'user', content: 'Scout the gate' }),
+        expect.objectContaining({ role: 'user', content: 'Open the gate' }),
+      ],
+    }));
+    const streamRequest = (provider.streamChat as jest.Mock).mock.calls[0][0] as { messages: Array<{ role: string; content: string }> };
+    expect(streamRequest.messages.at(-1)).toEqual(expect.objectContaining({ role: 'user', content: 'Open the gate' }));
+    expect(streamRequest.messages.some((message) => message.role === 'assistant' && message.content === '')).toBe(false);
   });
 
   it('addQuestToSession adds a quest entry to worldState.questLog', async () => {

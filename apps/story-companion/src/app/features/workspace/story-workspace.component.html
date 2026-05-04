@@ -2,7 +2,7 @@
   @if (session(); as active) {
     <header class="topbar">
       <a routerLink="/" class="back">Sessions</a>
-      <div>
+      <div class="topbar-copy">
         <h1>{{ active.title }}</h1>
         <p>{{ active.scenario.setting }}</p>
       </div>
@@ -13,9 +13,10 @@
         <a [routerLink]="['/workspace', active.id, 'combat']">Combat</a>
       </nav>
       <div class="provider" aria-label="Provider mode">
-        <button type="button" [class.active]="active.providerMode === 'local'" (click)="setProvider('local')">Local</button>
-        <button type="button" [class.active]="active.providerMode === 'puter'" (click)="setProvider('puter')">Puter/Grok</button>
+        <button type="button" [class.active]="active.providerMode === 'local'" (click)="setProvider('local')">Local proxy</button>
+        <button type="button" [class.active]="active.providerMode === 'openrouter'" (click)="setProvider('openrouter')">OpenRouter cloud</button>
         <button type="button" (click)="toggleWorldPanel()">{{ showWorldPanel() ? 'Hide World' : 'Show World' }}</button>
+        <p class="provider-hint">{{ providerDescription() }}</p>
       </div>
     </header>
 
@@ -36,19 +37,39 @@
         }
       </div>
 
-      <section class="chat-controls">
-        <button type="button" (click)="stop()" [disabled]="!loading()">Stop</button>
-        <button type="button" (click)="regenerate()" [disabled]="loading()">Regenerate</button>
-        <button type="button" (click)="retry()" [disabled]="loading()">Retry</button>
-        <button type="button" (click)="requestConfirmation('reset')" [disabled]="loading()">Reset</button>
-        <button type="button" (click)="requestConfirmation('new')" [disabled]="loading()">New</button>
-        <button type="button" (click)="requestConfirmation('change')" [disabled]="loading()">Edit</button>
-        <button type="button" (click)="requestConfirmation('delete')" [disabled]="loading()">Delete</button>
+      <section class="chat-toolbar" aria-label="Chat actions">
+        <div class="chat-controls primary-controls">
+          <button type="button" class="primary" (click)="stop()" [disabled]="!loading()">Stop</button>
+          <button type="button" (click)="regenerate()" [disabled]="loading()">Regenerate reply</button>
+          <button type="button" (click)="retry()" [disabled]="loading()">Retry failed reply</button>
+        </div>
+        <button type="button" class="utility-toggle" (click)="toggleSessionTools()" [attr.aria-expanded]="showSessionTools()">
+          {{ showSessionTools() ? 'Hide session tools' : 'Session tools' }}
+        </button>
       </section>
+
+      @if (showSessionTools()) {
+        <section class="session-tools">
+          <p class="section-label">Manage this session</p>
+          <div class="chat-controls secondary-controls">
+            <button type="button" (click)="requestConfirmation('change')" [disabled]="loading()">Edit scenario</button>
+            <button type="button" (click)="requestConfirmation('new')" [disabled]="loading()">Start new session</button>
+            <button type="button" (click)="requestConfirmation('reset')" [disabled]="loading()">Reset messages</button>
+            <button type="button" class="danger" (click)="requestConfirmation('delete')" [disabled]="loading()">Delete session</button>
+          </div>
+        </section>
+      }
 
       @if (confirmation()) {
         <section class="confirm-bar">
-          <span>Confirm {{ confirmation() }} action?</span>
+          <span>
+            @switch (confirmation()) {
+              @case ('reset') { Reset messages and keep the scenario? }
+              @case ('new') { Leave this session and start a new one? }
+              @case ('change') { Return to the wizard and edit the scenario? }
+              @case ('delete') { Permanently delete this session? }
+            }
+          </span>
           <button type="button" class="primary" (click)="confirmAction()">Confirm</button>
           <button type="button" (click)="clearConfirmation()">Cancel</button>
         </section>
@@ -70,21 +91,31 @@
       }
 
       <section class="context-panel">
-        <div [class.warn]="contextWarning()" [class.critical]="contextCritical()">
-          Context usage: {{ tokenEstimate() }} / {{ contextWindow() }} tokens ({{ contextUsagePercent() }}%)
+        <div class="context-summary">
+          <div [class.warn]="contextWarning()" [class.critical]="contextCritical()">
+            Context usage: {{ tokenEstimate() }} / {{ contextWindow() }} tokens ({{ contextUsagePercent() }}%)
+          </div>
+          <button type="button" class="utility-toggle" (click)="toggleContextTools()" [attr.aria-expanded]="showContextTools()">
+            {{ showContextTools() ? 'Hide context tools' : 'Context tools' }}
+          </button>
         </div>
-        <label>
-          Keep last messages
-          <input type="number" min="1" [ngModel]="keepLastCount()" (ngModelChange)="keepLastCount.set(+$event || 1)" />
-        </label>
-        <div class="context-actions">
-          <button type="button" (click)="trimContext()">Trim Context</button>
-          <button type="button" (click)="exportSession()">Export</button>
-          <button type="button" (click)="exportAndReset()">Export + Reset</button>
-        </div>
+        @if (showContextTools()) {
+          <div class="context-details">
+            <label>
+              Keep last messages
+              <input type="number" min="1" [ngModel]="keepLastCount()" (ngModelChange)="keepLastCount.set(+$event || 1)" />
+            </label>
+            <div class="context-actions">
+              <button type="button" (click)="trimContext()">Trim context</button>
+              <button type="button" (click)="exportSession()">Export session</button>
+              <button type="button" (click)="exportAndReset()">Export and reset</button>
+            </div>
+          </div>
+        }
       </section>
 
       <form class="composer" (ngSubmit)="send()">
+        <p class="section-label">Write the next turn</p>
         <div class="modes">
           <button type="button" [class.active]="inputMode() === 'dialogue'" (click)="inputMode.set('dialogue')">Dialogue</button>
           <button type="button" [class.active]="inputMode() === 'action'" (click)="inputMode.set('action')">Action</button>
@@ -99,10 +130,16 @@
           name="draft"
           rows="4"
         ></textarea>
-        <button type="button" (click)="assistInput()" [disabled]="assistLoading() || loading()">
-          {{ assistLoading() ? 'Working...' : (draft().trim() ? 'Rewrite Input' : 'Suggest Input') }}
-        </button>
-        <button type="submit" class="primary" [disabled]="loading()">{{ loading() ? 'Writing...' : 'Send' }}</button>
+        <div class="composer-actions">
+          <button type="button" (click)="assistInput()" [disabled]="assistLoading() || loading()">
+            {{ assistLoading() ? 'Working...' : (draft().trim() ? 'Rewrite Input' : 'Suggest Input') }}
+          </button>
+          <button type="button" (click)="clearDraft()" [disabled]="loading() || !draft().trim()">Clear draft</button>
+          @if (lastClearedDraft()) {
+            <button type="button" (click)="undoClearDraft()" [disabled]="loading()">Undo clear</button>
+          }
+          <button type="submit" class="primary" [disabled]="loading()">{{ loading() ? 'Writing...' : 'Send' }}</button>
+        </div>
       </form>
     </section>
 

@@ -1,25 +1,21 @@
 import { appRoutes } from './app.routes';
 
 describe('appRoutes', () => {
+  it('includes root wizard route with loadComponent', () => {
+    const route = appRoutes.find((r) => r.path === '');
+    expect(route).toBeDefined();
+    expect(route?.loadComponent).toBeDefined();
+  });
+
   it('includes workspace route', () => {
-    expect(appRoutes.some((r) => r.path === 'workspace/:id')).toBe(true);
-  });
-
-  it('includes dm route with loadComponent', () => {
-    const route = appRoutes.find((r) => r.path === 'workspace/:id/dm');
+    const route = appRoutes.find((r) => r.path === 'workspace/:id');
     expect(route).toBeDefined();
     expect(route?.loadComponent).toBeDefined();
   });
 
-  it('includes journal route with loadComponent', () => {
-    const route = appRoutes.find((r) => r.path === 'workspace/:id/journal');
+  it('includes wildcard redirect to the wizard', () => {
+    const route = appRoutes.find((r) => r.path === '**');
     expect(route).toBeDefined();
-    expect(route?.loadComponent).toBeDefined();
-  });
-
-  it('includes combat route with loadComponent', () => {
-    const route = appRoutes.find((r) => r.path === 'workspace/:id/combat');
-    expect(route).toBeDefined();
-    expect(route?.loadComponent).toBeDefined();
+    expect(route?.redirectTo).toBe('');
   });
 });

@@ -1,4 +1,12 @@
 .wizard {
+  --story-bg: #f5f7fb;
+  --story-panel: #ffffff;
+  --story-border: #d8dde7;
+  --story-text: #1c2430;
+  --story-subtle: #5f6877;
+  --story-primary: #1f6feb;
+  --story-primary-strong: #1758b4;
+  --story-accent-soft: #eef4ff;
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
   gap: 20px;
@@ -20,17 +28,18 @@
 .eyebrow,
 .summary,
 .mode,
+.provider-copy,
 .panel p,
 .recent p,
 .recent span {
-  color: #5f6877;
+  color: var(--story-subtle);
 }
 
 .panel,
 .recent {
-  border: 1px solid #d8dde7;
+  border: 1px solid var(--story-border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--story-panel);
   padding: 18px;
 }
 
@@ -39,12 +48,62 @@
   grid-row: 1 / span 3;
 }
 
+.step-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.step-heading {
+  display: grid;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--story-border);
+}
+
+.step-kicker {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--story-primary);
+}
+
+.step-heading h2,
+.launch-panel h3 {
+  margin: 0;
+}
+
+.launch-panel {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--story-accent-soft);
+  border: 1px solid #d7e7ff;
+}
+
 .toolbar,
-.actions {
+.actions,
+.inline-actions {
   display: flex;
   gap: 10px;
   align-items: center;
   flex-wrap: wrap;
+}
+
+.inline-actions {
+  justify-content: flex-start;
+}
+
+.recovery-banner {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px 14px;
+  border: 1px solid #d7e7ff;
+  border-radius: 8px;
+  background: #f8fbff;
 }
 
 label {
@@ -67,16 +126,20 @@ button {
   border: 1px solid #c8d1df;
   border-radius: 6px;
   background: #f8fafc;
-  color: #1c2430;
+  color: var(--story-text);
   padding: 9px 12px;
   cursor: pointer;
 }
 
 button.active,
 .primary {
-  background: #1f6feb;
-  border-color: #1f6feb;
+  background: var(--story-primary);
+  border-color: var(--story-primary);
   color: #fff;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--story-primary-strong);
 }
 
 button:disabled {

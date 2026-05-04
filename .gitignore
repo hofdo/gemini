@@ -43,6 +43,9 @@ Thumbs.db
 
 .angular
 .venv
+.env
+.env.local
+.env.*.local
 
 .nx/polygraph
 .claude/worktrees

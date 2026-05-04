@@ -20,15 +20,6 @@ export function makeDefaultScenario(): ScenarioDto {
     character_description: 'A protagonist at the edge of a decision.',
     npcs: [],
     rules: [],
-    partner_name: '',
-    partner_gender: '',
-    partner_personality: '',
-    partner_body_description: '',
-    partner_appearance: '',
-    partner_relationship: '',
-    partner_likes: '',
-    partner_dislikes: '',
-    partner_turn_ons: '',
   };
 }
 
@@ -106,5 +97,5 @@ export function makeAssistantMessage(content = '') {
 }
 
 export function providerLabel(mode: ProviderMode): string {
-  return mode === 'local' ? 'Local' : 'Puter/Grok';
+  return mode === 'local' ? 'Local' : 'OpenRouter';
 }

@@ -15,37 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@nx-monorepo-experiment/shared-world-state": [
-        "libs/shared/world-state/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/shared-scenario": [
-        "libs/shared/scenario/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/shared-settings": [
-        "libs/shared/settings/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/shared-ui": ["libs/shared/ui/src/index.ts"],
-      "@nx-monorepo-experiment/feature-chat": [
-        "libs/feature-chat/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/feature-dm": ["libs/feature-dm/src/index.ts"],
-      "@nx-monorepo-experiment/feature-combat": [
-        "libs/feature-combat/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/feature-journal": [
-        "libs/feature-journal/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/feature-settings": [
-        "libs/feature-settings/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/feature-scenario": [
-        "libs/feature-scenario/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/feature-menu": [
-        "libs/feature-menu/src/index.ts"
-      ],
-      "@nx-monorepo-experiment/shared-config": [
-        "libs/shared/config/src/index.ts"
+      "@nx-monorepo-experiment/shared-api-contracts": [
+        "libs/shared/api-contracts/src/index.ts"
       ]
     }
   },

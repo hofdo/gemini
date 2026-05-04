@@ -12,18 +12,6 @@ export const appRoutes: Route[] = [
       import('./features/workspace/story-workspace.component').then((m) => m.StoryWorkspaceComponent),
   },
   {
-    path: 'workspace/:id/dm',
-    loadComponent: () => import('./features/dm/dm.component').then((m) => m.DmComponent),
-  },
-  {
-    path: 'workspace/:id/journal',
-    loadComponent: () => import('./features/journal/journal.component').then((m) => m.JournalComponent),
-  },
-  {
-    path: 'workspace/:id/combat',
-    loadComponent: () => import('./features/combat/combat.component').then((m) => m.CombatComponent),
-  },
-  {
     path: '**',
     redirectTo: '',
   },

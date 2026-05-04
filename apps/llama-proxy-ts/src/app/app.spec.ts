@@ -1,4 +1,5 @@
 import { describe, expect, it, jest } from '@jest/globals';
+import type { FastifyBaseLogger } from 'fastify';
 
 import { buildApp } from './app';
 import { createBackendStore } from './services/backend-store';
@@ -15,9 +16,27 @@ const validScenario = {
   rules: [],
 };
 
+function createMockLogger() {
+  const logger = {
+    level: 'info',
+    silent: jest.fn(),
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    fatal: jest.fn(),
+    trace: jest.fn(),
+    child: jest.fn(),
+  };
+  logger.child.mockReturnValue(logger);
+  return logger as unknown as FastifyBaseLogger & typeof logger;
+}
+
 describe('llama-proxy-ts app', () => {
   it('exposes provider health and lets the active backend be switched', async () => {
+    const logger = createMockLogger();
     const app = buildApp({
+      loggerInstance: logger,
       backendStore: createBackendStore([
         {
           id: 'local-a',
@@ -58,13 +77,23 @@ describe('llama-proxy-ts app', () => {
 
     const health = await app.inject({ method: 'GET', url: '/health' });
     expect(health.json()).toEqual({ status: 'ok', active_backend: 'local-b' });
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        route: '/config/backend',
+        previousBackendId: 'local-a',
+        nextBackendId: 'local-b',
+      }),
+      'proxy backend switched',
+    );
 
     await app.close();
   });
 
   it('validates chat requests and proxies non-streaming local LLM calls', async () => {
+    const logger = createMockLogger();
     const complete = jest.fn<LlmClient['complete']>().mockResolvedValue('The door opens.');
     const app = buildApp({
+      loggerInstance: logger,
       llmClient: {
         complete,
         stream: jest.fn<LlmClient['stream']>(),
@@ -94,6 +123,15 @@ describe('llama-proxy-ts app', () => {
         expect.objectContaining({ role: 'user', content: '[Action]: Open the door.' }),
       ]),
       expect.objectContaining({ timeoutMs: 120_000 }),
+    );
+    expect(logger.info).toHaveBeenCalledWith(
+      expect.objectContaining({
+        route: '/chat',
+        backendId: expect.any(String),
+        stream: false,
+        messageCount: expect.any(Number),
+      }),
+      'proxy chat request completed',
     );
 
     await app.close();
@@ -171,7 +209,7 @@ describe('llama-proxy-ts app', () => {
     const prompt = complete.mock.calls[0][0][0].content;
     expect(prompt).toContain('"scenario_type": "adventure"');
     expect(prompt.toLowerCase()).not.toContain('interpersonal');
-    expect(prompt).not.toContain('partner_name');
+    expect(prompt).not.toContain('Partner:');
 
     await app.close();
   });
@@ -235,9 +273,6 @@ describe('llama-proxy-ts app', () => {
           tone: 'tense',
           character_name: 'Mira',
           character_description: 'A watch captain with a broken oath.',
-          partner_name: 'Lena',
-          partner_personality: 'steady',
-          partner_relationship: 'ally',
         },
       },
     });
@@ -251,10 +286,12 @@ describe('llama-proxy-ts app', () => {
   });
 
   it('retries generated scenarios once with a schema repair prompt', async () => {
+    const logger = createMockLogger();
     const complete = jest.fn<LlmClient['complete']>()
       .mockResolvedValueOnce('not json')
       .mockResolvedValueOnce(JSON.stringify(validScenario));
     const app = buildApp({
+      loggerInstance: logger,
       llmClient: {
         complete,
         stream: jest.fn<LlmClient['stream']>(),
@@ -271,6 +308,13 @@ describe('llama-proxy-ts app', () => {
     expect(response.json().title).toBe('Ash Gate');
     expect(complete).toHaveBeenCalledTimes(2);
     expect(complete.mock.calls[1][0][0].content).toContain('reconstruct it as one valid scenario JSON object');
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        route: '/generate-scenario',
+        attempt: 'repair',
+      }),
+      'proxy scenario generation required repair',
+    );
 
     await app.close();
   });
@@ -342,8 +386,10 @@ describe('llama-proxy-ts app', () => {
   });
 
   it('includes known ids in world-state update prompt and falls back to empty delta on invalid JSON', async () => {
+    const logger = createMockLogger();
     const complete = jest.fn<LlmClient['complete']>().mockResolvedValue('not json');
     const app = buildApp({
+      loggerInstance: logger,
       llmClient: {
         complete,
         stream: jest.fn<LlmClient['stream']>(),
@@ -367,6 +413,56 @@ describe('llama-proxy-ts app', () => {
     expect(response.json()).toMatchObject({ key_facts_append: [] });
     expect(complete.mock.calls[0][0][0].content).toContain('sable-scout');
     expect(complete.mock.calls[0][0][0].content).toContain('guild');
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        route: '/world-state/update',
+        fallback: 'empty_delta',
+      }),
+      'proxy world-state update returned invalid JSON',
+    );
+    await app.close();
+  });
+
+  it('emits debug prompt content only when PROXY_TS_DEBUG_LOGGING is enabled', async () => {
+    const logger = createMockLogger();
+    const previous = process.env['PROXY_TS_DEBUG_LOGGING'];
+    process.env['PROXY_TS_DEBUG_LOGGING'] = '1';
+
+    const complete = jest.fn<LlmClient['complete']>().mockResolvedValue('The door opens.');
+    const app = buildApp({
+      loggerInstance: logger,
+      llmClient: {
+        complete,
+        stream: jest.fn<LlmClient['stream']>(),
+      },
+    });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: '/chat',
+      payload: {
+        messages: [{ role: 'user', content: 'Open the door.', input_type: 'action' }],
+        stream: false,
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(logger.debug).toHaveBeenCalledWith(
+      expect.objectContaining({
+        route: '/chat',
+        messages: expect.arrayContaining([
+          expect.objectContaining({ role: 'user', content: expect.stringContaining('Open the door.') }),
+        ]),
+      }),
+      'proxy request content',
+    );
+
+    if (previous === undefined) {
+      delete process.env['PROXY_TS_DEBUG_LOGGING'];
+    } else {
+      process.env['PROXY_TS_DEBUG_LOGGING'] = previous;
+    }
+
     await app.close();
   });
 

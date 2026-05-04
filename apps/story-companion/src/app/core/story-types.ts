@@ -1,6 +1,6 @@
 import type { ChatMessageDto, ScenarioDto, WorldStateDeltaDto } from '@nx-monorepo-experiment/shared-api-contracts';
 
-export type ProviderMode = 'local' | 'puter';
+export type ProviderMode = 'local' | 'openrouter';
 export type InputMode = ChatMessageDto['input_type'];
 export type OracleType = 'npc_name' | 'location_name' | 'quest_hook';
 
@@ -8,6 +8,19 @@ export interface StoryMessage extends ChatMessageDto {
   id: string;
   createdAt: string;
   failed?: boolean;
+}
+
+export interface StoryWorldEvent {
+  id: string;
+  title: string;
+  description: string;
+  type: string;
+  turn: number;
+  certainty?: string;
+  source?: string;
+  involved_npc_ids?: string[];
+  involved_faction_ids?: string[];
+  location_id?: string | null;
 }
 
 export interface StoryWorldState {
@@ -26,18 +39,7 @@ export interface StoryWorldState {
   keyFacts?: string[];
   factions?: Array<{ id: string; name: string; standing: number; notes: string[] }>;
   npcStates?: Array<{ npcId: string; name: string; status: string; disposition: number }>;
-  events?: Array<{
-    id: string;
-    title: string;
-    description: string;
-    type: string;
-    turn: number;
-    certainty?: string;
-    source?: string;
-    involved_npc_ids?: string[];
-    involved_faction_ids?: string[];
-    location_id?: string | null;
-  }>;
+  events?: StoryWorldEvent[];
   questLog?: Array<{ id: string; title: string; status: string }>;
   sessionSummaries?: Array<{ turn: number; summary: string; keyFacts: string[]; createdAt: string }>;
   ambientInject?: string | null;

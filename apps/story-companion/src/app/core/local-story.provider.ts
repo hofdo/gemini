@@ -131,9 +131,11 @@ export class LocalStoryProvider implements StoryProvider {
 }
 
 function toDtoMessages(messages: ChatMessageDto[]): ChatMessageDto[] {
-  return messages.map((message) => ({
-    role: message.role,
-    content: message.content,
-    input_type: message.input_type ?? 'dialogue',
-  }));
+  return messages
+    .filter((message) => message.role !== 'assistant' || message.content.trim().length > 0)
+    .map((message) => ({
+      role: message.role,
+      content: message.content,
+      input_type: message.input_type ?? 'dialogue',
+    }));
 }

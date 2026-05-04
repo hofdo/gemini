@@ -1,9 +1,0 @@
-{
-  "name": "@nx-monorepo-experiment/shared-scenario",
-  "version": "0.0.1",
-  "peerDependencies": {
-    "@angular/core": "^21.1.0",
-    "@nx-monorepo-experiment/shared-config": "^0.0.1"
-  },
-  "sideEffects": false
-}

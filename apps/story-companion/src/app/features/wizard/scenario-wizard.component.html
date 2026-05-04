@@ -2,25 +2,37 @@
   <section class="intro">
     <p class="eyebrow">Story Companion</p>
     <h1>Create the next session</h1>
-    <p class="summary">Generate a scenario first, review it, then enter the companion workspace.</p>
+    <p class="summary">Move from idea to playable session in three clear steps: generate, refine, then start the workspace.</p>
   </section>
 
-  <section class="panel">
-    <div class="toolbar" aria-label="Provider mode">
-      <button type="button" [class.active]="providerMode() === 'local'" (click)="setProvider('local')">Local</button>
-      <button type="button" [class.active]="providerMode() === 'puter'" (click)="setProvider('puter')">Puter/Grok</button>
+  <section class="panel step-panel">
+    <div class="step-heading">
+      <p class="step-kicker">Step 1</p>
+      <div>
+        <h2>Generate or load a scenario</h2>
+        <p>Choose a provider, write a prompt or load a preset, and create the first draft.</p>
+      </div>
     </div>
+    <div class="toolbar" aria-label="Provider mode">
+      <button type="button" [class.active]="providerMode() === 'local'" (click)="setProvider('local')">Local proxy</button>
+      <button type="button" [class.active]="providerMode() === 'openrouter'" (click)="setProvider('openrouter')">OpenRouter cloud</button>
+    </div>
+    <p class="provider-copy">{{ providerMode() === 'local' ? 'Local proxy keeps the workflow close to the app and world-state tooling.' : 'OpenRouter cloud favors broader generation variety for rough drafting.' }}</p>
 
     <label>
       Prompt
       <textarea [ngModel]="prompt()" (ngModelChange)="prompt.set($event)" rows="5"></textarea>
     </label>
 
+    <div class="inline-actions">
+      <button type="button" (click)="clearPrompt()" [disabled]="loading() || !prompt().length">Clear prompt</button>
+    </div>
+
     <div class="actions">
       <button type="button" class="primary" [disabled]="loading()" (click)="generate()">
         {{ loading() ? 'Generating...' : 'Generate scenario' }}
       </button>
-      <span class="mode">{{ providerMode() === 'local' ? 'TS proxy' : 'x-ai/grok-4.3' }}</span>
+      <span class="mode">{{ providerMode() === 'local' ? 'TS proxy' : 'OpenRouter' }}</span>
     </div>
 
     <label>
@@ -38,10 +50,13 @@
     }
   </section>
 
-  <section class="panel review">
-    <header>
-      <h2>Scenario editor</h2>
-      <p>Build the adventure scenario in structured fields, then start the workspace.</p>
+  <section class="panel review step-panel">
+    <header class="step-heading">
+      <p class="step-kicker">Step 2</p>
+      <div>
+        <h2>Review the scenario</h2>
+        <p>Refine the generated adventure in structured fields before you commit to the session.</p>
+      </div>
     </header>
     <story-adventure-scenario-editor
       [scenario]="generatedScenario()"
@@ -49,6 +64,9 @@
       (scenarioChange)="onScenarioChange($event)"
       (validityChange)="onValidityChange($event)"
     />
+    <div class="inline-actions">
+      <button type="button" (click)="resetScenarioEdits()" [disabled]="loading() || !generatedScenario()">Reset to generated</button>
+    </div>
     <button type="button" (click)="toggleAdvanced()">{{ advancedOpen() ? 'Hide Advanced JSON' : 'Show Advanced JSON' }}</button>
     @if (advancedOpen()) {
       <textarea [ngModel]="scenarioJson()" (ngModelChange)="scenarioJson.set($event)" rows="14" spellcheck="false"></textarea>
@@ -57,8 +75,30 @@
     @if (validationError()) {
       <p class="error">{{ validationError() }}</p>
     }
+    <div class="launch-panel">
+      <div>
+        <p class="step-kicker">Step 3</p>
+        <h3>{{ editSessionId() ? 'Save changes into a session' : 'Start the workspace' }}</h3>
+        <p>{{ editSessionId() ? 'Apply the refined scenario to the current session or branch into a new one.' : 'Launch the companion workspace once the scenario is ready.' }}</p>
+      </div>
+    </div>
+    @if (recoveryNoticeVisible()) {
+      <section class="recovery-banner">
+        <span>Recovered unsaved edits</span>
+        <div class="inline-actions">
+          <button type="button" (click)="keepRecoveredDraft()">Keep</button>
+          <button type="button" (click)="discardRecoveredDraft()">Discard</button>
+        </div>
+      </section>
+    }
+    @if (editSessionId()) {
+      <div class="toolbar" aria-label="Save mode">
+        <button type="button" [class.active]="saveMode() === 'current'" (click)="saveMode.set('current')">Save into current session</button>
+        <button type="button" [class.active]="saveMode() === 'new'" (click)="saveMode.set('new')">Save as new session</button>
+      </div>
+    }
     <button type="button" class="primary" [disabled]="!canConfirm()" (click)="confirm()">
-      {{ editSessionId() ? 'Save Scenario' : 'Start workspace' }}
+      {{ editSessionId() ? (saveMode() === 'current' ? 'Save into current session' : 'Save as new session') : 'Start workspace' }}
     </button>
   </section>
 

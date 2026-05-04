@@ -10,7 +10,7 @@ import {
   newId,
   nowIso,
 } from './story-factories';
-import type { InputMode, ProviderMode, StoryOracleResult, StorySession } from './story-types';
+import type { InputMode, ProviderMode, StoryOracleResult, StorySession, StoryWorldEvent } from './story-types';
 import { appendSessionSummary, applyWorldDelta, normalizeWorldState } from './world-delta';
 
 @Injectable({ providedIn: 'root' })
@@ -62,6 +62,9 @@ export class StorySessionService {
     if (session && session.scenario) {
       session.worldState = normalizeWorldState(session.worldState, session.scenario);
     }
+    if (session) {
+      session.providerMode = normalizeProviderMode(session.providerMode);
+    }
     this.activeSession.set(session ?? null);
     if (session) this.providerMode.set(session.providerMode);
     return session ?? null;
@@ -94,7 +97,7 @@ export class StorySessionService {
       const provider = this.providers.forMode(nextSession.providerMode);
       for await (const token of provider.streamChat({
         session: nextSession,
-        messages: nextSession.messages,
+        messages: [...session.messages, userMessage],
       })) {
         if (this.cancelRequested) break;
         nextSession = appendToAssistant(nextSession, assistantMessage.id, token);
@@ -286,7 +289,7 @@ export class StorySessionService {
     await this.saveSession({ ...session, worldState: { ...session.worldState, combat } });
   }
 
-  async appendWorldEvent(event: { id: string; title: string; description: string; type: string; turn: number }): Promise<void> {
+  async appendWorldEvent(event: StoryWorldEvent): Promise<void> {
     const session = this.activeSession();
     if (!session) return;
     const events = [...(session.worldState.events ?? []), event];
@@ -328,4 +331,8 @@ function appendToAssistant(session: StorySession, id: string, token: string): St
       message.id === id ? { ...message, content: message.content + token } : message,
     ),
   };
+}
+
+function normalizeProviderMode(mode: string): ProviderMode {
+  return mode === 'puter' ? 'openrouter' : mode === 'openrouter' ? 'openrouter' : 'local';
 }

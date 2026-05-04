@@ -1,4 +1,7 @@
 <section class="editor">
+  <div class="editor-actions">
+    <button type="button" (click)="clearForm()" [disabled]="readonly">Clear form</button>
+  </div>
   <label>
     Title
     <input [disabled]="readonly" [(ngModel)]="model().title" (ngModelChange)="update()" />

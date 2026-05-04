@@ -7,85 +7,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Interactive RPG/storytelling platform. Three-tier architecture:
 
 ```
-llama-chat (Angular 21, :4200)
+story-companion (Angular 21, :4300)
     ↓ dev-proxy: /chat /assist /generate-* /config /health
-llama-proxy (FastAPI, :8000)
-    ↓ httpx streaming
+llama-proxy-ts (Fastify + Zod, :8000)
+    ↓ OpenAI-compatible HTTP
 llm (llama-server / llama.cpp, :8080)
 ```
 
-Two LLM backends configured: `gemma4-obliterated` (Q8_0) and `gemma4-uncensored` (Q6_K_P). Active backend toggled at runtime via `PATCH /config/backend` or env vars.
+Two LLM backends configured: `gemma4-uncensored` (Q6_K_P) and `qwen3-uncensored` (Q8_0). Active backend toggled at runtime via `PATCH /config/backend` or env vars.
 
 ## Commands
 
 ```bash
 # Start everything
-npm run dev                        # obliterated model (default)
-npm run dev:uncensored             # uncensored model variant
+npm run dev                        # story-companion + proxy-ts + llm
+npm run dev:qwen3                  # same stack with qwen3 llm config
 
 # Individual services
-npx nx serve llama-chat            # Angular dev server (:4200)
-npx nx serve llama-proxy           # FastAPI (:8000)
+npx nx serve story-companion       # Angular dev server (:4300)
+npx nx serve llama-proxy-ts        # TypeScript Fastify proxy (:8000)
 npx nx serve llm                   # llama-server (:8080)
-npx nx serve llm --configuration=uncensored
+npx nx serve llm --configuration=qwen3-uncensored
 
 # Build / lint / test
 npx nx run-many -t lint test build e2e
-npx nx test llama-chat             # single project
-npx nx e2e llama-chat-e2e
-npx nx run llama-proxy:lint        # Ruff
-npx nx run llama-proxy:setup       # create .venv + pip install
+npx nx test story-companion        # frontend app
+npx nx run llama-proxy-ts:test     # TS backend tests
 ```
 
-## Frontend Architecture (`apps/llama-chat`)
+## Frontend Architecture (`apps/story-companion`)
 
-All components are **standalone** (no NgModules). State via **Angular signals** (`signal()`, `.set()`, `.update()`). Routes lazy-load components.
+All components are **standalone**. The frontend is organized around a scenario wizard and a workspace view, with state handled via Angular signals and focused services under `apps/story-companion/src/app/core`.
 
-**Routes**: `/ → MenuComponent` → `scenario/:mode → ScenarioFormComponent` → `/chat → ChatComponent` or `/dm → DmComponent` → `/settings → SettingsComponent`
+**Routes**: `/ → ScenarioWizardComponent` → `/workspace/:id → StoryWorkspaceComponent`
 
-**Key services** (all `providedIn: 'root'`):
+**Key frontend services**:
 
 | Service | Responsibility |
 |---|---|
-| `ChatService` | Streaming SSE chat via `fetch` + `ReadableStream`; holds `messages` signal |
-| `AiAssistService` | Calls `/assist`, `/generate-scenario`, `/generate-npc`, `/generate-quest` |
-| `ScenarioService` | Holds `activeScenario` signal; persists to `sessionStorage` |
-| `SettingsService` | Loads backend list from `/config/backends`; syncs active backend to proxy + `localStorage` |
+| `StorySessionService` | Session lifecycle, persistence, streaming message flow, and provider orchestration |
+| `LocalStoryProvider` | Calls proxy-ts endpoints for chat, world-state, oracle, and scenario generation |
+| `AdventureAssistService` | Suggests or rewrites player input from current scenario/session context |
+| `ChatRenderingService` | Renders assistant markdown safely for the workspace |
 
-**Core models** (`scenario/scenario.model.ts`):
-- `ScenarioType`: `'adventure' | 'interpersonal'`
-- `InputType`: `'dialogue' | 'action' | 'direct'` — tagged on each chat message
-- `Scenario`, `Npc`, `NpcStats` — scenario config passed to every LLM call
+## Backend Architecture (`apps/llama-proxy-ts`)
 
-## Backend Architecture (`apps/llama-proxy/main.py`)
-
-Single-file FastAPI app. All logic in `main.py`.
-
-**Endpoints:**
-
-| Endpoint | What it does |
-|---|---|
-| `POST /chat` | Streaming SSE; passes full message history + scenario as system prompt to llama-server |
-| `POST /assist` | Suggest/rewrite user input given conversation context |
-| `POST /generate-scenario` | LLM-generates a full `Scenario` JSON |
-| `POST /generate-npc` | LLM-generates NPC with stats |
-| `POST /generate-quest` | LLM-generates a `Quest` with encounters/rewards |
-| `GET /health` | Proxy + LLM reachability check |
-| `GET /config/backends` | List configured backends |
-| `PATCH /config/backend` | Switch active backend (mutates global `active_backend`) |
-
-**Backend config** overridable via env vars:
-- `AVAILABLE_BACKENDS` — JSON array of backend objects
-- `ACTIVE_BACKEND_ID` — default active backend id
-- `LLAMA_CPP_URL` — llama-server URL (default `http://localhost:8080`)
+Default local proxy is TypeScript/Fastify with Zod shared contracts in
+`libs/shared/api-contracts`. It proxies local OpenAI-compatible llama.cpp
+endpoints, supports streaming `/chat`, structured JSON generation, and provider
+health/config endpoints. Puter/Grok cloud mode remains frontend-side.
 
 ## Nx Workspace
 
 - Package manager: `npm` — prefix Nx commands with `npx nx`
-- Tags: `scope:backend lang:python` (llama-proxy), `scope:infra` (llm)
-- Python `.venv` lives at `apps/llama-proxy/.venv` — must run `setup` target before first use
-- E2E: Playwright (`apps/llama-chat-e2e`)
-- Linting: ESLint 9 (Angular), Ruff (Python)
+- Main active projects: `story-companion`, `story-companion-e2e`, `llama-proxy-ts`, `llm`
+- Tags: `scope:app` / `lang:angular` for frontend, `scope:backend` / `lang:typescript` for proxy, `scope:infra` for llm
+- E2E: Playwright (`apps/story-companion-e2e`)
+- Linting: ESLint 9
 
 ## Wiki / Docs System
 

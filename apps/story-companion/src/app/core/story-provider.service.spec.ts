@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { makeStorySession } from './story-factories';
 import { LocalStoryProvider } from './local-story.provider';
-import { PuterStoryProvider } from './puter-story.provider';
+import { OpenRouterStoryProvider } from './openrouter-story.provider';
 import { StoryProviderService } from './story-provider.service';
 
 describe('StoryProviderService', () => {
@@ -17,10 +17,10 @@ describe('StoryProviderService', () => {
       generateOracle: jest.fn(),
       cancelGeneration: jest.fn(),
     };
-    const puter = {
+    const openrouter = {
       generateScenario: jest.fn(),
       streamChat: jest.fn(async function* () {
-        yield 'puter';
+        yield 'openrouter';
       }),
       extractWorldDelta: jest.fn(),
       summarizeSession: jest.fn(),
@@ -31,7 +31,7 @@ describe('StoryProviderService', () => {
       providers: [
         StoryProviderService,
         { provide: LocalStoryProvider, useValue: local },
-        { provide: PuterStoryProvider, useValue: puter },
+        { provide: OpenRouterStoryProvider, useValue: openrouter },
       ],
     });
 
@@ -46,10 +46,10 @@ describe('StoryProviderService', () => {
 
     expect(tokens).toEqual(['local']);
     expect(local.streamChat).toHaveBeenCalled();
-    expect(puter.streamChat).not.toHaveBeenCalled();
+    expect(openrouter.streamChat).not.toHaveBeenCalled();
   });
 
-  it('uses the Puter provider for puter mode', async () => {
+  it('uses the OpenRouter provider for openrouter mode', async () => {
     const local = {
       generateScenario: jest.fn(),
       streamChat: jest.fn(),
@@ -58,10 +58,10 @@ describe('StoryProviderService', () => {
       generateOracle: jest.fn(),
       cancelGeneration: jest.fn(),
     };
-    const puter = {
+    const openrouter = {
       generateScenario: jest.fn(),
       streamChat: jest.fn(async function* () {
-        yield 'grok';
+        yield 'cloud';
       }),
       extractWorldDelta: jest.fn(),
       summarizeSession: jest.fn(),
@@ -72,21 +72,21 @@ describe('StoryProviderService', () => {
       providers: [
         StoryProviderService,
         { provide: LocalStoryProvider, useValue: local },
-        { provide: PuterStoryProvider, useValue: puter },
+        { provide: OpenRouterStoryProvider, useValue: openrouter },
       ],
     });
 
     const service = TestBed.inject(StoryProviderService);
     const tokens = [];
-    for await (const token of service.forMode('puter').streamChat({
-      session: makeStorySession({ providerMode: 'puter' }),
+    for await (const token of service.forMode('openrouter').streamChat({
+      session: makeStorySession({ providerMode: 'openrouter' }),
       messages: [],
     })) {
       tokens.push(token);
     }
 
-    expect(tokens).toEqual(['grok']);
-    expect(puter.streamChat).toHaveBeenCalled();
+    expect(tokens).toEqual(['cloud']);
+    expect(openrouter.streamChat).toHaveBeenCalled();
     expect(local.streamChat).not.toHaveBeenCalled();
   });
 });

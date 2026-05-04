@@ -63,6 +63,23 @@ describe('shared API contracts', () => {
     expect(delta.scene_update).toBeNull();
   });
 
+  it('accepts legacy partner fields and strips them from parsed scenarios', () => {
+    const scenario = scenarioSchema.parse({
+      title: 'Lantern Road',
+      setting: 'An old pilgrim road.',
+      tone: 'mythic',
+      character_name: 'Ivo',
+      character_description: 'A tired sword hand.',
+      partner_name: 'Lena',
+      partner_relationship: 'ally',
+      partner_personality: 'steady',
+    });
+
+    expect('partner_name' in scenario).toBe(false);
+    expect('partner_relationship' in scenario).toBe(false);
+    expect(scenario.title).toBe('Lantern Road');
+  });
+
   it('validates provider configuration responses', () => {
     const parsed = providerConfigResponseSchema.parse({
       backends: [
